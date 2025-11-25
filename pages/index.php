@@ -1,186 +1,128 @@
-<?php
-include("../includes/header.php");
-?>
-</div>
-<main>
-    <div class="my-10 text-center">
-        <h1 class="text-3xl font-bold m-auto">
-            Welcome to AL Class Management System.
-        </h1>
+<?PHP include('../includes/header.php');?>
 
-    </div>
-    <div>
-        <img src="../assests/images/2.jpg" alt="">
-    </div>
-
-    <div>
-        <h2 class="text-2xl font-bold font-semibold text-center my-5">Manage Your A/L Classes Efficiently</h2>
-        <p class="text-center mx-20 my-5">
-            Our A/L Class Management System is designed to streamline the administration of advanced level classes.
-            Whether you're a teacher, student, or administrator, our platform offers a comprehensive suite of tools to
-            enhance your educational experience. From scheduling classes and tracking attendance to managing assignments
-            and communicating with students, our system simplifies the complexities of class management. Join us today
-            and take the first step towards a more organized and efficient learning environment.
-        </p>
-    </div>
-
-
-    <h2 class="text-2xl font-bold font-semibold text-center">Our Teachers</h2>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mx-10 my-10 p-5 mt-0">
-
-        <div class="w-full bg-white shadow-[0px_0px_15px_rgba(0,0,0,0.09)] p-6 space-y-3 relative overflow-hidden">
-            <div class="w-24 h-24 bg-violet-500 rounded-full absolute -right-5 -top-7">
-                <p class="absolute bottom-6 left-7 text-white text-2xl">02</p>
+        <div class="flex flex-col-reverse lg:flex-row items-center gap-12">
+            
+            <!-- Hero Text -->
+            <div class="w-full lg:w-1/2 text-center lg:text-left z-10">
+                <div class="inline-block px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-semibold mb-6 hero-badge opacity-0">
+                    <i class="fas fa-trophy mr-2 text-yellow-500"></i> #1 A/L Institute in Sri Lanka
+                </div>
+                <h1 class="text-4xl lg:text-6xl font-bold leading-tight mb-6 hero-title opacity-0">
+                    Your Journey at Our <span class="text-indigo-600">Institute</span> Starts Here
+                </h1>
+                <p class="text-lg text-gray-600 mb-8 hero-desc opacity-0">
+                    Master Physics, Chemistry, Maths & Biology with the island's best lecturers. Comprehensive Theory, Revision & Paper classes.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start hero-buttons opacity-0">
+                    <a href="student_register.html" class="px-8 py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:bg-indigo-700 hover:shadow-indigo-500/40 transition transform hover:-translate-y-1 flex items-center justify-center gap-2">
+                        Register Now <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="#" class="px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold hover:bg-gray-50 hover:border-gray-300 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-calendar-alt text-indigo-500 text-xl"></i> View Timetable
+                    </a>
+                </div>
+                
+                <!-- Stats -->
+                <div class="mt-12 flex justify-center lg:justify-start gap-8 border-t border-gray-200 pt-8 hero-stats opacity-0">
+                    <div>
+                        <span class="block text-3xl font-bold text-gray-800">500+</span>
+                        <span class="text-sm text-gray-500">Campus Selects</span>
+                    </div>
+                    <div>
+                        <span class="block text-3xl font-bold text-gray-800">50+</span>
+                        <span class="text-sm text-gray-500">District Ranks</span>
+                    </div>
+                    <div>
+                        <span class="block text-3xl font-bold text-gray-800">10+</span>
+                        <span class="text-sm text-gray-500">Years Excellence</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="fill-violet-500 w-12">
-                <svg viewBox="0 0 24 24" data-name="Layer 1" id="Layer_1" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="m24,6.928v13.072h-11.5v3h5v1H6.5v-1h5v-3H0V4.5c0-1.379,1.122-2.5,2.5-2.5h12.98c-.253.295-.54.631-.856,1H2.5c-.827,0-1.5.673-1.5,1.5v14.5h22v-10.993l1-1.079Zm-12.749,3.094C19.058.891,19.093.855,19.11.838c1.118-1.115,2.936-1.113,4.052.002,1.114,1.117,1.114,2.936,0,4.052l-8.185,8.828c-.116,1.826-1.623,3.281-3.478,3.281h-5.59l.097-.582c.043-.257,1.086-6.16,5.244-6.396Zm2.749,3.478c0-1.379-1.122-2.5-2.5-2.5-2.834,0-4.018,3.569-4.378,5h4.378c1.378,0,2.5-1.121,2.5-2.5Zm.814-1.073l2.066-2.229c-.332-1.186-1.371-2.057-2.606-2.172-.641.749-1.261,1.475-1.817,2.125,1.117.321,1.998,1.176,2.357,2.277Zm.208-5.276c1.162.313,2.125,1.134,2.617,2.229l4.803-5.18c.737-.741.737-1.925.012-2.653-.724-.725-1.908-.727-2.637,0-.069.08-2.435,2.846-4.795,5.606Z">
-                    </path>
-                </svg>
-            </div>
-            <div class="mb-4">
-                <a href="#">
-                    <img class="rounded-sm w-full" src="assests/images/2.jpg" alt="" />
-                </a>
-            </div>
+            <!-- Hero Image / Visual -->
+            <div class="w-full lg:w-1/2 relative hero-img-container opacity-0">
+                <div class="relative z-10 w-full max-w-md mx-auto">
+                    <!-- Abstract Education Composition using Icons/CSS -->
+                    <div class="aspect-square bg-gradient-to-br from-indigo-100 to-white rounded-3xl shadow-2xl flex items-center justify-center border border-white/50 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-purple-100 rounded-bl-full z-0"></div>
+                        <div class="absolute bottom-0 left-0 w-24 h-24 bg-blue-100 rounded-tr-full z-0"></div>
+                        
+                        <!-- Background math symbols -->
+                        <i class="fas fa-square-root-alt text-8xl text-indigo-600/10 absolute top-10 left-10"></i>
+                        <i class="fas fa-atom text-9xl text-indigo-600/20 absolute bottom-10 right-10"></i>
+                        
+                        <div class="relative z-10 text-center">
+                            <div class="w-24 h-24 bg-white rounded-2xl shadow-xl flex items-center justify-center mx-auto mb-4 text-indigo-600 text-4xl animate-bounce">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800">A/L 2026</h3>
+                            <p class="text-sm text-gray-500">Science | Maths | Tech</p>
+                        </div>
 
-            <h1 class="font-bold text-xl">UI / UX Creative Desing</h1>
-            <p class="text-sm text-zinc-500 leading-6">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse fuga
-                adipisicing elit
-            </p>
+                        <!-- Floating Badge 1 (Physics) -->
+                        <div class="absolute top-10 left-4 bg-white p-3 rounded-xl shadow-lg flex items-center gap-3 animate-pulse">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                                <i class="fas fa-atom"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-500">Subject</div>
+                                <div class="font-bold text-sm">Physics</div>
+                            </div>
+                        </div>
+
+                        <!-- Floating Badge 2 (Combined Maths) -->
+                        <div class="absolute bottom-10 right-4 bg-white p-3 rounded-xl shadow-lg flex items-center gap-3">
+                            <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-600">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-500">Subject</div>
+                                <div class="font-bold text-sm">Comb. Maths</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </header>
 
-
-        <div class="w-full rounded-md bg-white shadow-[0px_0px_15px_rgba(0,0,0,0.09)] p-6 space-y-3 relative overflow-hidden">
-            <div class="w-24 h-24 bg-violet-500 rounded-full absolute -right-5 -top-7">
-                <p class="absolute bottom-6 left-7 text-white text-2xl">02</p>
+    <!-- Features Section -->
+    <section class="py-20 relative z-10">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 section-header opacity-0">
+                <h2 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">Our Methodology</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">We use a proven system to ensure you get the best Z-Score.</p>
             </div>
 
-            <div class="fill-violet-500 w-12">
-                <svg viewBox="0 0 24 24" data-name="Layer 1" id="Layer_1" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="m24,6.928v13.072h-11.5v3h5v1H6.5v-1h5v-3H0V4.5c0-1.379,1.122-2.5,2.5-2.5h12.98c-.253.295-.54.631-.856,1H2.5c-.827,0-1.5.673-1.5,1.5v14.5h22v-10.993l1-1.079Zm-12.749,3.094C19.058.891,19.093.855,19.11.838c1.118-1.115,2.936-1.113,4.052.002,1.114,1.117,1.114,2.936,0,4.052l-8.185,8.828c-.116,1.826-1.623,3.281-3.478,3.281h-5.59l.097-.582c.043-.257,1.086-6.16,5.244-6.396Zm2.749,3.478c0-1.379-1.122-2.5-2.5-2.5-2.834,0-4.018,3.569-4.378,5h4.378c1.378,0,2.5-1.121,2.5-2.5Zm.814-1.073l2.066-2.229c-.332-1.186-1.371-2.057-2.606-2.172-.641.749-1.261,1.475-1.817,2.125,1.117.321,1.998,1.176,2.357,2.277Zm.208-5.276c1.162.313,2.125,1.134,2.617,2.229l4.803-5.18c.737-.741.737-1.925.012-2.653-.724-.725-1.908-.727-2.637,0-.069.08-2.435,2.846-4.795,5.606Z">
-                    </path>
-                </svg>
-            </div>
-            <div class="mb-4">
-                <a href="#">
-                    <img class="rounded-sm w-full" src="assests/images/2.jpg" alt="" />
-                </a>
-            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="glass-card p-8 rounded-2xl text-center feature-card opacity-0 translate-y-10">
+                    <div class="w-16 h-16 mx-auto bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-2xl mb-6">
+                        <i class="fas fa-book-reader"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Theory & Revision</h3>
+                    <p class="text-gray-600">Complete syllabus coverage with special revision sessions targeting difficult areas.</p>
+                </div>
 
-            <h1 class="font-bold text-xl">UI / UX Creative Desing</h1>
-            <p class="text-sm text-zinc-500 leading-6">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse fuga
-                adipisicing elit
-            </p>
+                <!-- Card 2 -->
+                <div class="glass-card p-8 rounded-2xl text-center feature-card opacity-0 translate-y-10">
+                    <div class="w-16 h-16 mx-auto bg-pink-100 text-pink-600 rounded-full flex items-center justify-center text-2xl mb-6">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Model Papers</h3>
+                    <p class="text-gray-600">Regular unit tests and island-wide mock exams to prepare you for the real challenge.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-card p-8 rounded-2xl text-center feature-card opacity-0 translate-y-10">
+                    <div class="w-16 h-16 mx-auto bg-cyan-100 text-cyan-600 rounded-full flex items-center justify-center text-2xl mb-6">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Progress Tracking</h3>
+                    <p class="text-gray-600">Individual attention and performance tracking to improve your Z-Score systematically.</p>
+                </div>
+            </div>
         </div>
-
-
-        <div class="w-full bg-white shadow-[0px_0px_15px_rgba(0,0,0,0.09)] p-6 space-y-3 relative overflow-hidden">
-            <div class="w-24 h-24 bg-violet-500 rounded-full absolute -right-5 -top-7">
-                <p class="absolute bottom-6 left-7 text-white text-2xl">02</p>
-            </div>
-
-            <div class="fill-violet-500 w-12">
-                <svg viewBox="0 0 24 24" data-name="Layer 1" id="Layer_1" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="m24,6.928v13.072h-11.5v3h5v1H6.5v-1h5v-3H0V4.5c0-1.379,1.122-2.5,2.5-2.5h12.98c-.253.295-.54.631-.856,1H2.5c-.827,0-1.5.673-1.5,1.5v14.5h22v-10.993l1-1.079Zm-12.749,3.094C19.058.891,19.093.855,19.11.838c1.118-1.115,2.936-1.113,4.052.002,1.114,1.117,1.114,2.936,0,4.052l-8.185,8.828c-.116,1.826-1.623,3.281-3.478,3.281h-5.59l.097-.582c.043-.257,1.086-6.16,5.244-6.396Zm2.749,3.478c0-1.379-1.122-2.5-2.5-2.5-2.834,0-4.018,3.569-4.378,5h4.378c1.378,0,2.5-1.121,2.5-2.5Zm.814-1.073l2.066-2.229c-.332-1.186-1.371-2.057-2.606-2.172-.641.749-1.261,1.475-1.817,2.125,1.117.321,1.998,1.176,2.357,2.277Zm.208-5.276c1.162.313,2.125,1.134,2.617,2.229l4.803-5.18c.737-.741.737-1.925.012-2.653-.724-.725-1.908-.727-2.637,0-.069.08-2.435,2.846-4.795,5.606Z">
-                    </path>
-                </svg>
-            </div>
-            <div class="mb-4">
-                <a href="#">
-                    <img class="rounded-sm w-full" src="assests/images/2.jpg" alt="" />
-                </a>
-            </div>
-
-            <h1 class="font-bold text-xl">UI / UX Creative Desing</h1>
-            <p class="text-sm text-zinc-500 leading-6">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse fuga
-                adipisicing elit
-            </p>
-        </div>
-
-
-        <div class="w-full bg-white shadow-[0px_0px_15px_rgba(0,0,0,0.09)] p-6 space-y-3 relative overflow-hidden">
-            <div class="w-24 h-24 bg-violet-500 rounded-full absolute -right-5 -top-7">
-                <p class="absolute bottom-6 left-7 text-white text-2xl">02</p>
-            </div>
-
-            <div class="fill-violet-500 w-12">
-                <svg viewBox="0 0 24 24" data-name="Layer 1" id="Layer_1" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="m24,6.928v13.072h-11.5v3h5v1H6.5v-1h5v-3H0V4.5c0-1.379,1.122-2.5,2.5-2.5h12.98c-.253.295-.54.631-.856,1H2.5c-.827,0-1.5.673-1.5,1.5v14.5h22v-10.993l1-1.079Zm-12.749,3.094C19.058.891,19.093.855,19.11.838c1.118-1.115,2.936-1.113,4.052.002,1.114,1.117,1.114,2.936,0,4.052l-8.185,8.828c-.116,1.826-1.623,3.281-3.478,3.281h-5.59l.097-.582c.043-.257,1.086-6.16,5.244-6.396Zm2.749,3.478c0-1.379-1.122-2.5-2.5-2.5-2.834,0-4.018,3.569-4.378,5h4.378c1.378,0,2.5-1.121,2.5-2.5Zm.814-1.073l2.066-2.229c-.332-1.186-1.371-2.057-2.606-2.172-.641.749-1.261,1.475-1.817,2.125,1.117.321,1.998,1.176,2.357,2.277Zm.208-5.276c1.162.313,2.125,1.134,2.617,2.229l4.803-5.18c.737-.741.737-1.925.012-2.653-.724-.725-1.908-.727-2.637,0-.069.08-2.435,2.846-4.795,5.606Z">
-                    </path>
-                </svg>
-            </div>
-            <div class="mb-4">
-                <a href="#">
-                    <img class="rounded-sm w-full" src="assests/images/2.jpg" alt="" />
-                </a>
-            </div>
-
-            <h1 class="font-bold text-xl">UI / UX Creative Desing</h1>
-            <p class="text-sm text-zinc-500 leading-6">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse fuga
-                adipisicing elit
-            </p>
-        </div>
-
-
-        <div class="w-full bg-white shadow-[0px_0px_15px_rgba(0,0,0,0.09)] p-6 space-y-3 relative overflow-hidden">
-            <div class="w-24 h-24 bg-violet-500 rounded-full absolute -right-5 -top-7">
-                <p class="absolute bottom-6 left-7 text-white text-2xl">02</p>
-            </div>
-
-            <div class="fill-violet-500 w-12">
-                <svg viewBox="0 0 24 24" data-name="Layer 1" id="Layer_1" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="m24,6.928v13.072h-11.5v3h5v1H6.5v-1h5v-3H0V4.5c0-1.379,1.122-2.5,2.5-2.5h12.98c-.253.295-.54.631-.856,1H2.5c-.827,0-1.5.673-1.5,1.5v14.5h22v-10.993l1-1.079Zm-12.749,3.094C19.058.891,19.093.855,19.11.838c1.118-1.115,2.936-1.113,4.052.002,1.114,1.117,1.114,2.936,0,4.052l-8.185,8.828c-.116,1.826-1.623,3.281-3.478,3.281h-5.59l.097-.582c.043-.257,1.086-6.16,5.244-6.396Zm2.749,3.478c0-1.379-1.122-2.5-2.5-2.5-2.834,0-4.018,3.569-4.378,5h4.378c1.378,0,2.5-1.121,2.5-2.5Zm.814-1.073l2.066-2.229c-.332-1.186-1.371-2.057-2.606-2.172-.641.749-1.261,1.475-1.817,2.125,1.117.321,1.998,1.176,2.357,2.277Zm.208-5.276c1.162.313,2.125,1.134,2.617,2.229l4.803-5.18c.737-.741.737-1.925.012-2.653-.724-.725-1.908-.727-2.637,0-.069.08-2.435,2.846-4.795,5.606Z">
-                    </path>
-                </svg>
-            </div>
-            <div class="mb-4">
-                <a href="#">
-                    <img class="rounded-sm w-full" src="assests/images/2.jpg" alt="" />
-                </a>
-            </div>
-
-            <h1 class="font-bold text-xl">UI / UX Creative Desing</h1>
-            <p class="text-sm text-zinc-500 leading-6">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse fuga
-                adipisicing elit
-            </p>
-        </div>
-
-
-
-    </div>
-
-
-
-
-    <div>
-        <h2 class="text-2xl font-bold font-semibold text-center my-5">JoinUs</h2>
-
-
-
-    </div>
-
-
-
-
-
-
-
-
-
-</main>
-<?php
-include("../includes/footer.php");
-?>
+    </section>
+<?php include('../includes/footer.php');?>
+    
