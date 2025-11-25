@@ -1,8 +1,7 @@
-<?PHP include('../includes/header.php');?>
+<?php include('../includes/header.php');?>
 
         <div class="flex flex-col-reverse lg:flex-row items-center gap-12">
             
-            <!-- Hero Text -->
             <div class="w-full lg:w-1/2 text-center lg:text-left z-10">
                 <div class="inline-block px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-semibold mb-6 hero-badge opacity-0">
                     <i class="fas fa-trophy mr-2 text-yellow-500"></i> #1 A/L Institute in Sri Lanka
@@ -22,7 +21,6 @@
                     </a>
                 </div>
                 
-                <!-- Stats -->
                 <div class="mt-12 flex justify-center lg:justify-start gap-8 border-t border-gray-200 pt-8 hero-stats opacity-0">
                     <div>
                         <span class="block text-3xl font-bold text-gray-800">500+</span>
@@ -39,15 +37,12 @@
                 </div>
             </div>
 
-            <!-- Hero Image / Visual -->
             <div class="w-full lg:w-1/2 relative hero-img-container opacity-0">
                 <div class="relative z-10 w-full max-w-md mx-auto">
-                    <!-- Abstract Education Composition using Icons/CSS -->
                     <div class="aspect-square bg-gradient-to-br from-indigo-100 to-white rounded-3xl shadow-2xl flex items-center justify-center border border-white/50 relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-purple-100 rounded-bl-full z-0"></div>
                         <div class="absolute bottom-0 left-0 w-24 h-24 bg-blue-100 rounded-tr-full z-0"></div>
                         
-                        <!-- Background math symbols -->
                         <i class="fas fa-square-root-alt text-8xl text-indigo-600/10 absolute top-10 left-10"></i>
                         <i class="fas fa-atom text-9xl text-indigo-600/20 absolute bottom-10 right-10"></i>
                         
@@ -59,7 +54,6 @@
                             <p class="text-sm text-gray-500">Science | Maths | Tech</p>
                         </div>
 
-                        <!-- Floating Badge 1 (Physics) -->
                         <div class="absolute top-10 left-4 bg-white p-3 rounded-xl shadow-lg flex items-center gap-3 animate-pulse">
                             <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
                                 <i class="fas fa-atom"></i>
@@ -70,7 +64,6 @@
                             </div>
                         </div>
 
-                        <!-- Floating Badge 2 (Combined Maths) -->
                         <div class="absolute bottom-10 right-4 bg-white p-3 rounded-xl shadow-lg flex items-center gap-3">
                             <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-600">
                                 <i class="fas fa-calculator"></i>
@@ -86,7 +79,6 @@
         </div>
     </header>
 
-    <!-- Features Section -->
     <section class="py-20 relative z-10">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16 section-header opacity-0">
@@ -95,7 +87,6 @@
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- Card 1 -->
                 <div class="glass-card p-8 rounded-2xl text-center feature-card opacity-0 translate-y-10">
                     <div class="w-16 h-16 mx-auto bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-2xl mb-6">
                         <i class="fas fa-book-reader"></i>
@@ -104,7 +95,6 @@
                     <p class="text-gray-600">Complete syllabus coverage with special revision sessions targeting difficult areas.</p>
                 </div>
 
-                <!-- Card 2 -->
                 <div class="glass-card p-8 rounded-2xl text-center feature-card opacity-0 translate-y-10">
                     <div class="w-16 h-16 mx-auto bg-pink-100 text-pink-600 rounded-full flex items-center justify-center text-2xl mb-6">
                         <i class="fas fa-file-alt"></i>
@@ -113,7 +103,6 @@
                     <p class="text-gray-600">Regular unit tests and island-wide mock exams to prepare you for the real challenge.</p>
                 </div>
 
-                <!-- Card 3 -->
                 <div class="glass-card p-8 rounded-2xl text-center feature-card opacity-0 translate-y-10">
                     <div class="w-16 h-16 mx-auto bg-cyan-100 text-cyan-600 rounded-full flex items-center justify-center text-2xl mb-6">
                         <i class="fas fa-chart-line"></i>
@@ -125,4 +114,3 @@
         </div>
     </section>
 <?php include('../includes/footer.php');?>
-    
