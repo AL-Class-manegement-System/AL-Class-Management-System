@@ -95,10 +95,11 @@
 
     <nav class="glass-nav fixed w-full z-50 top-0 left-0 shadow-sm">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center relative">
-            <div class="logo text-2xl font-bold text-indigo-700 flex items-center gap-2 cursor-pointer">
+            
+            <a href="../pages/index.php" class="logo text-2xl font-bold text-indigo-700 flex items-center gap-2 cursor-pointer hover:text-indigo-800 transition">
                 <i class="fas fa-university"></i>
                 <span>Future Minds</span>
-            </div>
+            </a>
 
             <div class="hidden md:flex items-center space-x-8">
                 <a href="../pages/index.php" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Home</a>
@@ -106,7 +107,7 @@
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Timetable</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Results</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Teachers</a>
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Comments</a>
+                <a href="../pages/Comments.php" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Comments</a>
             </div>
 
             <div class="hidden md:flex items-center space-x-4">
