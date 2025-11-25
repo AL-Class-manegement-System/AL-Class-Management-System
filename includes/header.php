@@ -29,12 +29,12 @@
             </div>
 
             <div class="hidden md:flex items-center space-x-8">
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Home</a>
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Streams</a>
+                <a href="../pages/index.php" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Home</a>
+                <a href="../pages/Streams.php" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Streams</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Timetable</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Results</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Teachers</a>
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Comments</a>
+                <a href="../pages/Streams.php" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Comments</a>
             </div>
 
             <div class="hidden md:flex items-center space-x-4">
@@ -49,8 +49,8 @@
 
         <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-xl transition-all duration-300 origin-top">
             <div class="flex flex-col p-6 space-y-4 text-center">
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Home</a>
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Streams</a>
+                <a href="../pages/index.php" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Home</a>
+                <a href="../pages/Streams.php" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Streams</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Timetable</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Results</a>
                 <hr class="border-gray-200">
