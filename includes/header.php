@@ -108,8 +108,8 @@
             </div>
 
             <div class="hidden md:flex items-center space-x-4">
-                <a href="#" class="text-indigo-600 font-medium hover:text-indigo-800 transition nav-btn">LMS Login</a>
-                <a href="student_register.html" class="bg-indigo-600 text-white px-5 py-2 rounded-full font-medium hover:bg-indigo-700 transition shadow-lg hover:shadow-indigo-500/30 nav-btn">Join 2026 Batch</a>
+                <a href="../log/login.php" class="text-indigo-600 font-medium hover:text-indigo-800 transition nav-btn">LMS Login</a>
+                <a href="../log/registration.php" class="bg-indigo-600 text-white px-5 py-2 rounded-full font-medium hover:bg-indigo-700 transition shadow-lg hover:shadow-indigo-500/30 nav-btn">Join 2026 Batch</a>
             </div>
 
             <div id="mobile-menu-btn" class="md:hidden text-2xl text-gray-600 cursor-pointer p-2 z-50">

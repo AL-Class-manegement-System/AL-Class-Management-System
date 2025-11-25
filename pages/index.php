@@ -13,7 +13,7 @@
                     Master Physics, Chemistry, Maths & Biology with the island's best lecturers. Comprehensive Theory, Revision & Paper classes.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start hero-buttons opacity-0">
-                    <a href="student_register.html" class="px-8 py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:bg-indigo-700 hover:shadow-indigo-500/40 transition transform hover:-translate-y-1 flex items-center justify-center gap-2">
+                    <a href="../log/registration.php" class="px-8 py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:bg-indigo-700 hover:shadow-indigo-500/40 transition transform hover:-translate-y-1 flex items-center justify-center gap-2">
                         Register Now <i class="fas fa-arrow-right"></i>
                     </a>
                     <a href="#" class="px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold hover:bg-gray-50 hover:border-gray-300 transition flex items-center justify-center gap-2">
