@@ -79,4 +79,4 @@
         });
     </script>
 
-    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 container mx-auto px-6">
+    
