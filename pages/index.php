@@ -6,8 +6,15 @@
 
         <div class="w-full lg:w-1/2 text-center lg:text-left z-10">
             <div
-                class="inline-block px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-semibold mb-6 hero-badge opacity-0">
+                class="relative inline-flex h-12 active:scale-95 transistion overflow-hidden rounded-full p-[1px] focus:outline-none mb-6 hero-badge opacity-0">
+                <span
+                    class="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#e7029a_0%,#f472b6_50%,#bd5fff_100%)]">
+                </span>
+                <span
+                    class="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-white opacity-100 px-7 text-sm font-medium text-black backdrop-blur-3xl gap-2 undefined">
                 <i class="fas fa-trophy mr-2 text-yellow-500"></i> #1 A/L Institute in Sri Lanka
+                </span>
+
             </div>
             <h1 class="text-4xl lg:text-6xl font-bold leading-tight mb-6 hero-title opacity-0">
                 Your Journey at Our <span class="text-indigo-600">Institute</span> Starts Here
