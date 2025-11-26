@@ -1,4 +1,6 @@
 <?php include('../includes/header.php'); ?>
+<!-- Spacer to create gap below header (adjust height as needed) -->
+<div class="h-16 md:h-20 lg:h-24" aria-hidden="true"></div>
 <main class="flex-grow py-10 p-10 px-4">
         <!-- Contact Container -->
         <div class="max-w-[1200px] mx-auto bg-white shadow-[0_0_10px_rgba(0,0,0,0.1)] p-8 md:p-10 rounded-sm">
