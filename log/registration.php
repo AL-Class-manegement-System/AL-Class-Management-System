@@ -68,7 +68,7 @@
             </div>
 
             <div class="p-6">
-               <form id="studentForm" action="../backend/registrationbackend.php" method="POST" enctype="multipart/form-data">
+              <form id="studentForm" action="../lib/registrationbackend.php" method="POST" enctype="multipart/form-data">
 
                     <div class="mb-6">
                         <div class="flex items-center gap-2 mb-4 border-b border-gray-700 pb-2">
