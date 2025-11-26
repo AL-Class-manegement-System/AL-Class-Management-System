@@ -2,7 +2,7 @@
      $dbserver="localhost";
      $dbuser="root";
      $password="";
-    $database="web_project2";
+    $database="al_class_db";
 
     $con=mysqli_connect( $dbserver,  $dbuser,$password,$database);
      if(!$con){
