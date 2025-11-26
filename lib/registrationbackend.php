@@ -123,3 +123,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     header("Location:../log/registration.php");
     exit();
 }
+
+$conn->close();
