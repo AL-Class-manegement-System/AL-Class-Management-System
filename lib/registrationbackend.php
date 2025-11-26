@@ -102,3 +102,4 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 }
 
 $conn->close();
+?>
