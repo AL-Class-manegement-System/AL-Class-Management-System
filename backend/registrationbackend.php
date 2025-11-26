@@ -4,16 +4,24 @@ session_start();
 include '../includes/connection.php';
 
 
-if ($_SERVER["REQUEST_METHOD"]=="post") {
-        $full_name = $_POST['full_name'];
-        $dob =  $_POST['date_of_birth'];
-        $gender = $_POST['gender'];
-        $school = $_POST['school'];
-        $address =  $_POST['address'];
-        $student_phone =  $_POST['student_phone'];
-        $parent_phone =  $_POST['parent_phone'];
-        $stream =  $_POST['stream'];
-        $batch = $_POST['batch'];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+
+    $full_name = isset($_POST['full_name']) ? trim($_POST['full_name']) : '';
+    $dob = isset($_POST['date_of_birth']) ? trim($_POST['date_of_birth']) : '';
+    $gender = isset($_POST['gender']) ? trim($_POST['gender']) : '';
+    $school = isset($_POST['school']) ? trim($_POST['school']) : '';
+    $address = isset($_POST['address']) ? trim($_POST['address']) : '';
+    $student_phone = isset($_POST['student_phone']) ? trim($_POST['student_phone']) : '';
+    $parent_phone = isset($_POST['parent_phone']) ? trim($_POST['parent_phone']) : '';
+    $stream = isset($_POST['stream']) ? trim($_POST['stream']) : '';
+    $batch = isset($_POST['batch']) ? trim($_POST['batch']) : '';
+
+
+    if (empty($full_name) || empty($dob) || empty($gender) || empty($parent_phone) || empty($stream) || empty($batch)) {
+        header("Location: ../log/registration.php?error=" . urlencode('Please fill all required fields'));
+        exit();
+    }
 
         // 3. Student Registration Number එක Auto Generate කිරීම (ST + Year + ID)
         // උදාහරණ: ST2025001
@@ -24,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"]=="post") {
         $id_query = "SELECT reg_number FROM students WHERE reg_number LIKE '$prefix%' ORDER BY student_id DESC LIMIT 1";
         $result = $conn->query($id_query);
 
-        if ($result->num_rows > 0) {
+        if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $last_reg = $row['reg_number'];
             // අන්තිම ඉලක්කම් 3 වෙන් කර ගැනීම
@@ -40,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"]=="post") {
         // 4. Photo Upload කිරීම (Image Handling)
         $photo_name = ""; // ෆොටෝ එකක් නැත්නම් හිස්ව තියන්න
 
-        if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
+        if (isset($_FILES['photo']) && isset($_FILES['photo']['error']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
             // ෆොටෝ සේව් වන තැන (assests/images/students/)
             $target_dir = "../assests/images/students/";
 
@@ -49,22 +57,30 @@ if ($_SERVER["REQUEST_METHOD"]=="post") {
                 mkdir($target_dir, 0777, true);
             }
 
-            $file_extension = pathinfo($_FILES["photo"]["name"], PATHINFO_EXTENSION);
+            $file_extension = strtolower(pathinfo($_FILES["photo"]["name"], PATHINFO_EXTENSION));
             // ෆයිල් එකේ නම Reg No එකට මාරු කිරීම (උදා: ST2025001.jpg)
             $new_filename = "{$reg_number}.{$file_extension}"; 
             $target_file = "{$target_dir}{$new_filename}";
 
-            // Image වර්ග පරීක්ෂා කිරීම
+            // Image checks: extension, mime type and size (<= 2MB)
             $allowed_types = ['jpg', 'jpeg', 'png'];
-            if (in_array(strtolower($file_extension), $allowed_types)) {
-                if (move_uploaded_file($_FILES["photo"]["tmp_name"], $target_file)) {
-                    $photo_name = $new_filename;
-                } else {
-                    header("Location: registration.php?error=Image upload failed");
-                    exit();
-                }
+            $imginfo = @getimagesize($_FILES['photo']['tmp_name']);
+            $is_valid_image = $imginfo !== false && in_array($imginfo['mime'], ['image/jpeg', 'image/png']) && in_array($file_extension, $allowed_types);
+
+            if (!$is_valid_image) {
+                header("Location: ../log/registration.php?error=" . urlencode('Only JPG/JPEG/PNG valid image files are allowed'));
+                exit();
+            }
+
+            if ($_FILES['photo']['size'] > 2 * 1024 * 1024) {
+                header("Location: ../log/registration.php?error=" . urlencode('Image too large (max 2MB)'));
+                exit();
+            }
+
+            if (move_uploaded_file($_FILES["photo"]["tmp_name"], $target_file)) {
+                $photo_name = $new_filename;
             } else {
-                header("Location: registration.php?error=Only JPG, JPEG, PNG allowed");
+                header("Location: ../log/registration.php?error=" . urlencode('Image upload failed'));
                 exit();
             }
         }
@@ -72,30 +88,38 @@ if ($_SERVER["REQUEST_METHOD"]=="post") {
         // 5. QR Code (Optional - දැනට Reg Number එකම දාමු)
         $qr_code = $reg_number; 
 
-        // 6. Database එකට Data ඇතුළත් කිරීම (Insert Query)
+        // 6. Database 
+       
         $sql = "INSERT INTO students (
                     reg_number, full_name, dob, gender, school, address, 
                     student_phone, parent_phone, stream, batch, photo, qr_code
                 ) VALUES (
-                    '$reg_number', '$full_name', '$dob', '$gender', '$school', '$address', 
-                    '$student_phone', '$parent_phone', '$stream', '$batch', '$photo_name', '$qr_code'
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                 )";
+        $stmt = $conn->prepare($sql);
+        if ($stmt === false) {
+            $conn->close();
+            header("Location: ../log/registration.php?error=" . urlencode($conn->error));
+            exit();
+        }
 
-        if ($conn->query($sql) === TRUE) {
-            // සාර්ථක නම් Success Message එකක් සමඟ නැවත යවන්න
-            header("Location: registration.php?success=Student Registered Successfully! Reg No: {$reg_number}");
+        $stmt->bind_param('ssssssssssss', $reg_number, $full_name, $dob, $gender, $school, $address, $student_phone, $parent_phone, $stream, $batch, $photo_name, $qr_code);
+
+        if ($stmt->execute()) {
+            $stmt->close();
+            $conn->close();
+            header("Location: ../log/registration.php?success=Student Registered Successfully! Reg No: {$reg_number}");
             exit();
         } else {
-            // Error එකක් ආවොත්
-            header("Location: registration.php?error=" . urlencode($conn->error));
+            $stmt->close();
+            $conn->close();
+            header("Location: ../log/registration.php?error=" . urlencode($stmt->error ?: $conn->error));
             exit();
         }
         // break; // No need for break here since there's no switch
 
 } else {
     // කෙලින්ම මෙම ෆයිල් එකට ආවොත් ආපසු registration එකට යවන්න
-    header("Location: registration.php");
+    header("Location:../log/registration.php");
     exit();
 }
-
-$conn->close();
