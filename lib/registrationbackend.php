@@ -126,6 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <<<<<<< HEAD
 // $conn->close();
+
 ?>
 =======
 $conn->close();
