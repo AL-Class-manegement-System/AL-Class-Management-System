@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 25, 2025 at 10:52 AM
+-- Generation Time: Nov 26, 2025 at 09:53 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,11 +44,28 @@ CREATE TABLE `attendance` (
 CREATE TABLE `classes` (
   `class_id` int(11) NOT NULL,
   `class_name` varchar(100) NOT NULL,
-  `subject` varchar(50) DEFAULT NULL,
+  `teacher_id` int(11) DEFAULT NULL,
+  `stream` enum('Physical Science','Bio Science','Commerce','Tech','Arts') NOT NULL,
+  `subject` varchar(50) NOT NULL,
+  `batch` varchar(10) DEFAULT NULL,
   `fee` decimal(10,2) NOT NULL,
-  `class_day` varchar(20) DEFAULT NULL,
-  `start_time` time DEFAULT NULL,
-  `end_time` time DEFAULT NULL
+  `status` tinyint(4) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `class_schedules`
+--
+
+CREATE TABLE `class_schedules` (
+  `schedule_id` int(11) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `day_of_week` enum('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday') NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `location` varchar(50) DEFAULT 'Main Hall',
+  `class_type` enum('Theory','Revision','Paper','Group') DEFAULT 'Theory'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -165,13 +182,17 @@ CREATE TABLE `students` (
   `student_id` int(11) NOT NULL,
   `reg_number` varchar(20) NOT NULL,
   `full_name` varchar(150) NOT NULL,
+  `dob` date DEFAULT NULL,
+  `gender` varchar(10) DEFAULT NULL,
   `address` text DEFAULT NULL,
   `student_phone` varchar(15) DEFAULT NULL,
   `parent_phone` varchar(15) DEFAULT NULL,
   `school` varchar(100) DEFAULT NULL,
   `stream` varchar(50) DEFAULT NULL,
+  `batch` varchar(10) DEFAULT NULL,
   `qr_code` varchar(255) DEFAULT NULL,
-  `status` tinyint(4) DEFAULT 1,
+  `photo` varchar(255) DEFAULT NULL,
+  `status` tinyint(4) DEFAULT 0,
   `registered_date` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -187,6 +208,22 @@ CREATE TABLE `student_remarks` (
   `note` text NOT NULL,
   `priority` enum('Low','Medium','High') DEFAULT 'Low',
   `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teachers`
+--
+
+CREATE TABLE `teachers` (
+  `teacher_id` int(11) NOT NULL,
+  `full_name` varchar(150) NOT NULL,
+  `subject` varchar(100) NOT NULL,
+  `qualifications` varchar(255) DEFAULT NULL,
+  `image` varchar(255) DEFAULT 'default_teacher.jpg',
+  `contact_number` varchar(15) DEFAULT NULL,
+  `status` tinyint(4) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -219,7 +256,15 @@ ALTER TABLE `attendance`
 -- Indexes for table `classes`
 --
 ALTER TABLE `classes`
-  ADD PRIMARY KEY (`class_id`);
+  ADD PRIMARY KEY (`class_id`),
+  ADD KEY `teacher_id` (`teacher_id`);
+
+--
+-- Indexes for table `class_schedules`
+--
+ALTER TABLE `class_schedules`
+  ADD PRIMARY KEY (`schedule_id`),
+  ADD KEY `class_id` (`class_id`);
 
 --
 -- Indexes for table `exams`
@@ -277,8 +322,7 @@ ALTER TABLE `sms_logs`
 --
 ALTER TABLE `students`
   ADD PRIMARY KEY (`student_id`),
-  ADD UNIQUE KEY `reg_number` (`reg_number`),
-  ADD UNIQUE KEY `qr_code` (`qr_code`);
+  ADD UNIQUE KEY `reg_number` (`reg_number`);
 
 --
 -- Indexes for table `student_remarks`
@@ -286,6 +330,12 @@ ALTER TABLE `students`
 ALTER TABLE `student_remarks`
   ADD PRIMARY KEY (`remark_id`),
   ADD KEY `student_id` (`student_id`);
+
+--
+-- Indexes for table `teachers`
+--
+ALTER TABLE `teachers`
+  ADD PRIMARY KEY (`teacher_id`);
 
 --
 -- Indexes for table `users`
@@ -309,6 +359,12 @@ ALTER TABLE `attendance`
 --
 ALTER TABLE `classes`
   MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `class_schedules`
+--
+ALTER TABLE `class_schedules`
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `exams`
@@ -365,6 +421,12 @@ ALTER TABLE `student_remarks`
   MODIFY `remark_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `teachers`
+--
+ALTER TABLE `teachers`
+  MODIFY `teacher_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
@@ -380,6 +442,18 @@ ALTER TABLE `users`
 ALTER TABLE `attendance`
   ADD CONSTRAINT `attendance_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `attendance_ibfk_2` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `classes`
+--
+ALTER TABLE `classes`
+  ADD CONSTRAINT `classes_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`teacher_id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `class_schedules`
+--
+ALTER TABLE `class_schedules`
+  ADD CONSTRAINT `class_schedules_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `exams`
