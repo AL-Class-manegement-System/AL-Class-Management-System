@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-include '../includes/connection.php';
+require_once '../includes/connection.php';
 
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -123,5 +123,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     header("Location:../log/registration.php");
     exit();
 }
+
 $conn->close();
-?>
