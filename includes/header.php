@@ -9,81 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="../css/header.css">
 
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            overflow-x: hidden;
-        }
-        
-        /* Moving Background Shapes */
-        .shape {
-            position: absolute;
-            filter: blur(60px);
-            z-index: -1;
-            animation: float 12s infinite ease-in-out;
-        }
-        .shape-1 {
-            top: -5%;
-            left: -5%;
-            width: 400px;
-            height: 400px;
-            background: #4f46e5; /* Indigo */
-            border-radius: 50%;
-            opacity: 0.4;
-        }
-        .shape-2 {
-            bottom: 10%;
-            right: -10%;
-            width: 350px;
-            height: 350px;
-            background: #ec4899; /* Pink */
-            border-radius: 50%;
-            animation-delay: 2s;
-            opacity: 0.4;
-        }
-        .shape-3 {
-            top: 40%;
-            left: 30%;
-            width: 200px;
-            height: 200px;
-            background: #06b6d4; /* Cyan */
-            border-radius: 50%;
-            animation-delay: 4s;
-            opacity: 0.3;
-        }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-            100% { transform: translate(0, 0) scale(1); }
-        }
-
-        /* Glassmorphism Styles */
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .glass-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        /* Hero Image Container */
-        .hero-img-container {
-            position: relative;
-        }
-    </style>
+    
 </head>
 <body class="bg-slate-50 min-h-screen text-gray-800 relative">
 
@@ -101,12 +29,12 @@
             </div>
 
             <div class="hidden md:flex items-center space-x-8">
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Home</a>
+                <a href="../pages/index.php" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Home</a>
                 <a href="../pages/Streams.php" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Streams</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Timetable</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Results</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Teachers</a>
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Comments</a>
+                <a href="../pages/Streams.php" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Comments</a>
             </div>
 
             <div class="hidden md:flex items-center space-x-4">
@@ -121,8 +49,8 @@
 
         <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-xl transition-all duration-300 origin-top">
             <div class="flex flex-col p-6 space-y-4 text-center">
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Home</a>
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Streams</a>
+                <a href="../pages/index.php" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Home</a>
+                <a href="../pages/Streams.php" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Streams</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Timetable</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Results</a>
                 <hr class="border-gray-200">
@@ -151,4 +79,4 @@
         });
     </script>
 
-    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 container mx-auto px-6">
+    
