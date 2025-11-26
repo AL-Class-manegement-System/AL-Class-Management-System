@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 26, 2025 at 08:40 AM
+-- Generation Time: Nov 25, 2025 at 10:52 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -182,13 +182,17 @@ CREATE TABLE `students` (
   `student_id` int(11) NOT NULL,
   `reg_number` varchar(20) NOT NULL,
   `full_name` varchar(150) NOT NULL,
+  `dob` date DEFAULT NULL,
+  `gender` varchar(10) DEFAULT NULL,
   `address` text DEFAULT NULL,
   `student_phone` varchar(15) DEFAULT NULL,
   `parent_phone` varchar(15) DEFAULT NULL,
   `school` varchar(100) DEFAULT NULL,
   `stream` varchar(50) DEFAULT NULL,
+  `batch` varchar(10) DEFAULT NULL,
   `qr_code` varchar(255) DEFAULT NULL,
-  `status` tinyint(4) DEFAULT 1,
+  `photo` varchar(255) DEFAULT NULL,
+  `status` tinyint(4) DEFAULT 0,
   `registered_date` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
