@@ -98,5 +98,5 @@ if ($_SERVER["REQUEST_METHOD"]=="post") {
     exit();
 }
 
-$conn->close();
+
 ?>
