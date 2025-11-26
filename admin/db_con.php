@@ -4,10 +4,10 @@ $username = "root";
 $password = "";
 $dbname = "al_class_db";
 
-// Connection එක සාදන්න
+// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Connection එක check කරන්න
+// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
