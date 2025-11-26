@@ -4,7 +4,7 @@ session_start();
 include '../includes/connection.php';
 
 
-if ($_SERVER["REQUEST_METHOD"]=="post") {
+if ($_SERVER["REQUEST_METHOD"]=="post") {   
         $full_name = $_POST['full_name'];
         $dob =  $_POST['date_of_birth'];
         $gender = $_POST['gender'];
