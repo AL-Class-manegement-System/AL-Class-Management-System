@@ -4,19 +4,16 @@ session_start();
 include '../includes/connection.php';
 
 
-// 2. Form එක Submit කළ විට ක්‍රියාත්මක වන කොටස
-switch ($_SERVER["REQUEST_METHOD"]) {
-    case "POST":
-        // Input Data ලබා ගැනීම සහ පිරිසිදු කිරීම (Security සඳහා)
-        $full_name = mysqli_real_escape_string($conn, $_POST['full_name']);
-        $dob = mysqli_real_escape_string($conn, $_POST['date_of_birth']);
-        $gender = mysqli_real_escape_string($conn, $_POST['gender']);
-        $school = mysqli_real_escape_string($conn, $_POST['school']);
-        $address = mysqli_real_escape_string($conn, $_POST['address']);
-        $student_phone = mysqli_real_escape_string($conn, $_POST['student_phone']);
-        $parent_phone = mysqli_real_escape_string($conn, $_POST['parent_phone']);
-        $stream = mysqli_real_escape_string($conn, $_POST['stream']);
-        $batch = mysqli_real_escape_string($conn, $_POST['batch']);
+if ($_SERVER["REQUEST_METHOD"]=="post") {
+        $full_name = $_POST['full_name'];
+        $dob =  $_POST['date_of_birth'];
+        $gender = $_POST['gender'];
+        $school = $_POST['school'];
+        $address =  $_POST['address'];
+        $student_phone =  $_POST['student_phone'];
+        $parent_phone =  $_POST['parent_phone'];
+        $stream =  $_POST['stream'];
+        $batch = $_POST['batch'];
 
         // 3. Student Registration Number එක Auto Generate කිරීම (ST + Year + ID)
         // උදාහරණ: ST2025001
@@ -93,12 +90,12 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             header("Location: registration.php?error=" . urlencode($conn->error));
             exit();
         }
-        break;
+        // break; // No need for break here since there's no switch
 
-    default:
-        // කෙලින්ම මෙම ෆයිල් එකට ආවොත් ආපසු registration එකට යවන්න
-        header("Location: registration.php");
-        exit();
+} else {
+    // කෙලින්ම මෙම ෆයිල් එකට ආවොත් ආපසු registration එකට යවන්න
+    header("Location: registration.php");
+    exit();
 }
 
 $conn->close();
