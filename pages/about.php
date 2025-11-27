@@ -1,5 +1,6 @@
 <?php include('../includes/header.php'); ?>
 
+    <link rel="stylesheet" href="about.css">
     <div class="container">
         <div class="section about-us-section">
             <h2 class="section-title">ABOUT US</h2>
@@ -34,3 +35,4 @@
             </div>
         </div>
     </div>
+<?php include('../includes/footer.php'); ?>
