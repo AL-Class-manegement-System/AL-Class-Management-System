@@ -1,78 +1,76 @@
-<?php include('../includes/header.php'); ?>
-<?php include('../includes/connection.php'); ?>
+<?php 
+// DB Connection එක සහ Header එක
+// ඔබේ ෆයිල් ස්ට්‍රක්චර් එක අනුව path එක වෙනස් විය හැක. (උදා: include('../db_con.php');)
+include 'db_con.php'; 
+include('../includes/header.php'); 
+?>
 
-<div class="relative pt-32 pb-20 bg-slate-50 min-h-screen">
+<div class="p-3">
     
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-indigo-50/50 to-transparent -z-10"></div>
+    <div class="flex items-center mt-20 w-full p-2 text-orange-500 p-6 backdrop-blur-sm bg-orange-50 opacity-100 rounded-2xl text-xl font-bold font-10 mb-5 outline-[#243c5a] shadow-lg text-shadow-lg border-solid">
+        <h1>Our Expert Teachers</h1>
+    </div>
 
-    <div class="container mx-auto px-6">
-        
-        <div class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-                Meet Our <span class="text-indigo-600">Experts</span>
-            </h1>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                Learn from the most experienced and qualified panel of lecturers in the island.
-            </p>
-        </div>
+    <div class="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-            
-            <?php
-            // Fetch teachers from DB
-            $sql = "SELECT * FROM teachers WHERE status = 1 ORDER BY teacher_id DESC";
-            $result = mysqli_query($conn, $sql);
+        <?php
+        // Database එකෙන් teachers ලා ඔක්කොම ගන්න Query එක
+        $sql = "SELECT * FROM teachers ORDER BY id DESC";
+        $result = mysqli_query($conn, $sql);
 
-            if (mysqli_num_rows($result) > 0) {
-                while ($row = mysqli_fetch_assoc($result)) {
-                    // Image path fix (admin folder eke upload wena nisa assets folder eka thiyenne eka level ekak udin)
-                    $image_path = "../assets/images/teachers/" . $row['image'];
-            ?>
-
-            <div class="group relative bg-white rounded-3xl p-4 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-2">
+        // Teachers ලා ඉන්නවා නම් Loop එක run වෙනවා
+        if (mysqli_num_rows($result) > 0) {
+            while ($row = mysqli_fetch_assoc($result)) {
                 
-                <div class="relative h-[300px] w-full overflow-hidden rounded-2xl mb-6">
-                    <img src="<?php echo $image_path; ?>" alt="<?php echo $row['full_name']; ?>"
-                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        onerror="this.src='../assests/images/user2.jpg'"> <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg shadow-sm">
-                        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wide">
-                            <?php echo $row['subject']; ?>
-                        </span>
-                    </div>
+                // Image Path එක
+                // 'assests' නෙවෙයි 'assets' ලෙස නිවැරදි කර ඇත.
+                $imagePath = "../assets/images/teachers/" . $row['image'];
+        ?>
 
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60"></div>
-                </div>
-
-                <div class="px-2 pb-4">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">
-                        <?php echo $row['full_name']; ?>
-                    </h3>
-                    <p class="text-gray-500 text-sm leading-relaxed line-clamp-3 mb-4">
-                        <?php echo $row['description']; ?>
-                    </p>
-                    
-                    <button class="w-full py-3 rounded-xl bg-gray-50 text-gray-700 font-semibold text-sm hover:bg-indigo-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
-                        View Profile <i class="fas fa-arrow-right text-xs"></i>
-                    </button>
-                </div>
-
+        <div class="group relative w-full h-[450px]">
+            <div class="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200">
             </div>
 
-            <?php 
-                } // End While
-            } else {
-            ?>
-                <div class="col-span-full text-center py-20">
-                    <div class="inline-block p-6 rounded-full bg-indigo-50 text-indigo-300 mb-4">
-                        <i class="fas fa-chalkboard-teacher text-4xl"></i>
+            <div class="relative w-full h-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition-all duration-300 transform group-hover:-translate-y-2 group-hover:shadow-2xl ring-1 ring-slate-900/5">
+                
+                <div class="h-56 overflow-hidden relative">
+                    <img src="<?php echo $imagePath; ?>" alt="<?php echo $row['full_name']; ?>"
+                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        onerror="this.src='../assets/images/default_teacher.png'"> <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm">
+                        <i data-lucide="heart" class="w-5 h-5 text-rose-500 fill-rose-500/20"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-400">No teachers added yet.</h3>
                 </div>
-            <?php 
-            } 
-            ?>
 
+                <div class="p-6 flex flex-col flex-1 justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="px-2 py-1 text-xs font-semibold text-purple-600 bg-purple-50 rounded-md uppercase tracking-wider">
+                                <?php echo $row['subject']; ?>
+                            </span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-purple-600 transition-colors">
+                            <?php echo $row['full_name']; ?>
+                        </h3>
+                        
+                        <p class="text-slate-500 text-sm leading-relaxed line-clamp-3">
+                            <?php echo $row['description']; ?>
+                        </p>
+                    </div>
+
+                    <button class="mt-4 w-full py-3 rounded-lg bg-slate-900 text-white font-medium text-sm flex items-center justify-center gap-2 transition-all duration-300 hover:bg-purple-600 group-hover:translate-x-1">
+                        View Profile <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
         </div>
+        <?php 
+            } // End of While Loop
+        } else {
+            echo "<p class='text-center text-gray-500 col-span-3'>No teachers added yet.</p>";
+        }
+        ?>
+
     </div>
 </div>
 

@@ -1,13 +1,14 @@
 <?php
-include 'db_con.php';
+// db_con.php ගොනුව නිවැරදි path එකෙන් include කරගන්න
+include 'db_con.php'; 
 
 if (isset($_POST['submit'])) {
-    $name = $_POST['name'];
-    $subject = $_POST['subject'];
-    $desc = $_POST['desc'];
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $subject = mysqli_real_escape_string($conn, $_POST['subject']);
+    $desc = mysqli_real_escape_string($conn, $_POST['desc']);
     
     // Image Upload Logic
-    // Folder eka nathi nam hadanna
+    // Folder එක නැත්නම් හදන්න (assets ලෙස නම වෙනස් කළා)
     if (!file_exists('../assets/images/teachers/')) {
         mkdir('../assets/images/teachers/', 0777, true);
     }
@@ -15,7 +16,7 @@ if (isset($_POST['submit'])) {
     $image = $_FILES['image']['name'];
     $image_tmp = $_FILES['image']['tmp_name'];
     
-    // Unique name ekak denawa image ekata conflict nowenna
+    // Unique name එකක් දෙනවා
     $new_image_name = time() . "_" . basename($image);
     $target = "../assets/images/teachers/" . $new_image_name;
 
@@ -25,7 +26,7 @@ if (isset($_POST['submit'])) {
         if (move_uploaded_file($image_tmp, $target)) {
             echo "<script>alert('Teacher added successfully'); window.location='teachers.php';</script>";
         } else {
-            echo "<script>alert('Teacher added but image upload failed'); window.location='teachers.php';</script>";
+            echo "<script>alert('Teacher added but image upload failed');</script>";
         }
     } else {
         echo "Error: " . mysqli_error($conn);
@@ -89,7 +90,7 @@ if (isset($_POST['submit'])) {
                                 <div class="flex flex-col items-center justify-center pt-5 pb-6">
                                     <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
                                     <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                                    <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX. 2MB)</p>
+                                    <p class="text-xs text-gray-500">JPG, PNG (MAX. 2MB)</p>
                                 </div>
                                 <input id="dropzone-file" name="image" type="file" class="hidden" required />
                             </label>
