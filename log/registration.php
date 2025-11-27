@@ -6,24 +6,17 @@
     <title>Add New Student</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
                         dark: {
-                            900: '#111827', // Body bg
-                            800: '#1F2937', // Card bg
-                            700: '#374151', // Input bg
-                            600: '#4B5563', // Borders
+                            900: '#111827', 800: '#1F2937', 700: '#374151', 600: '#4B5563',
                         }
                     }
                 }
@@ -32,21 +25,12 @@
     </script>
 
     <style>
-        /* Dark Theme Background */
         body { background-color: #111827; }
-        .required::after { content: " *"; color: #F87171; } /* Lighter red for dark mode */
-        
-        /* Custom Scrollbar for Dark Mode */
+        .required::after { content: " *"; color: #F87171; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #1F2937; }
         ::-webkit-scrollbar-thumb { background: #4B5563; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #6B7280; }
-
-        /* Date picker icon invert for dark mode */
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-        }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     </style>
 </head>
 <body class="antialiased text-gray-300 py-6 px-4">
@@ -68,7 +52,24 @@
             </div>
 
             <div class="p-6">
-              <form id="studentForm" action="../lib/registrationbackend.php" method="POST" enctype="multipart/form-data">
+                <?php if (isset($_GET['error'])): ?>
+                    <div class="flex items-center p-4 mb-6 text-sm text-red-200 border border-red-500 rounded-lg bg-red-500/10 animate-pulse" role="alert">
+                        <i class="fa-solid fa-circle-exclamation mr-3 text-xl"></i>
+                        <div>
+                            <span class="font-bold">Error:</span> <?php echo htmlspecialchars($_GET['error']); ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (isset($_GET['success'])): ?>
+                    <div class="flex items-center p-4 mb-6 text-sm text-green-200 border border-green-500 rounded-lg bg-green-500/10" role="alert">
+                        <i class="fa-solid fa-circle-check mr-3 text-xl"></i>
+                        <div>
+                            <span class="font-bold">Success!</span> <?php echo htmlspecialchars($_GET['success']); ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                <form id="studentForm" action="../lib/registrationbackend.php" method="POST" enctype="multipart/form-data">
 
                     <div class="mb-6">
                         <div class="flex items-center gap-2 mb-4 border-b border-gray-700 pb-2">
@@ -77,7 +78,6 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-semibold text-gray-400 mb-1 required">Full Name</label>
                                 <div class="relative group">
@@ -272,12 +272,10 @@
                     </div>
 
                     <div class="flex gap-3 pt-4 border-t border-gray-700 mt-2">
-                        
                         <a href="login.php" class="w-1/3 flex items-center justify-center gap-2 py-3 bg-transparent border border-gray-600 text-gray-300 text-sm font-bold rounded-xl hover:bg-gray-700 hover:text-white hover:border-gray-500 transition-all shadow-sm">
                             <i class="fa-solid fa-arrow-left"></i> 
                             Back
                         </a>
-
                         <button type="submit" class="w-2/3 flex items-center justify-center gap-2 py-3 text-white bg-indigo-600 hover:bg-indigo-500 text-sm font-bold rounded-xl shadow-lg shadow-indigo-900/50 transition-all transform hover:-translate-y-0.5">
                             <i class="fa-solid fa-check-circle"></i>
                             Register Student

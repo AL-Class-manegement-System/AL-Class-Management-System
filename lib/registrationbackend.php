@@ -17,13 +17,46 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stream = isset($_POST['stream']) ? trim($_POST['stream']) : '';
     $batch = isset($_POST['batch']) ? trim($_POST['batch']) : '';
 
-    // 2. Validation (NIC සහ Email අනිවාර්ය කර ඇත)
+    // ==========================================
+    // 2. VALIDATION SECTION (Validation ආරම්භය)
+    // ==========================================
+
+    // A. හිස්දැයි පරීක්ෂා කිරීම (Required Fields Check)
     if (empty($full_name) || empty($nic) || empty($dob) || empty($gender) || empty($parent_phone) || empty($email) || empty($stream) || empty($batch)) {
         header("Location: ../log/registration.php?error=" . urlencode('Please fill all required fields'));
         exit();
     }
 
-    // 3. Student Registration Number Auto Generate කිරීම
+    // B. NIC Validation (පරණ අංක 9+V/X හෝ අලුත් අංක 12)
+    // Regex නිවැරදි කිරීම: '|' ලකුණ ඉවත් කර [vVxX] ලෙස යෙදීම වඩා නිවැරදිය.
+    if (!preg_match('/^([0-9]{9}[vVxX]|[0-9]{12})$/', $nic)) {
+        header("Location: ../log/registration.php?error=" . urlencode('Invalid NIC Format (Ex: 123456789V or 200012345678)'));
+        exit();
+    }
+
+    // C. Phone Number Validation (Parent Phone) - ඉලක්කම් 10ක් විය යුතුය
+    if (!preg_match('/^[0-9]{10}$/', $parent_phone)) {
+        header("Location: ../log/registration.php?error=" . urlencode('Invalid Parent Phone Number (Must be 10 digits)'));
+        exit();
+    }
+
+    // D. Student Phone Validation (තිබේ නම් පමණක් පරීක්ෂා කරයි)
+    if (!empty($student_phone) && !preg_match('/^[0-9]{10}$/', $student_phone)) {
+        header("Location: ../log/registration.php?error=" . urlencode('Invalid Student Phone Number'));
+        exit();
+    }
+
+    // E. Email Validation
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        header("Location: ../log/registration.php?error=" . urlencode('Invalid Email Address'));
+        exit();
+    }
+
+    // ==========================================
+    // 3. ID GENERATE & PHOTO UPLOAD
+    // ==========================================
+
+    // Student Registration Number Auto Generate කිරීම
     $current_year = date("Y");
     $prefix = "ST{$current_year}";
 
@@ -40,14 +73,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $reg_number = "{$prefix}001"; 
     }
 
-    // 4. Photo Upload කිරීම
+    // Photo Upload කිරීම
     $photo_name = ""; 
 
     if (isset($_FILES['photo']) && isset($_FILES['photo']['error']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
         
-        // Corrected spelling: 'assets' instead of 'assests'
         $target_dir = "../assets/images/students/";
 
+        // Folder එක නැත්නම් සාදන්න
         if (!file_exists($target_dir)) {
             mkdir($target_dir, 0777, true);
         }
@@ -60,7 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $imginfo = @getimagesize($_FILES['photo']['tmp_name']);
         
         if ($imginfo !== false && in_array($imginfo['mime'], ['image/jpeg', 'image/png']) && in_array($file_extension, $allowed_types)) {
-             if ($_FILES['photo']['size'] <= 2 * 1024 * 1024) {
+             if ($_FILES['photo']['size'] <= 2 * 1024 * 1024) { // Max 2MB
                 if (move_uploaded_file($_FILES["photo"]["tmp_name"], $target_file)) {
                     $photo_name = $new_filename;
                 } else {
@@ -77,7 +110,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 
-    // 5. Database Insertion (Removed qr_code to match DB)
+    // ==========================================
+    // 4. DATABASE INSERTION
+    // ==========================================
+    
     $sql = "INSERT INTO students (
                 reg_number, full_name, nic, dob, gender, school, address, 
                 student_phone, parent_phone, email, stream, batch, photo
@@ -93,21 +129,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    // s = string (13 parameters)
     $stmt->bind_param('sssssssssssss', $reg_number, $full_name, $nic, $dob, $gender, $school, $address, $student_phone, $parent_phone, $email, $stream, $batch, $photo_name);
 
     if ($stmt->execute()) {
         $stmt->close();
         $conn->close();
+        // Success Message
         header("Location: ../log/registration.php?success=Student Registered Successfully! Reg No: {$reg_number}");
         exit();
     } else {
         $error_msg = $stmt->error;
         $stmt->close();
         $conn->close();
-        // Check for duplicate entry error
+        
+        // Duplicate Check
         if (strpos($error_msg, 'Duplicate entry') !== false) {
-             header("Location: ../log/registration.php?error=" . urlencode("Registration Number or NIC already exists!"));
+             header("Location: ../log/registration.php?error=" . urlencode("Error: Registration Number or NIC already exists!"));
         } else {
              header("Location: ../log/registration.php?error=" . urlencode("Save Failed: " . $error_msg));
         }
