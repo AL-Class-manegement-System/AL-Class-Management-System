@@ -37,11 +37,11 @@
                     <!-- Office Details Column -->
                     <div class="flex-1 md:pl-10 md:border-l border-[#eee]">
                         <p class="font-bold text-[#05943c] mb-1.5">FUTUREMINDS.lk</p>
-                        <h2 class="text-[2em] leading-[1.2] mt-0 mb-5 font-bold text-gray-800">Our Head Office <br> At Rajagiriya</h2>
+                        <h2 class="text-[2em] leading-[1.2] mt-0 mb-5 font-bold text-gray-800">Our Head Office <br> At Nugegoda</h2>
 
                         <div class="space-y-2.5 text-[#333]">
-                            <p>No: 160, Buthgamuwa Road, Kalapaluwawa, Rajagiriya.</p>
-                            <p>075 444 4444</p>
+                            <p>No. 123, High Level Road, Nugegoda, Sri Lanka</p>
+                            <p>077 123 4567</p>
                             <p>info@futureminds.lk</p>
                             <p>Monday-Saturday : 8am-5pm</p>
                         </div>
