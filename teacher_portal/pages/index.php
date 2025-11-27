@@ -1,15 +1,14 @@
 <?php
-// 1. CSS/Images සඳහා Path එක පස්සට (Root folder එකට) යැවිය යුතුය.
-// index.php තියෙන්නේ folder දෙකක් ඇතුලේ නිසා ../../ භාවිතා කරන්න.
+// 1. Path variable setup
 $path = "../../"; 
 
-// 2. Header එක ඇත්තේ 'teacher_include' folder එකේ නිසා path එක වෙනස් කළා.
-include("../teacher_include/teacher_head.php"); 
+// 2. Include Head
+include("../include/head.php"); 
 ?>
 
-<?php include("../teacher_include/teacher_sidebar.php"); ?>
+<?php include("../include/sidebar.php"); ?>
 
-<div class="p-4 sm:ml-64">
+<div class="p-4 sm:ml-64 pb-20">
    
    <div class="flex items-center justify-between p-4 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
       <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
@@ -79,9 +78,19 @@ include("../teacher_include/teacher_head.php");
        </div>
    </div>
 
-   <?php include("../../includes/footer.php"); ?>
+   <div class="w-full bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6">
+       <div class="flex justify-between items-center mb-4">
+           <div>
+               <h5 class="text-xl font-bold leading-none text-gray-900">Student Attendance</h5>
+               <p class="text-sm text-gray-500 mt-1">Attendance overview for the last 7 days</p>
+           </div>
+       </div>
+       <div id="attendance-chart" class="w-full"></div>
+   </div>
+
+   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+   <script src="../js/dashboard.js"></script>
+
+   <?php include("../include/footer.php"); ?>
 
 </div>
-
-</body>
-</html>
