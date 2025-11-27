@@ -68,7 +68,7 @@
             </div>
 
             <div class="p-6">
-               <form id="studentForm" action="../backend/registrationbackend.php" method="POST" enctype="multipart/form-data">
+              <form id="studentForm" action="../lib/registrationbackend.php" method="POST" enctype="multipart/form-data">
 
                     <div class="mb-6">
                         <div class="flex items-center gap-2 mb-4 border-b border-gray-700 pb-2">
@@ -169,36 +169,6 @@
                         </div>
                     </div>
 
-                    <div class="mb-6">
-                        <div class="flex items-center gap-2 mb-4 border-b border-gray-700 pb-2">
-                            <i class="fa-solid fa-lock text-indigo-400"></i>
-                            <h3 class="text-lg font-bold text-gray-100">Login Details</h3>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-400 mb-1 required">Email Address</label>
-                                <div class="relative group">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-                                        <i class="fa-solid fa-envelope text-sm"></i>
-                                    </div>
-                                    <input type="email" id="email" name="email" placeholder="student@example.com" 
-                                        class="w-full pl-9 pr-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm text-white placeholder-gray-400 focus:bg-gray-600 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none" required>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-400 mb-1 required">Password</label>
-                                <div class="relative group">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-                                        <i class="fa-solid fa-key text-sm"></i>
-                                    </div>
-                                    <input type="password" id="password" name="password" placeholder="••••••••" 
-                                        class="w-full pl-9 pr-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm text-white placeholder-gray-400 focus:bg-gray-600 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     <div class="mb-6">
                         <div class="flex items-center gap-2 mb-4 border-b border-gray-700 pb-2">
                             <i class="fa-solid fa-book-open-reader text-indigo-400"></i>
