@@ -1,0 +1,119 @@
+/* GLOBAL STYLES */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff; /* White background */
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+p {
+    line-height: 1.6;
+    margin-bottom: 15px;
+    font-size: 14px; /* Adjusting font size to match the image */
+}
+
+/* --- ABOUT US SECTION STYLES --- */
+.section-title {
+    font-size: 16px;
+    color: #4f46e5; /* Bright blue color for titles */
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    padding-left: 15px; /* Space for the blue line */
+    position: relative;
+    font-weight: bold;
+}
+
+/* Blue line next to ABOUT US title */
+.section-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 8px; /* Thickness of the line */
+    background-color: #4f46e5;
+}
+
+.about-us-section {
+    padding-top: 20px;
+}
+
+.content-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px; /* Space between the two text columns */
+}
+
+.content-left {
+    flex: 1; /* Takes up equal space */
+}
+
+.content-right {
+    flex: 1; /* Takes up equal space */
+}
+
+/* Separator line style */
+.separator {
+    border: none;
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 40px 0;
+}
+
+
+/* --- VISION & MISSION SECTION STYLES --- */
+.vision-mission-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.vision-box, .mission-box {
+    flex: 1;
+    padding-top: 10px;
+}
+
+.box-title {
+    font-size: 16px;
+    color: #4f46e5;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    font-weight: normal; /* To make the overall title lighter */
+    position: relative;
+    padding-bottom: 10px; /* Space for the bottom line */
+}
+
+/* Blue line above text in Vision/Mission section */
+.box-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0; /* Positioned at the bottom of the title */
+    height: 2px;
+    width: 100%; /* Line spans the whole width */
+    background-color: #e0e0e0;
+}
+
+/* Styling the bold part of VISSION/MISSION titles */
+.box-title strong {
+    font-weight: bold;
+}
+
+.vision-box p, .mission-box p {
+    padding-top: 10px; /* Space between the line and the paragraph text */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .content-row, .vision-mission-section {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
