@@ -43,7 +43,7 @@ include("../include/head.php");
       </div>
    </div>
 
-   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
        <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
            <div class="flex items-center justify-between mb-4">
                <h3 class="text-lg font-bold text-gray-700">Total Students</h3>
@@ -53,17 +53,6 @@ include("../include/head.php");
            </div>
            <p class="text-3xl font-bold text-gray-900">120</p>
            <p class="text-sm text-green-500 mt-2 flex items-center"><i class="ph ph-trend-up mr-1"></i> +5 New this month</p>
-       </div>
-
-       <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-           <div class="flex items-center justify-between mb-4">
-               <h3 class="text-lg font-bold text-gray-700">Monthly Income</h3>
-               <div class="p-2 bg-green-100 rounded-lg text-green-600">
-                   <i class="ph ph-money text-2xl"></i>
-               </div>
-           </div>
-           <p class="text-3xl font-bold text-gray-900">LKR 45k</p>
-           <p class="text-sm text-gray-500 mt-2">Pending: LKR 12k</p>
        </div>
 
        <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
