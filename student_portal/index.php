@@ -1,4 +1,4 @@
 <?php
-header("Location:student_portal/pages");
+header("Location:pages");
 
 ?>
