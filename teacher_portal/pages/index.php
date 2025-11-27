@@ -1,15 +1,14 @@
 <?php
-// 1. CSS/Images සඳහා Path එක පස්සට (Root folder එකට) යැවිය යුතුය.
-// index.php තියෙන්නේ folder දෙකක් ඇතුලේ නිසා ../../ භාවිතා කරන්න.
+// 1. Path variable setup
 $path = "../../"; 
 
-// 2. Header එක ඇත්තේ 'teacher_include' folder එකේ නිසා path එක වෙනස් කළා.
-include("../teacher_include/teacher_head.php"); 
+// 2. Include Head
+include("../include/head.php"); 
 ?>
 
-<?php include("../teacher_include/teacher_sidebar.php"); ?>
+<?php include("../include/sidebar.php"); ?>
 
-<div class="p-4 sm:ml-64">
+<div class="p-4 sm:ml-64 pb-20">
    
    <div class="flex items-center justify-between p-4 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
       <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
@@ -44,7 +43,7 @@ include("../teacher_include/teacher_head.php");
       </div>
    </div>
 
-   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
        <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
            <div class="flex items-center justify-between mb-4">
                <h3 class="text-lg font-bold text-gray-700">Total Students</h3>
@@ -54,17 +53,6 @@ include("../teacher_include/teacher_head.php");
            </div>
            <p class="text-3xl font-bold text-gray-900">120</p>
            <p class="text-sm text-green-500 mt-2 flex items-center"><i class="ph ph-trend-up mr-1"></i> +5 New this month</p>
-       </div>
-
-       <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-           <div class="flex items-center justify-between mb-4">
-               <h3 class="text-lg font-bold text-gray-700">Monthly Income</h3>
-               <div class="p-2 bg-green-100 rounded-lg text-green-600">
-                   <i class="ph ph-money text-2xl"></i>
-               </div>
-           </div>
-           <p class="text-3xl font-bold text-gray-900">LKR 45k</p>
-           <p class="text-sm text-gray-500 mt-2">Pending: LKR 12k</p>
        </div>
 
        <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -79,9 +67,19 @@ include("../teacher_include/teacher_head.php");
        </div>
    </div>
 
-   <?php include("../../includes/footer.php"); ?>
+   <div class="w-full bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6">
+       <div class="flex justify-between items-center mb-4">
+           <div>
+               <h5 class="text-xl font-bold leading-none text-gray-900">Student Attendance</h5>
+               <p class="text-sm text-gray-500 mt-1">Attendance overview for the last 7 days</p>
+           </div>
+       </div>
+       <div id="attendance-chart" class="w-full"></div>
+   </div>
+
+   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+   <script src="../js/dashboard.js"></script>
+
+   <?php include("../include/footer.php"); ?>
 
 </div>
-
-</body>
-</html>
