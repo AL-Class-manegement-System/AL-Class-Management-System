@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 27, 2025 at 05:40 AM
+-- Generation Time: Nov 27, 2025 at 07:33 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -45,6 +45,29 @@ CREATE TABLE `students` (
   `registered_date` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `students`
+--
+
+INSERT INTO `students` (`student_id`, `reg_number`, `full_name`, `nic`, `dob`, `gender`, `school`, `address`, `student_phone`, `parent_phone`, `email`, `stream`, `batch`, `photo`, `registered_date`) VALUES
+(1, 'ST2025001', 'janith', '200011234567', '2025-11-04', 'Male', 'richmend', 'galle', '0740614128', '0773093941', 'nuwanthanadee2005@gmail.com', 'Art', '2025', 'ST2025001.png', '2025-11-27 10:39:50');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teachers`
+--
+
+CREATE TABLE `teachers` (
+  `teacher_id` int(11) NOT NULL,
+  `full_name` varchar(150) NOT NULL,
+  `subject` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `status` int(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 
 --
@@ -78,6 +101,12 @@ ALTER TABLE `students`
   ADD UNIQUE KEY `reg_number` (`reg_number`);
 
 --
+-- Indexes for table `teachers`
+--
+ALTER TABLE `teachers`
+  ADD PRIMARY KEY (`teacher_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -92,7 +121,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `teachers`
+--
+ALTER TABLE `teachers`
+  MODIFY `teacher_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
