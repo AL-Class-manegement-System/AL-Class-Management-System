@@ -25,7 +25,12 @@
             <a href="#" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
                <i class="ph ph-users-three text-xl text-gray-400 group-hover:text-white"></i>
                <span class="ms-3">Students</span>
-               <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">120</span>
+            </a>
+         </li>
+         <li>
+            <a href="#" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
+               <i class="ph ph-users-three text-xl text-gray-400 group-hover:text-white"></i>
+               <span class="ms-3">Papers</span>
             </a>
          </li>
 
@@ -33,13 +38,6 @@
             <a href="#" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
                <i class="ph ph-files text-xl text-gray-400 group-hover:text-white"></i>
                <span class="ms-3">Assignments</span>
-            </a>
-         </li>
-
-         <li>
-            <a href="#" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
-               <i class="ph ph-currency-circle-dollar text-xl text-gray-400 group-hover:text-white"></i>
-               <span class="ms-3">Income & Fees</span>
             </a>
          </li>
 
