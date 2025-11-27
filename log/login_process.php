@@ -48,8 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: login.php?error=Invalid username or password");
     }
     */
+
     
-    // දැනට ටෙස්ට් කරන්න නිකන් message එකක්:
-    echo "reCAPTCHA Verified Successfully! Now checking database...";
 }
 ?>
