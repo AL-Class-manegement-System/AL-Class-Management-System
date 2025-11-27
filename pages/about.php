@@ -1,6 +1,7 @@
 <?php include('../includes/header.php'); ?>
+<div class="h-16 md:h-20 lg:h-24" aria-hidden="true"></div>
 
-    <link rel="stylesheet" href="about.css">
+    <link rel="stylesheet" href="../css/about.css">
     <div class="container">
         <div class="section about-us-section">
             <h2 class="section-title">ABOUT US</h2>
