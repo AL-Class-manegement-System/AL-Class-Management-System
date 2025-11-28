@@ -18,8 +18,19 @@ $stmt->execute();
 
 $student = $stmt->get_result();
 
-if($student->num_rows === 1) {
+if ($student->num_rows === 1) {
     $student = $student->fetch_assoc();
+
+    $photo_url = $student['photo'];
+    $image_path = "../../assets/images/students/" . $photo_url;
+    if (!empty($$photo_url) && file_exists($image_path)) {
+        // ෆොටෝ එක තියෙනවා නම් ඒක ගන්න
+        $profile_pic = $image_path;
+    } else {
+        // ෆොටෝ එකක් නැත්නම්, නමේ අකුරු වලින් හැදෙන පින්තූරයක් (Default) ගන්න
+        $profile_pic = "https://ui-avatars.com/api/?name=" . urlencode($student['full_name']) . "&background=6366f1&color=fff";
+    }
+
 } else {
     // Handle case where student is not found
     header("Location: ../log/login.php");
@@ -37,6 +48,7 @@ if($student->num_rows === 1) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Portal | Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../js/dashboard.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
@@ -60,7 +72,7 @@ if($student->num_rows === 1) {
                 <a href="#"
                     class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all">
                     <i class="fas fa-book w-6"></i>
-                    <span class="font-medium">My Courses</span>
+                    <span class="font-medium">My Classes</span>
                 </a>
 
                 <a href="#"
@@ -74,6 +86,21 @@ if($student->num_rows === 1) {
                     <i class="fas fa-calendar-alt w-6"></i>
                     <span class="font-medium">Time Table</span>
                 </a>
+                <a href="#"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all">
+                    <i class="fas fa-calendar-alt w-6"></i>
+                    <span class="font-medium">Ongoing Classes</span>
+                </a>
+                <a href="#"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all">
+                    <i class="fas fa-calendar-alt w-6"></i>
+                    <span class="font-medium">Past Lessons</span>
+                </a>
+                <a href="#"
+                    class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all">
+                    <i class="fas fa-calendar-alt w-6"></i>
+                    <span class="font-medium">Study Packes</span>
+                </a>
             </nav>
 
             <div class="p-4 border-t border-slate-700">
@@ -83,10 +110,11 @@ if($student->num_rows === 1) {
                     <span class="font-medium">Logout</span>
                 </a>
             </div>
+
         </aside>
 
-        <div class="flex-1 flex flex-col h-screen overflow-y-auto">
 
+        <div class="flex-1 flex flex-col h-screen overflow-y-auto">
             <header class="h-20 bg-white shadow-sm flex items-center justify-between px-8 sticky top-0 z-10">
                 <div class="md:hidden">
                     <button class="text-slate-500 hover:text-primary"><i class="fas fa-bars text-2xl"></i></button>
@@ -103,125 +131,190 @@ if($student->num_rows === 1) {
 
                     <div class="flex items-center gap-3 pl-4 border-l">
                         <div class="text-right hidden sm:block">
-                            <p class="text-sm font-bold text-slate-700"><?php echo htmlspecialchars($student['full_name']); ?></p>
-                            <p class="text-xs text-slate-500"><?php echo htmlspecialchars($student_id); ?></p>
+                            <p class="text-md font-bold text-slate-700">
+                                <?php echo htmlspecialchars($student['full_name']); ?>
+                            </p>
+                            <!-- <p class="text-xs text-slate-500"><?php echo htmlspecialchars($student_id); ?></p> -->
                         </div>
-                        <img src="<?php echo urlencode($student['photo']); ?>&background=6366f1&color=fff"
-                            class="w-10 h-10 rounded-full border-2 border-slate-200">
+                        <div class="flex items-center gap-2 relative">
+
+                            <div class="relative ml-3">
+
+                                <button onclick="toggleDropdown()" class="flex items-center focus:outline-none">
+                                    <!-- <div class="text-right hidden sm:block mr-3">
+                                        <p class="text-sm font-bold text-slate-700">
+                                            <?php echo htmlspecialchars($full_name); ?></p>
+                                        <p class="text-xs text-slate-500"><?php echo htmlspecialchars($student_id); ?>
+                                        </p>
+                                    </div> -->
+                                    <img src="<?php echo $profile_pic; ?>"
+                                        class="w-10 h-10 rounded-full object-cover border-2 border-slate-200 hover:border-primary transition cursor-pointer">
+                                </button>
+
+                                <div id="userDropdown"
+                                    class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5 transition-all duration-200 ease-out origin-top-right transform">
+
+                                    <div class="px-4 py-2 border-b border-gray-100 md:hidden">
+                                        <p class="text-sm font-medium text-gray-900">
+                                            <?php echo htmlspecialchars($full_name); ?>
+                                        </p>
+                                    </div>
+
+                                    <a href="#"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700">
+                                        <i class="fas fa-user mr-2 w-4"></i> Your Profile
+                                    </a>
+                                    <a href="#"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700">
+                                        <i class="fas fa-cog mr-2 w-4"></i> Settings
+                                    </a>
+                                    <div class="border-t border-gray-100"></div>
+                                    <a href="../../lib/logout.php"
+                                        class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700">
+                                        <i class="fas fa-sign-out-alt mr-2 w-4"></i> Sign out
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <main class="p-8">
 
-                <div
-                    class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white mb-8 shadow-lg relative overflow-hidden opacity-80">
-                    <div class="relative z-10">
-                        <h1 class="text-3xl font-bold mb-2">Welcome back, <?php echo htmlspecialchars($student['full_name']) ?>! 👋
-                        </h1>
-                        <p class="opacity-90">You have <span class="font-bold text-yellow-300">2 assignments</span> due
-                            this week. Keep up the good work!</p>
-                    </div>
-                    <i
-                        class="fas fa-rocket absolute -bottom-4 -right-4 text-9xl text-white opacity-10 transform rotate-12"></i>
-                </div>
+            <div class="flex-1 flex flex-col h-screen overflow-y-auto">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-3 bg-blue-100 text-blue-600 rounded-lg"><i class="fas fa-book-open"></i></div>
-                            <span class="text-xs font-bold text-green-500 bg-green-100 px-2 py-1 rounded">+2 new</span>
+                <main class="p-8">
+
+                    <div
+                        class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white mb-8 shadow-lg relative overflow-hidden opacity-80">
+                        <div class="relative z-10">
+                            <h1 class="text-3xl font-bold mb-2">Welcome back,
+                                <?php echo htmlspecialchars($student['full_name']) ?>! 👋
+                            </h1>
+                            <p class="opacity-90">You have <span class="font-bold text-yellow-300">2 assignments</span>
+                                due
+                                this week. Keep up the good work!</p>
                         </div>
-                        <h3 class="text-2xl font-bold text-slate-800">06</h3>
-                        <p class="text-slate-500 text-sm">Enrolled Subjects</p>
+                        <i
+                            class="fas fa-rocket absolute -bottom-4 -right-4 text-9xl text-white opacity-10 transform rotate-12"></i>
                     </div>
 
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-3 bg-green-100 text-green-600 rounded-lg"><i class="fas fa-user-check"></i>
-                            </div>
-                            <span class="text-xs font-bold text-green-500 bg-green-100 px-2 py-1 rounded">Good</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-slate-800">85%</h3>
-                        <p class="text-slate-500 text-sm">Attendance</p>
+                    <div class=" w-40 p-5 bg-white h-30 mb-4 rounded-lg shadow-sm border border-yellow-500 hover:shadow-md transition flex-col items-center justify-center text-center">
+                        <p class="text-color-gray">Your Student Id</p>
+                       
+                        <p class="font-bold md pt-5"><?php echo htmlspecialchars($student['reg_number']) ?></p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-3 bg-purple-100 text-purple-600 rounded-lg"><i class="fas fa-chart-line"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-2xl font-bold text-slate-800">3.8</h3>
-                        <p class="text-slate-500 text-sm">Current GPA</p>
-                    </div>
 
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="p-3 bg-orange-100 text-orange-600 rounded-lg"><i class="fas fa-clock"></i></div>
-                        </div>
-                        <h3 class="text-2xl font-bold text-slate-800">Next: Math</h3>
-                        <p class="text-slate-500 text-sm">Starts in 30 mins</p>
-                    </div>
-                </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                        <h3 class="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">
-                            <i class="fas fa-calendar-day text-primary"></i> Today's Schedule
-                        </h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center p-4 bg-slate-50 rounded-xl border-l-4 border-primary">
-                                <div class="w-16 text-center">
-                                    <p class="text-sm font-bold text-slate-800">08:00</p>
-                                    <p class="text-xs text-slate-500">AM</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div
+                            class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 bg-blue-100 text-blue-600 rounded-lg"><i class="fas fa-book-open"></i>
                                 </div>
-                                <div class="ml-4">
-                                    <h4 class="font-bold text-slate-800">Combined Mathematics</h4>
-                                    <p class="text-sm text-slate-500">Dr. Perera • Hall A</p>
+                                <span class="text-xs font-bold text-green-500 bg-green-100 px-2 py-1 rounded">+2
+                                    new</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-800">06</h3>
+                            <p class="text-slate-500 text-sm">Enrolled Subjects</p>
+                        </div>
+
+                        <div
+                            class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 bg-green-100 text-green-600 rounded-lg"><i
+                                        class="fas fa-user-check"></i>
                                 </div>
                                 <span
-                                    class="ml-auto px-3 py-1 bg-green-100 text-green-600 text-xs font-bold rounded-full">Active</span>
+                                    class="text-xs font-bold text-green-500 bg-green-100 px-2 py-1 rounded">Good</span>
                             </div>
+                            <h3 class="text-2xl font-bold text-slate-800">85%</h3>
+                            <p class="text-slate-500 text-sm">Attendance</p>
+                        </div>
 
-                            <div
-                                class="flex items-center p-4 bg-slate-50 rounded-xl border-l-4 border-slate-300 opacity-75">
-                                <div class="w-16 text-center">
-                                    <p class="text-sm font-bold text-slate-800">10:30</p>
-                                    <p class="text-xs text-slate-500">AM</p>
-                                </div>
-                                <div class="ml-4">
-                                    <h4 class="font-bold text-slate-800">Physics</h4>
-                                    <p class="text-sm text-slate-500">Mr. Silva • Lab 02</p>
+                        <div
+                            class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 bg-purple-100 text-purple-600 rounded-lg"><i
+                                        class="fas fa-chart-line"></i>
                                 </div>
                             </div>
+                            <h3 class="text-2xl font-bold text-slate-800">3.8</h3>
+                            <p class="text-slate-500 text-sm">Current GPA</p>
+                        </div>
+
+                        <div
+                            class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 bg-orange-100 text-orange-600 rounded-lg"><i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-800">Next: Math</h3>
+                            <p class="text-slate-500 text-sm">Starts in 30 mins</p>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                        <h3 class="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">
-                            <i class="fas fa-bullhorn text-orange-500"></i> Notice Board
-                        </h3>
-                        <ul class="space-y-4">
-                            <li class="pb-3 border-b border-slate-100">
-                                <p class="text-sm font-semibold text-slate-700">Exam Timetable Released</p>
-                                <p class="text-xs text-slate-400 mt-1">2 hours ago</p>
-                            </li>
-                            <li class="pb-3 border-b border-slate-100">
-                                <p class="text-sm font-semibold text-slate-700">School Closed on Friday</p>
-                                <p class="text-xs text-slate-400 mt-1">Yesterday</p>
-                            </li>
-                            <li>
-                                <button
-                                    class="w-full py-2 text-sm text-primary font-semibold hover:bg-slate-50 rounded-lg transition">View
-                                    All Notices</button>
-                            </li>
-                        </ul>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                            <h3 class="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">
+                                <i class="fas fa-calendar-day text-primary"></i> Today's Schedule
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center p-4 bg-slate-50 rounded-xl border-l-4 border-primary">
+                                    <div class="w-16 text-center">
+                                        <p class="text-sm font-bold text-slate-800">08:00</p>
+                                        <p class="text-xs text-slate-500">AM</p>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h4 class="font-bold text-slate-800">Combined Mathematics</h4>
+                                        <p class="text-sm text-slate-500">Dr. Perera • Hall A</p>
+                                    </div>
+                                    <span
+                                        class="ml-auto px-3 py-1 bg-green-100 text-green-600 text-xs font-bold rounded-full">Active</span>
+                                </div>
+
+                                <div
+                                    class="flex items-center p-4 bg-slate-50 rounded-xl border-l-4 border-slate-300 opacity-75">
+                                    <div class="w-16 text-center">
+                                        <p class="text-sm font-bold text-slate-800">10:30</p>
+                                        <p class="text-xs text-slate-500">AM</p>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h4 class="font-bold text-slate-800">Physics</h4>
+                                        <p class="text-sm text-slate-500">Mr. Silva • Lab 02</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                            <h3 class="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">
+                                <i class="fas fa-bullhorn text-orange-500"></i> Notice Board
+                            </h3>
+                            <ul class="space-y-4">
+                                <li class="pb-3 border-b border-slate-100">
+                                    <p class="text-sm font-semibold text-slate-700">Exam Timetable Released</p>
+                                    <p class="text-xs text-slate-400 mt-1">2 hours ago</p>
+                                </li>
+                                <li class="pb-3 border-b border-slate-100">
+                                    <p class="text-sm font-semibold text-slate-700">School Closed on Friday</p>
+                                    <p class="text-xs text-slate-400 mt-1">Yesterday</p>
+                                </li>
+                                <li>
+                                    <button
+                                        class="w-full py-2 text-sm text-primary font-semibold hover:bg-slate-50 rounded-lg transition">View
+                                        All Notices</button>
+                                </li>
+                            </ul>
+                        </div>
+
                     </div>
 
-                </div>
-
-            </main>
+                </main>
+            </div>
         </div>
     </div>
 </body>
