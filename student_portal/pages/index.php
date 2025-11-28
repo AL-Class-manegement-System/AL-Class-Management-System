@@ -4,7 +4,6 @@ session_start();
 require_once '../../includes/connection.php';
 
 
-
 $student_id = $_SESSION['student_id'];
 $full_name = $_SESSION['full_name'];
 
@@ -41,7 +40,7 @@ if($student->num_rows === 1) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-200 font-sans">
 
     <div class="flex h-screen overflow-hidden">
 
@@ -51,7 +50,7 @@ if($student->num_rows === 1) {
                 <span class="text-xl font-bold tracking-wide">MySchool</span>
             </div>
 
-            <nav class="flex-1 px-4 py-6 space-y-2">
+            <nav class="flex-1 px-4 py-6 space-y-2 ">
                 <a href="#"
                     class="flex items-center px-4 py-3 bg-primary text-white rounded-xl transition-transform transform hover:scale-105 shadow-lg shadow-indigo-500/30">
                     <i class="fas fa-th-large w-6"></i>
