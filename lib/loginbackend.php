@@ -30,6 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // // Successful login
             $_SESSION['student_id'] = $student['reg_number'];
             $_SESSION['full_name'] = $student['full_name'];
+            $_SESSION['profile_pic'] = $student['photo'];
             header("Location: ../student_portal");
             exit();
         }
