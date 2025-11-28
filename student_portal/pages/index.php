@@ -3,10 +3,7 @@ session_start();
 
 require_once '../../includes/connection.php';
 
-if (!isset($_SESSION['reg_number'])) {
-    // header("Location: ../../log/login.php");
-    // exit();
-}
+
 
 $student_id = $_SESSION['student_id'];
 $full_name = $_SESSION['full_name'];
