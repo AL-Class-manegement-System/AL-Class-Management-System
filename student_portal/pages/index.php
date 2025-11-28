@@ -5,11 +5,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Check if user is logged in
-if (!isset($_SESSION['reg_number'])) {
-    header("Location: ../../log/login.php"); // Login නැත්නම් එළියට යවන්න
-    exit();
-}
 ?>
 
 <!DOCTYPE html>

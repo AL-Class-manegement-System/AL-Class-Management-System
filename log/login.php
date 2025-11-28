@@ -12,8 +12,6 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-
     <script>
         tailwind.config = {
             theme: {
@@ -75,7 +73,7 @@
                 </p>
             </div>
 
-            <form class="mt-8 space-y-6" method="POST" action="login_process.php">
+            <form class="mt-8 space-y-6" method="POST" action="../lib/loginbackend.php">
 
                 <div class="rounded-md space-y-5">
 
@@ -117,10 +115,6 @@
 
                 </div>
 
-                <div class="flex justify-center transform scale-90 sm:scale-100 origin-center">
-                    <div class="g-recaptcha" data-theme="dark" data-sitekey="6LeQlxcsAAAAAM5owCoFdIMQMRTTyxjOz_UxLeXX"></div>
-                </div>
-
                 <div>
                     <button type="submit"
                         class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-primary hover:bg-primaryHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-primary shadow-lg shadow-indigo-500/30 transition-all duration-300 ease-in-out transform hover:-translate-y-1">
@@ -140,7 +134,7 @@
                     </p>
                 </div>
 
-                <?php if (!empty($_GET['error'])): ?>
+                <!-- <?php if (!empty($_GET['error'])): ?>
                     <div class="mt-4 bg-red-900/30 border-l-4 border-red-500 p-4 rounded-md animate-pulse">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -153,7 +147,7 @@
                             </div>
                         </div>
                     </div>
-                <?php endif; ?>
+                <?php endif; ?> -->
 
             </form>
         </div>
