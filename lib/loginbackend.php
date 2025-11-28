@@ -28,17 +28,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($password == $student['nic']) {
             // // Successful login
-            // $_SESSION['student_id'] = $student['reg_number'];
-            // $_SESSION['full_name'] = $student['full_name'];
+            $_SESSION['student_id'] = $student['reg_number'];
+            $_SESSION['full_name'] = $student['full_name'];
             header("Location: ../student_portal");
             exit();
         }
 
     } else {
         // User not found
-        // $_SESSION['error'] = 'Invalid username or password';
-        // header("Location: ../log/login.php");
-        // exit();
+        $_SESSION['error'] = 'Invalid username or password';
+        header("Location: ../log/login.php");
+        exit();
     }
 
 }
