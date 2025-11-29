@@ -59,7 +59,7 @@ if ($student->num_rows === 1) {
         <aside class="w-64 bg-slate-900 text-white hidden md:flex flex-col shadow-xl z-20">
             <div class="h-20 flex items-center px-8 border-b border-slate-700">
                 <i class="fas fa-graduation-cap text-3xl text-primary mr-3"></i>
-                <span class="text-xl font-bold tracking-wide">MySchool</span>
+                <span class="text-xl font-bold tracking-wide">Student Portal</span>
             </div>
 
             <nav class="flex-1 px-4 py-6 space-y-2 ">
