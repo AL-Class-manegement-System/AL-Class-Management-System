@@ -27,10 +27,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
         if ($password == $student['nic']) {
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
             // // Successful login
             $_SESSION['student_id'] = $student['reg_number'];
             $_SESSION['full_name'] = $student['full_name'];
             $_SESSION['profile_pic'] = $student['photo'];
+=======
+            HGVF
+>>>>>>> Stashed changes
+=======
+            HGVF
+>>>>>>> Stashed changes
+=======
+            HGVF
+>>>>>>> Stashed changes
             header("Location: ../student_portal");
             exit();
         }
