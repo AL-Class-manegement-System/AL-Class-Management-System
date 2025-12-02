@@ -4,7 +4,9 @@ require_once '../includes/connection.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
+    // ==========================================
     // 1. Data ලබා ගැනීම සහ පිරිසිදු කිරීම
+    // ==========================================
     $full_name = isset($_POST['full_name']) ? trim($_POST['full_name']) : '';
     $nic = isset($_POST['nic']) ? trim($_POST['nic']) : '';
     $dob = isset($_POST['date_of_birth']) ? trim($_POST['date_of_birth']) : '';
@@ -18,29 +20,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $batch = isset($_POST['batch']) ? trim($_POST['batch']) : '';
 
     // ==========================================
-    // 2. VALIDATION SECTION (Validation ආරම්භය)
+    // 2. VALIDATION SECTION
     // ==========================================
 
-    // A. හිස්දැයි පරීක්ෂා කිරීම (Required Fields Check)
+    // A. Required Fields Check
     if (empty($full_name) || empty($nic) || empty($dob) || empty($gender) || empty($parent_phone) || empty($email) || empty($stream) || empty($batch)) {
         header("Location: ../log/registration.php?error=" . urlencode('Please fill all required fields'));
         exit();
     }
 
-    // B. NIC Validation (පරණ අංක 9+V/X හෝ අලුත් අංක 12)
-    // Regex නිවැරදි කිරීම: '|' ලකුණ ඉවත් කර [vVxX] ලෙස යෙදීම වඩා නිවැරදිය.
+    // B. NIC Validation
     if (!preg_match('/^([0-9]{9}[vVxX]|[0-9]{12})$/', $nic)) {
         header("Location: ../log/registration.php?error=" . urlencode('Invalid NIC Format (Ex: 123456789V or 200012345678)'));
         exit();
     }
 
-    // C. Phone Number Validation (Parent Phone) - ඉලක්කම් 10ක් විය යුතුය
+    // C. Parent Phone Validation
     if (!preg_match('/^[0-9]{10}$/', $parent_phone)) {
         header("Location: ../log/registration.php?error=" . urlencode('Invalid Parent Phone Number (Must be 10 digits)'));
         exit();
     }
 
-    // D. Student Phone Validation (තිබේ නම් පමණක් පරීක්ෂා කරයි)
+    // D. Student Phone Validation
     if (!empty($student_phone) && !preg_match('/^[0-9]{10}$/', $student_phone)) {
         header("Location: ../log/registration.php?error=" . urlencode('Invalid Student Phone Number'));
         exit();
@@ -53,10 +54,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // ==========================================
-    // 3. ID GENERATE & PHOTO UPLOAD
+    // 3. ID GENERATE
     // ==========================================
 
-    // Student Registration Number Auto Generate කිරීම
     $current_year = date("Y");
     $prefix = "ST{$current_year}";
 
@@ -73,45 +73,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $reg_number = "{$prefix}001"; 
     }
 
-    // Photo Upload කිරීම
-    $photo_name = ""; 
+    // ==========================================
+    // 4. PHOTO HANDLING (BLOB UPDATE)
+    // ==========================================
+    
+    $imageData = null; // ෆොටෝ එකේ Data තියාගන්න variable එක
 
     if (isset($_FILES['photo']) && isset($_FILES['photo']['error']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
         
-        $target_dir = "../assets/images/students/";
-
-        // Folder එක නැත්නම් සාදන්න
-        if (!file_exists($target_dir)) {
-            mkdir($target_dir, 0777, true);
-        }
-
-        $file_extension = strtolower(pathinfo($_FILES["photo"]["name"], PATHINFO_EXTENSION));
-        $new_filename = "{$reg_number}.{$file_extension}"; 
-        $target_file = "{$target_dir}{$new_filename}";
-
-        $allowed_types = ['jpg', 'jpeg', 'png'];
+        // Image එකක්දැයි පරීක්ෂා කිරීම
         $imginfo = @getimagesize($_FILES['photo']['tmp_name']);
         
-        if ($imginfo !== false && in_array($imginfo['mime'], ['image/jpeg', 'image/png']) && in_array($file_extension, $allowed_types)) {
-             if ($_FILES['photo']['size'] <= 2 * 1024 * 1024) { // Max 2MB
-                if (move_uploaded_file($_FILES["photo"]["tmp_name"], $target_file)) {
-                    $photo_name = $new_filename;
-                } else {
-                    header("Location: ../log/registration.php?error=" . urlencode('Image upload failed'));
-                    exit();
-                }
+        if ($imginfo !== false) {
+             // File Size Check (Max 2MB)
+             if ($_FILES['photo']['size'] <= 2 * 1024 * 1024) {
+                // Folder එකකට නොදා, කෙලින්ම Data කියවා ගන්නවා
+                $imageData = file_get_contents($_FILES['photo']['tmp_name']);
              } else {
                 header("Location: ../log/registration.php?error=" . urlencode('Image too large (max 2MB)'));
                 exit();
              }
         } else {
-            header("Location: ../log/registration.php?error=" . urlencode('Only JPG/JPEG/PNG valid image files are allowed'));
+            header("Location: ../log/registration.php?error=" . urlencode('Invalid image file'));
             exit();
         }
     }
 
     // ==========================================
-    // 4. DATABASE INSERTION
+    // 5. DATABASE INSERTION
     // ==========================================
     
     $sql = "INSERT INTO students (
@@ -129,7 +118,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    $stmt->bind_param('sssssssssssss', $reg_number, $full_name, $nic, $dob, $gender, $school, $address, $student_phone, $parent_phone, $email, $stream, $batch, $photo_name);
+    // 'null' භාවිතා කරන්නේ අපි BLOB එක වෙනම send_long_data වලින් යවන නිසා
+    $null = NULL;
+
+    // Bind parameters: 12 strings ('s') and 1 blob ('b')
+    $stmt->bind_param('ssssssssssssb', 
+        $reg_number, $full_name, $nic, $dob, $gender, $school, $address, 
+        $student_phone, $parent_phone, $email, $stream, $batch, $null
+    );
+
+    // Photo Data යැවීම (Index 12 යනු 13 වන ස්ථානයයි - Photo Column එක)
+    if ($imageData !== null) {
+        $stmt->send_long_data(12, $imageData);
+    }
 
     if ($stmt->execute()) {
         $stmt->close();
