@@ -1,3 +1,6 @@
+<?php
+session_start(); // 1. Session Start කරන්න ඕන මුලින්ම
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,9 +10,7 @@
     <title>Login — School System</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <script>
@@ -20,10 +21,10 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        primary: '#6366f1', // Indigo 500
-                        primaryHover: '#4f46e5', // Indigo 600
-                        darkCard: '#0f172a', // Slate 900
-                        darkInput: '#1e293b', // Slate 800
+                        primary: '#6366f1',
+                        primaryHover: '#4f46e5',
+                        darkCard: '#0f172a',
+                        darkInput: '#1e293b',
                     }
                 }
             }
@@ -32,16 +33,13 @@
 
     <style>
         body {
-            /* Background Image */
             background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
-
         .bg-overlay {
             background: rgba(2, 6, 23, 0.85);
-            /* Dark Slate Overlay */
         }
     </style>
 </head>
@@ -75,6 +73,20 @@
 
             <form class="mt-8 space-y-6" method="POST" action="../lib/loginbackend.php">
 
+                <?php if (isset($_SESSION['error'])): ?>
+                    <div class="bg-red-500/10 border-l-4 border-red-500 p-4 rounded-md mb-4 flex items-start gap-3">
+                        <i class="fas fa-circle-exclamation text-red-400 mt-0.5"></i>
+                        <div>
+                            <h3 class="text-sm font-bold text-red-200">Login Failed</h3>
+                            <p class="text-xs text-red-300 mt-1">
+                                <?php 
+                                    echo htmlspecialchars($_SESSION['error']); 
+                                    unset($_SESSION['error']); // 3. පණිවිඩය පෙන්නුවාට පස්සේ මකලා දානවා
+                                ?>
+                            </p>
+                        </div>
+                    </div>
+                <?php endif; ?>
                 <div class="rounded-md space-y-5">
 
                     <div class="relative">
@@ -134,21 +146,6 @@
                     </p>
                 </div>
 
-                <!-- <?php if (!empty($_GET['error'])): ?>
-                    <div class="mt-4 bg-red-900/30 border-l-4 border-red-500 p-4 rounded-md animate-pulse">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-exclamation-circle text-red-400"></i>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm text-red-200 font-medium">
-                                    <?php echo htmlspecialchars($_GET['error']); ?>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                <?php endif; ?> -->
-
             </form>
         </div>
 
@@ -175,5 +172,4 @@
     </script>
 
 </body>
-
 </html>

@@ -22,29 +22,48 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt_st->execute();
     $result_st = $stmt_st->get_result();
 
+    // User කෙනෙක් සිටීදැයි පරීක්ෂා කිරීම
     if ($result_st->num_rows === 1) {
         $student = $result_st->fetch_assoc();
 
+        // A. Status Active (1) ද කියා බැලීම
+        if ($student['status'] == 1) {
 
-        if ($password == $student['nic']) {
+            // B. Password (NIC) නිවැරදිදැයි බැලීම
+            if ($password == $student['nic']) {
 
-            // // Successful login
-            $_SESSION['student_id'] = $student['reg_number'];
-            $_SESSION['full_name'] = $student['full_name'];
-            $_SESSION['profile_pic'] = $student['photo'];
+                // Successful login
+                $_SESSION['student_id'] = $student['reg_number'];
+                $_SESSION['full_name'] = $student['full_name'];
+                $_SESSION['profile_pic'] = $student['photo'];
 
+                header("Location: ../student_portal");
+                exit();
 
+            } else {
+                // Password වැරදි නම්
+                $_SESSION['error'] = 'Invalid username or password';
+                header("Location: ../log/login.php");
+                exit();
+            }
 
-            header("Location: ../student_portal");
+        } else {
+            // Status එක Inactive (0) නම්
+            $_SESSION['error'] = 'Your account is deactivated. Please contact the office.';
+            header("Location: ../log/login.php");
             exit();
         }
 
     } else {
-        // User not found
+        // User කෙනෙක් සොයාගත නොහැකි නම් (Username වැරදි නම්)
         $_SESSION['error'] = 'Invalid username or password';
         header("Location: ../log/login.php");
         exit();
     }
 
+} else {
+    // POST Request එකක් නොවේ නම්
+    header("Location: ../log/login.php");
+    exit();
 }
 ?>

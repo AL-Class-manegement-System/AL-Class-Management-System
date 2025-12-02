@@ -17,6 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stream = isset($_POST['stream']) ? trim($_POST['stream']) : '';
     $batch = isset($_POST['batch']) ? trim($_POST['batch']) : '';
 
+$status = 1;
     // ==========================================
     // 2. VALIDATION SECTION (Validation ආරම්භය)
     // ==========================================
@@ -116,9 +117,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     
     $sql = "INSERT INTO students (
                 reg_number, full_name, nic, dob, gender, school, address, 
-                student_phone, parent_phone, email, stream, batch, photo
+                student_phone, parent_phone, email, stream, batch, photo, status
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )";
             
     $stmt = $conn->prepare($sql);
@@ -129,7 +130,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    $stmt->bind_param('sssssssssssss', $reg_number, $full_name, $nic, $dob, $gender, $school, $address, $student_phone, $parent_phone, $email, $stream, $batch, $photo_name);
+    $stmt->bind_param('sssssssssssssi', $reg_number, $full_name, $nic, $dob, $gender, $school, $address, $student_phone, $parent_phone, $email, $stream, $batch, $photo_name, $status);
 
     if ($stmt->execute()) {
         $stmt->close();
