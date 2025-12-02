@@ -15,7 +15,6 @@ $sql = "SELECT * FROM students WHERE reg_number = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $student_id);
 $stmt->execute();
-
 $student = $stmt->get_result();
 
 if ($student->num_rows === 1) {
