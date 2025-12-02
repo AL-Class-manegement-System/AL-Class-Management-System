@@ -1,5 +1,4 @@
 <?php 
-// Database connection එක
 include 'db_con.php'; 
 ?>
 
@@ -41,16 +40,51 @@ include 'db_con.php';
             </div>
             <?php endif; ?>
 
-            <form method="GET" action="" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6 flex gap-4 items-center">
-                <input type="text" name="search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>" 
-                       class="w-full md:w-96 pl-4 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                       placeholder="Search by Name or Reg No...">
-                
-                <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900">Search</button>
-                
-                <?php if(isset($_GET['search'])): ?>
-                    <a href="student.php" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">Reset</a>
-                <?php endif; ?>
+            <form method="GET" action="" class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6">
+                <div class="flex flex-col md:flex-row gap-4 items-end">
+                    
+                    <div class="w-full md:flex-1">
+                        <label class="text-xs font-semibold text-gray-500 mb-1 block">Search Student</label>
+                        <input type="text" name="search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>" 
+                            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" 
+                            placeholder="Name or Reg No...">
+                    </div>
+
+                    <div class="w-full md:w-48">
+                        <label class="text-xs font-semibold text-gray-500 mb-1 block">Stream</label>
+                        <select name="stream" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                            <option value="">All Streams</option>
+                            <option value="Maths" <?php if(isset($_GET['stream']) && $_GET['stream'] == 'Maths') echo 'selected'; ?>>Physical Science</option>
+                            <option value="Bio" <?php if(isset($_GET['stream']) && $_GET['stream'] == 'Bio') echo 'selected'; ?>>Bio Science</option>
+                            <option value="Tech" <?php if(isset($_GET['stream']) && $_GET['stream'] == 'Tech') echo 'selected'; ?>>Technology</option>
+                            <option value="Commerce" <?php if(isset($_GET['stream']) && $_GET['stream'] == 'Commerce') echo 'selected'; ?>>Commerce</option>
+                            <option value="Art" <?php if(isset($_GET['stream']) && $_GET['stream'] == 'Art') echo 'selected'; ?>>Arts</option>
+                        </select>
+                    </div>
+
+                    <div class="w-full md:w-32">
+                        <label class="text-xs font-semibold text-gray-500 mb-1 block">Batch</label>
+                        <select name="batch" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                            <option value="">All Years</option>
+                            <option value="2024" <?php if(isset($_GET['batch']) && $_GET['batch'] == '2024') echo 'selected'; ?>>2024</option>
+                            <option value="2025" <?php if(isset($_GET['batch']) && $_GET['batch'] == '2025') echo 'selected'; ?>>2025</option>
+                            <option value="2026" <?php if(isset($_GET['batch']) && $_GET['batch'] == '2026') echo 'selected'; ?>>2026</option>
+                            <option value="2027" <?php if(isset($_GET['batch']) && $_GET['batch'] == '2027') echo 'selected'; ?>>2027</option>
+                        </select>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition shadow-lg shadow-indigo-500/30">
+                            <i class="fas fa-filter mr-1"></i> Filter
+                        </button>
+                        
+                        <?php if(isset($_GET['search']) || isset($_GET['stream']) || isset($_GET['batch'])): ?>
+                            <a href="student.php" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition">
+                                Reset
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </form>
 
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -68,34 +102,52 @@ include 'db_con.php';
                         <tbody class="bg-white divide-y divide-gray-200">
                             
                             <?php
-                            // Search Logic
-                            $search_query = "";
+                            // ==========================================
+                            // UPDATED SEARCH LOGIC
+                            // ==========================================
+                            
+                            // 1. මූලික Query එක (Where 1=1 ලියන්නේ ඉදිරියට එන කොන්දේසි පහසුවෙන් අමුණන්නයි)
+                            $sql = "SELECT * FROM students WHERE 1=1";
+
+                            // 2. නම හෝ Reg No සෙවීම
                             if(isset($_GET['search']) && !empty($_GET['search'])){
                                 $search = $conn->real_escape_string($_GET['search']);
-                                $search_query = "WHERE full_name LIKE '%$search%' OR reg_number LIKE '%$search%'";
+                                $sql .= " AND (full_name LIKE '%$search%' OR reg_number LIKE '%$search%')";
                             }
 
-                            // Data database එකෙන් ගැනීම
-                            $sql = "SELECT * FROM students $search_query ORDER BY student_id DESC";
+                            // 3. Stream එක අනුව ෆිල්ටර් කිරීම
+                            if(isset($_GET['stream']) && !empty($_GET['stream'])){
+                                $stream = $conn->real_escape_string($_GET['stream']);
+                                $sql .= " AND stream = '$stream'";
+                            }
+
+                            // 4. Batch එක අනුව ෆිල්ටර් කිරීම
+                            if(isset($_GET['batch']) && !empty($_GET['batch'])){
+                                $batch = $conn->real_escape_string($_GET['batch']);
+                                $sql .= " AND batch = '$batch'";
+                            }
+
+                            // 5. අවසාන වශයෙන් Order එක එකතු කිරීම
+                            $sql .= " ORDER BY student_id DESC";
+
                             $result = $conn->query($sql);
 
                             if ($result->num_rows > 0) {
                                 while($row = $result->fetch_assoc()) {
                                     
-                                    // Status check (Database එකේ status 1 නම් Active, නැත්නම් Inactive)
-                                    // 'status' column එක නැත්නම් default Active ලෙස සලකයි.
+                                    // Status Logic
                                     $status_val = isset($row['status']) ? $row['status'] : 1; 
                                     $is_active = ($status_val == 1);
                                     
                                     $status_color = $is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
                                     $status_text = $is_active ? 'Active' : 'Inactive';
                                     
-                                    // Photo Path එක හැදීම (Note: folder name 'assets' ද 'assests' ද කියා check කරගන්න)
+                                    // Image Path Logic
                                     $photo_name = $row['photo'];
                                     if (!empty($photo_name) && file_exists("../assets/images/students/" . $photo_name)) {
                                         $photo_path = "../assets/images/students/" . $photo_name;
                                     } else {
-                                        $photo_path = "../assets/images/user2.jpg"; // Default image
+                                        $photo_path = "../assets/images/user2.jpg"; 
                                     }
                             ?>
 
@@ -142,7 +194,7 @@ include 'db_con.php';
                             <?php 
                                 }
                             } else {
-                                echo "<tr><td colspan='5' class='text-center py-8 text-gray-500'>No students found.</td></tr>";
+                                echo "<tr><td colspan='5' class='text-center py-8 text-gray-500'>No students found matching your filters.</td></tr>";
                             }
                             ?>
 
