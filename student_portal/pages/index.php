@@ -86,7 +86,7 @@ include('../includes/student_header.php');
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
 
-            <button
+            <div
                 class="bg-white p-6 rounded-2xl shadow-sm  hover:shadow-md group relative p-4 rounded-2xl backdrop-blur-xl border-2 border-indigo-800/30 bg-gradient-to-br from-white-500/40 via-black-500/60 to-black/80 shadow-2xl hover:shadow-indigo-500/30 hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all duration-500 ease-out cursor-pointer hover:border-indigo-400/60 overflow-hidden">
                 <div class="flex items-center justify-between mb-4">
                     <div class="p-3 bg-blue-100 text-blue-600 rounded-lg"><i class="fas fa-book-open"></i>
@@ -94,11 +94,11 @@ include('../includes/student_header.php');
                     <span class="text-xs font-bold text-red-500 bg-red-100 px-2 py-1 rounded">
                         🔴 Live</span>
                 </div>
+
                 
-                <h3 class="text-2xl font-bold text-slate-800">Live Class</h3>
                 <p class="text-blue-500 text-sm">join now</p>
-                
-            </button>
+                <a href="../pages/live_class.php"><h3 class="text-2xl font-bold text-slate-800">Live Class</h3></a>
+            </div>
 
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
                 <div class="flex items-center justify-between mb-4">
