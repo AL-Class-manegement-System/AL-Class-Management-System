@@ -23,7 +23,7 @@ if ($student->num_rows === 1) {
 
     $photo_url = $student['photo'];
     $image_path = "../../assets/images/students/" . $photo_url;
-    if (!empty($$photo_url) && file_exists($image_path)) {
+    if (!empty($photo_url) && file_exists($image_path)) {
         // ෆොටෝ එක තියෙනවා නම් ඒක ගන්න
         $profile_pic = $image_path;
     } else {
