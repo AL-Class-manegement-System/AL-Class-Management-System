@@ -22,7 +22,7 @@ include 'db_con.php';
         <header class="bg-white shadow-sm py-4 px-8 flex justify-between items-center sticky top-0 z-40">
             <h2 class="text-2xl font-bold text-gray-800">Student Management</h2>
             <div class="flex items-center gap-4">
-                <a href="../log/registration.php" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition shadow-lg shadow-indigo-500/30 flex items-center">
+                <a href="../log/registration.php" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition shadow-lg flex items-center">
                     <i class="fas fa-plus mr-2"></i> Add New Student
                 </a>
             </div>
@@ -31,30 +31,59 @@ include 'db_con.php';
         <main class="p-8">
             
             <?php if(isset($_GET['msg'])): ?>
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm flex justify-between items-center animate-pulse">
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm flex justify-between items-center">
                 <div>
                     <p class="font-bold">Success</p>
                     <p class="text-sm"><?php echo htmlspecialchars($_GET['msg']); ?></p>
                 </div>
-                <button onclick="this.parentElement.style.display='none'" class="text-green-700 hover:text-green-900"><i class="fas fa-times"></i></button>
+                <button onclick="this.parentElement.style.display='none'" class="text-green-700"><i class="fas fa-times"></i></button>
             </div>
             <?php endif; ?>
 
-            <form method="GET" action="" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row gap-4 justify-between items-center">
-                <div class="relative w-full md:w-96">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                        <i class="fas fa-search"></i>
-                    </span>
-                    <input type="text" name="search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>" 
-                           class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" 
-                           placeholder="Search by Name or Reg No...">
-                </div>
-                
-                <div class="flex gap-2">
-                     <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-900 transition">Search</button>
-                     <?php if(isset($_GET['search'])): ?>
-                        <a href="student.php" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition">Reset</a>
-                     <?php endif; ?>
+            <form method="GET" action="" class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6">
+                <div class="flex flex-col md:flex-row gap-4 items-end">
+                    
+                    <div class="w-full md:flex-1">
+                        <label class="text-xs font-semibold text-gray-500 mb-1 block">Search Student</label>
+                        <input type="text" name="search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>" 
+                            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" 
+                            placeholder="Name or Reg No...">
+                    </div>
+
+                    <div class="w-full md:w-48">
+                        <label class="text-xs font-semibold text-gray-500 mb-1 block">Stream</label>
+                        <select name="stream" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                            <option value="">All Streams</option>
+                            <option value="Maths" <?php if(isset($_GET['stream']) && $_GET['stream'] == 'Maths') echo 'selected'; ?>>Physical Science</option>
+                            <option value="Bio" <?php if(isset($_GET['stream']) && $_GET['stream'] == 'Bio') echo 'selected'; ?>>Bio Science</option>
+                            <option value="Tech" <?php if(isset($_GET['stream']) && $_GET['stream'] == 'Tech') echo 'selected'; ?>>Technology</option>
+                            <option value="Commerce" <?php if(isset($_GET['stream']) && $_GET['stream'] == 'Commerce') echo 'selected'; ?>>Commerce</option>
+                            <option value="Art" <?php if(isset($_GET['stream']) && $_GET['stream'] == 'Art') echo 'selected'; ?>>Arts</option>
+                        </select>
+                    </div>
+
+                    <div class="w-full md:w-32">
+                        <label class="text-xs font-semibold text-gray-500 mb-1 block">Batch</label>
+                        <select name="batch" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                            <option value="">All Years</option>
+                            <option value="2024" <?php if(isset($_GET['batch']) && $_GET['batch'] == '2024') echo 'selected'; ?>>2024</option>
+                            <option value="2025" <?php if(isset($_GET['batch']) && $_GET['batch'] == '2025') echo 'selected'; ?>>2025</option>
+                            <option value="2026" <?php if(isset($_GET['batch']) && $_GET['batch'] == '2026') echo 'selected'; ?>>2026</option>
+                            <option value="2027" <?php if(isset($_GET['batch']) && $_GET['batch'] == '2027') echo 'selected'; ?>>2027</option>
+                        </select>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition shadow-lg shadow-indigo-500/30">
+                            <i class="fas fa-filter mr-1"></i> Filter
+                        </button>
+                        
+                        <?php if(isset($_GET['search']) || isset($_GET['stream']) || isset($_GET['batch'])): ?>
+                            <a href="student.php" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition">
+                                Reset
+                            </a>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </form>
 
@@ -63,46 +92,70 @@ include 'db_con.php';
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Student Info</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Reg No</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Stream</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Student Info</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Reg No</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Stream</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Action</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             
                             <?php
-                            $search_query = "";
+                            // ==========================================
+                            // UPDATED SEARCH LOGIC
+                            // ==========================================
+                            
+                            // 1. මූලික Query එක (Where 1=1 ලියන්නේ ඉදිරියට එන කොන්දේසි පහසුවෙන් අමුණන්නයි)
+                            $sql = "SELECT * FROM students WHERE 1=1";
+
+                            // 2. නම හෝ Reg No සෙවීම
                             if(isset($_GET['search']) && !empty($_GET['search'])){
                                 $search = $conn->real_escape_string($_GET['search']);
-                                $search_query = "WHERE full_name LIKE '%$search%' OR reg_number LIKE '%$search%'";
+                                $sql .= " AND (full_name LIKE '%$search%' OR reg_number LIKE '%$search%')";
                             }
 
-                            $sql = "SELECT * FROM students $search_query ORDER BY registered_date DESC";
+                            // 3. Stream එක අනුව ෆිල්ටර් කිරීම
+                            if(isset($_GET['stream']) && !empty($_GET['stream'])){
+                                $stream = $conn->real_escape_string($_GET['stream']);
+                                $sql .= " AND stream = '$stream'";
+                            }
+
+                            // 4. Batch එක අනුව ෆිල්ටර් කිරීම
+                            if(isset($_GET['batch']) && !empty($_GET['batch'])){
+                                $batch = $conn->real_escape_string($_GET['batch']);
+                                $sql .= " AND batch = '$batch'";
+                            }
+
+                            // 5. අවසාන වශයෙන් Order එක එකතු කිරීම
+                            $sql .= " ORDER BY student_id DESC";
+
                             $result = $conn->query($sql);
 
                             if ($result->num_rows > 0) {
                                 while($row = $result->fetch_assoc()) {
                                     
-                                    $is_active = ($row['status'] == 1);
+                                    // Status Logic
+                                    $status_val = isset($row['status']) ? $row['status'] : 1; 
+                                    $is_active = ($status_val == 1);
+                                    
                                     $status_color = $is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
                                     $status_text = $is_active ? 'Active' : 'Inactive';
                                     
-                                    // Status Button Logic
-                                    $btn_class = $is_active ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-green-600 bg-green-50 hover:bg-green-100';
-                                    $btn_icon = $is_active ? 'fa-user-slash' : 'fa-user-check';
-                                    $btn_title = $is_active ? 'Deactivate User' : 'Activate User';
-                                    
-                                    // Correct Image Path
-                                    $photo_path = !empty($row['photo']) ? "../assests/images/students/" . $row['photo'] : "../assests/images/user2.jpg";
+                                    // Image Path Logic
+                                    $photo_name = $row['photo'];
+                                    if (!empty($photo_name) && file_exists("../assets/images/students/" . $photo_name)) {
+                                        $photo_path = "../assets/images/students/" . $photo_name;
+                                    } else {
+                                        $photo_path = "../assets/images/user2.jpg"; 
+                                    }
                             ?>
 
-                            <tr class="hover:bg-gray-50 transition duration-150">
+                            <tr class="hover:bg-gray-50 transition">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div class="flex-shrink-0 h-10 w-10">
-                                            <img class="h-10 w-10 rounded-full object-cover border border-gray-200 shadow-sm" src="<?php echo $photo_path; ?>" alt="Photo">
+                                            <img class="h-10 w-10 rounded-full object-cover border" src="<?php echo $photo_path; ?>" alt="Photo">
                                         </div>
                                         <div class="ml-4">
                                             <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($row['full_name']); ?></div>
@@ -111,28 +164,28 @@ include 'db_con.php';
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm text-gray-700 font-mono font-bold bg-gray-100 px-2 py-1 rounded"><?php echo $row['reg_number']; ?></span>
+                                    <span class="text-sm font-bold bg-gray-100 px-2 py-1 rounded"><?php echo $row['reg_number']; ?></span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900 font-medium"><?php echo $row['stream']; ?></div>
+                                    <div class="text-sm font-medium"><?php echo $row['stream']; ?></div>
                                     <div class="text-xs text-gray-500">Batch <?php echo $row['batch']; ?></div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $status_color; ?>">
+                                    <span class="px-2.5 py-0.5 inline-flex text-xs font-semibold rounded-full <?php echo $status_color; ?>">
                                         <?php echo $status_text; ?>
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
                                     
-                                    <a href="#" class="p-2 rounded-lg text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition" title="Edit Details">
+                                    <a href="#" class="p-2 rounded-lg text-indigo-600 bg-indigo-50 hover:bg-indigo-100" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
 
-                                    <a href="student_status.php?id=<?php echo $row['student_id']; ?>&status=<?php echo $row['status']; ?>" 
-                                       class="p-2 rounded-lg transition <?php echo $btn_class; ?>" 
-                                       title="<?php echo $btn_title; ?>"
-                                       onclick="return confirm('Are you sure?')">
-                                        <i class="fas <?php echo $btn_icon; ?>"></i>
+                                    <a href="student_status.php?id=<?php echo $row['student_id']; ?>&status=<?php echo $status_val; ?>" 
+                                       class="p-2 rounded-lg <?php echo $is_active ? 'text-red-500 bg-red-50' : 'text-green-600 bg-green-50'; ?>" 
+                                       onclick="return confirm('Change status?')"
+                                       title="Change Status">
+                                        <i class="fas <?php echo $is_active ? 'fa-user-slash' : 'fa-user-check'; ?>"></i>
                                     </a>
 
                                 </td>
@@ -141,7 +194,7 @@ include 'db_con.php';
                             <?php 
                                 }
                             } else {
-                                echo "<tr><td colspan='5' class='text-center py-8 text-gray-500'>No students found.</td></tr>";
+                                echo "<tr><td colspan='5' class='text-center py-8 text-gray-500'>No students found matching your filters.</td></tr>";
                             }
                             ?>
 
