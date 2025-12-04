@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 
 include('../includes/student_header.php');
@@ -62,8 +61,9 @@ include('../includes/student_header.php');
                 </div>
 
                 
-                <p class="text-blue-500 text-sm">join now</p>
-                <a href="../pages/live_class.php"><h3 class="text-2xl font-bold text-slate-800">Live Class</h3></a>
+                <p class="text-blue-500 text-sm"><a href="../pages/live_class.php"></a>join now</p>
+                <h3 class="text-2xl font-bold text-slate-800">Live Class</h3>
+                
             </div>
 
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
