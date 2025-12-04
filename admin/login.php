@@ -1,51 +1,52 @@
 <?php
 session_start();
-include 'db_con.php'; // Database connection එක
+include 'db_con.php'; // Database connection
+
+// Error message ekak thibunoth pennanna variable ekak
+$error = "";
 
 if (isset($_POST['login_btn'])) {
     
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
 
-    // 1. Prepared Statement එක සෑදීම
-    // (SQL Injection වලින් ආරක්ෂා වීමට ? ලකුණ භාවිතා කරයි)
+    // 1. Database Connection Check
+    if ($conn->connect_error) {
+        die("Connection Failed: " . $conn->connect_error);
+    }
+
+    // 2. User wa soyanna (Prepared Statement use karala)
     $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND role = 'Admin' LIMIT 1");
 
     if ($stmt) {
-        // 2. Data Bind කිරීම (s = string)
         $stmt->bind_param("s", $username);
-        
-        // 3. Query එක Execute කිරීම
         $stmt->execute();
-        
-        // 4. ප්‍රතිඵල ලබා ගැනීම
         $result = $stmt->get_result();
 
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
 
-            // 5. Password පරීක්ෂා කිරීම (Database එකේ Plain text නම්)
-            // ඔබේ Database එකේ Password එක '123' වගේ Plain text නම් මේ විදියට තියන්න.
+            // 3. Password Check (Plain text '123' wage thiyena nisa kelinma check karanawa)
             if ($password === $user['password']) {
                 
-                // Login සාර්ථකයි - Session ආරම්භ කිරීම
+                // Login Harinam Session start karanawa
                 $_SESSION['admin_id'] = $user['user_id'];
                 $_SESSION['admin_name'] = $user['username'];
                 $_SESSION['is_admin_logged_in'] = true;
 
-                // Dashboard එකට යැවීම
+                // Dashboard ekata yawanna
                 header("Location: index.php");
                 exit();
 
             } else {
-                $error = "Invalid Password!";
+                $error = "Incorrect Password!";
             }
         } else {
-            $error = "Invalid Username or Access Denied!";
+            $error = "User Not Found or Not an Admin!";
         }
         $stmt->close();
     } else {
-        $error = "Database Error: " . $conn->error;
+        $error = "Database Query Error!";
     }
 }
 ?>
@@ -69,7 +70,7 @@ if (isset($_POST['login_btn'])) {
             <p class="text-gray-500 text-sm">Please sign in to continue</p>
         </div>
 
-        <?php if(isset($error)): ?>
+        <?php if(!empty($error)): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-sm text-center">
                 <?php echo $error; ?>
             </div>

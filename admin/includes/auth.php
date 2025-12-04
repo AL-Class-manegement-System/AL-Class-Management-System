@@ -1,11 +1,12 @@
 <?php
-// Session එකක් පටන් ගෙන නැත්නම් පටන් ගන්න
+// Session eka patan aran nathnam patan gannawa
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Admin කෙනෙක් Log වෙලා නැත්නම් Login Page එකට එලවන්න
+// Admin kenek log wela nathnam Login page ekata yawanna
 if (!isset($_SESSION['is_admin_logged_in']) || $_SESSION['is_admin_logged_in'] !== true) {
+    // Dan inna thana anuwa path eka hadaganna
     header("Location: login.php");
     exit();
 }
