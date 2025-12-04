@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 04, 2025 at 08:22 AM
+-- Generation Time: Dec 04, 2025 at 10:22 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -224,6 +224,7 @@ CREATE TABLE `teachers` (
   `teacher_number` varchar(20) NOT NULL,
   `password` varchar(255) NOT NULL,
   `full_name` varchar(150) NOT NULL,
+  `phone` varchar(20) NOT NULL,
   `subject` varchar(100) NOT NULL,
   `description` text DEFAULT NULL,
   `image` varchar(255) DEFAULT NULL,
@@ -235,8 +236,10 @@ CREATE TABLE `teachers` (
 -- Dumping data for table `teachers`
 --
 
-INSERT INTO `teachers` (`teacher_id`, `teacher_number`, `password`, `full_name`, `subject`, `description`, `image`, `status`, `created_at`) VALUES
-(1, 'TC2025001', '893411', 'SVFdsfgswre', 'Physics', 'fsdfsedfef', '1764832639_6931357f6f360.jpg', 1, '2025-12-04 07:17:19');
+INSERT INTO `teachers` (`teacher_id`, `teacher_number`, `password`, `full_name`, `phone`, `subject`, `description`, `image`, `status`, `created_at`) VALUES
+(1, 'TC2025001', '893411', 'SVFdsfgswre', '', 'Physics', 'fsdfsedfef', '1764832639_6931357f6f360.jpg', 1, '2025-12-04 07:17:19'),
+(2, 'TC2025002', '295001', ' Mr.Dinesh Muthugala', '', 'Biology', 'In addition to his academic qualifications, Muthugala is a well-known Biology lecturer in Sri Lanka and is the founder of DM Education Private Limited. He is also an entrepreneur and film producer. ', '1764837787_6931499b53340.jpg', 1, '2025-12-04 08:43:07'),
+(3, 'TC2025003', '770370', 'Mr.Ravindu bandaranayake', '0713510441', 'ICT', 'He holds a B.Sc. (Hons) in Cybersecurity and Forensics from the University of Gloucestershire, United Kingdom. He previously studied Software Engineering at the Sri Lanka Institute of Information Technology (SLIIT) and Electronics at Wayamba University of Sri Lanka (WUSL).', '1764839145_69314ee93cd88.jpg', 1, '2025-12-04 09:05:45');
 
 -- --------------------------------------------------------
 
@@ -389,7 +392,7 @@ ALTER TABLE `students`
 -- AUTO_INCREMENT for table `teachers`
 --
 ALTER TABLE `teachers`
-  MODIFY `teacher_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `teacher_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
