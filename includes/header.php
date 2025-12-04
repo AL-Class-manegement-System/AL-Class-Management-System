@@ -31,7 +31,7 @@
             <div class="hidden md:flex items-center space-x-8">
                 <a href="../pages/index.php" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Home</a>
                 <a href="../pages/Streams.php" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Streams</a>
-                <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Timetable</a>
+               <a href="../pages/timetable.php" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Timetable</a>
                 <a href="../pages/about.php" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">About</a>
                 <a href="../pages/teachers.php" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Teachers</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition nav-link">Comments</a>

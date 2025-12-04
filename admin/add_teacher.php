@@ -1,52 +1,64 @@
 <?php 
 include 'db_con.php'; 
 
-// Form Submit කළාම
+// Form Submit Logic
 if (isset($_POST['submit'])) {
     
-    // Data ලබා ගැනීම
+    // 1. Data ලබා ගැනීම
     $name = mysqli_real_escape_string($conn, $_POST['name']);
     $subject = mysqli_real_escape_string($conn, $_POST['subject']);
     $desc = mysqli_real_escape_string($conn, $_POST['desc']);
     
-    // Image Upload Logic
+    // 2. Image Upload Logic
     $target_dir = "../assets/images/teachers/";
     
-    // ෆෝල්ඩරය නැත්නම් හදන්න
+    // Folder එක නැත්නම් හදන්න
     if (!file_exists($target_dir)) {
         mkdir($target_dir, 0777, true);
     }
 
     $new_image_name = "";
+    $uploadOk = 1;
 
-    // පින්තූරයක් තෝරාගෙන ඇත්නම්
     if (!empty($_FILES["image"]["name"])) {
-        $image = $_FILES['image']['name'];
-        $image_tmp = $_FILES['image']['tmp_name'];
-        $file_ext = strtolower(pathinfo($image, PATHINFO_EXTENSION));
-        
-        // අලුත් නමක් (Unique Name)
-        $new_image_name = time() . "_" . uniqid() . "." . $file_ext;
-        $target_file = $target_dir . $new_image_name;
+        $file_ext = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
+        $allowed_types = ['jpg', 'jpeg', 'png', 'webp'];
 
-        if (move_uploaded_file($image_tmp, $target_file)) {
-            // Upload Success
+        if (in_array($file_ext, $allowed_types)) {
+            // අලුත් නමක් දීම (Unique Name)
+            $new_image_name = time() . "_" . uniqid() . "." . $file_ext;
+            $target_file = $target_dir . $new_image_name;
+
+            if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                // Upload Success
+            } else {
+                $msg = "Sorry, there was an error uploading your file.";
+                $msg_type = "error";
+                $uploadOk = 0;
+            }
         } else {
-            $msg = "Error uploading image.";
+            $msg = "Only JPG, JPEG, PNG & WEBP files are allowed.";
             $msg_type = "error";
+            $uploadOk = 0;
         }
+    } else {
+        $msg = "Please select an image.";
+        $msg_type = "error";
+        $uploadOk = 0;
     }
 
-    // Database එකට Save කිරීම
-    $sql = "INSERT INTO teachers (full_name, subject, description, image, status) VALUES ('$name', '$subject', '$desc', '$new_image_name', 1)";
-    
-    if (mysqli_query($conn, $sql)) {
-        // Success - Teachers Page එකට Redirect කරනවා
-        header("Location: teachers.php?msg=Teacher added successfully!");
-        exit();
-    } else {
-        $msg = "Database Error: " . mysqli_error($conn);
-        $msg_type = "error";
+    // 3. Database Insert
+    if ($uploadOk == 1) {
+        $sql = "INSERT INTO teachers (full_name, subject, description, image, status) 
+                VALUES ('$name', '$subject', '$desc', '$new_image_name', 1)";
+        
+        if ($conn->query($sql) === TRUE) {
+            header("Location: teachers.php?msg=Teacher added successfully!");
+            exit();
+        } else {
+            $msg = "Database Error: " . $conn->error;
+            $msg_type = "error";
+        }
     }
 }
 ?>
@@ -98,12 +110,12 @@ if (isset($_POST['submit'])) {
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                                 <input type="text" name="name" placeholder="Ex: Mr. Amal Perera" required
-                                    class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Teaching Subject</label>
-                                <select name="subject" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <select name="subject" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition cursor-pointer">
                                     <option value="" disabled selected>Select Subject</option>
                                     <option value="Combined Maths">Combined Maths</option>
                                     <option value="Physics">Physics</option>
@@ -113,23 +125,26 @@ if (isset($_POST['submit'])) {
                                     <option value="Technology">Technology</option>
                                     <option value="Commerce">Commerce</option>
                                     <option value="Arts">Arts</option>
+                                    <option value="English">English</option>
                                 </select>
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Profile Photo</label>
-                                <input type="file" name="image" accept="image/*" required class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
+                                <input type="file" name="image" accept="image/*" required 
+                                    class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition cursor-pointer bg-gray-50 rounded-lg border border-gray-200"/>
+                                <p class="text-xs text-gray-400 mt-1">Recommended: Square image (1:1)</p>
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Description / Bio</label>
-                            <textarea name="desc" placeholder="Write a short description..." rows="4"
-                                class="w-full p-4 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description / Qualifications</label>
+                            <textarea name="desc" placeholder="B.Sc (Hons) University of Colombo..." rows="4" required
+                                class="w-full p-4 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"></textarea>
                         </div>
 
-                        <div class="flex items-center justify-end gap-4 pt-4 border-t border-gray-100">
-                            <button type="submit" name="submit" class="px-8 py-2.5 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 shadow-lg">
+                        <div class="flex items-center justify-end pt-4 border-t border-gray-100">
+                            <button type="submit" name="submit" class="px-8 py-3 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition transform hover:-translate-y-0.5">
                                 <i class="fas fa-save mr-2"></i> Save Teacher
                             </button>
                         </div>
