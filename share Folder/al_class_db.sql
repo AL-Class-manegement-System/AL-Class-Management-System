@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 02, 2025 at 04:05 PM
+-- Generation Time: Dec 04, 2025 at 08:22 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -67,7 +67,9 @@ CREATE TABLE `classes` (
 INSERT INTO `classes` (`class_id`, `class_name`, `stream`, `subject`, `teacher_name`, `fee`, `day`, `time`, `status`) VALUES
 (1, '2025 Revision', 'Physical Science', 'Combined Maths', 'Mr. Perera', 2500.00, 'Saturday', '08:00 AM', 1),
 (2, '2026 Theory', 'Bio Science', 'Biology', 'Mrs. Silva', 2000.00, 'Sunday', '10:00 AM', 1),
-(3, '2025 Paper Class', 'Commerce', 'Econ', 'Mr. Kamal', 1500.00, 'Friday', '02:30 PM', 1);
+(3, '2025 Paper Class', 'Commerce', 'Econ', 'Mr. Kamal', 1500.00, 'Friday', '02:30 PM', 1),
+(4, 'Bio Revision class', 'Bio Science', 'Bio Revision', 'Dinesh Muthugala', 2500.00, 'Friday', '08:00 am to 02:00 pm', 1),
+(5, 'ET for Srimal Wijesinghe', 'Technology', 'Engineering Technology ', 'Srimal Wijesinghe', 2500.00, 'Friday', '08:00 am to 02:00 pm', 1);
 
 -- --------------------------------------------------------
 
@@ -161,16 +163,11 @@ CREATE TABLE `payments` (
 --
 
 INSERT INTO `payments` (`payment_id`, `student_id`, `class_id`, `month`, `year`, `amount`, `method`, `payment_type`, `paid_date`) VALUES
-(1, 4, 1, 'November', 2025, 2500.00, 'Cash', 'Full', '2025-11-30 12:23:25'),
 (2, 1, 1, 'November', 2025, 2500.00, 'Card', 'Full', '2025-11-30 12:28:35'),
 (3, 1, 1, 'May', 2025, 2500.00, 'Card', 'Half', '2025-11-30 12:39:16'),
-(4, 4, 1, 'November', 2025, 2500.00, 'Cash', 'Full', '2025-11-30 13:07:51'),
-(5, 4, 1, 'November', 2025, 2500.00, 'Cash', 'Full', '2025-11-30 13:20:35'),
 (6, 1, 1, 'November', 2025, 2500.00, 'Cash', 'Full', '2025-11-30 13:36:13'),
 (7, 1, 1, 'December', 2025, 2500.00, 'Cash', 'Full', '2025-12-01 17:32:52'),
 (8, 6, 1, 'December', 2025, 2500.00, 'Cash', 'Full', '2025-12-02 12:16:38'),
-(9, 4, 1, 'March', 2025, 2500.00, 'Cash', 'Half', '2025-12-02 13:21:39'),
-(10, 4, 1, 'March', 2025, 2500.00, 'Cash', 'Half', '2025-12-02 13:21:51'),
 (11, 1, 1, 'January', 2025, 2500.00, 'Cash', 'Full', '2025-12-02 14:29:26'),
 (12, 1, 1, 'January', 2025, 2500.00, 'Cash', 'Full Payment', '2025-12-02 14:43:59'),
 (13, 1, 1, 'January', 2025, 2500.00, 'Cash', 'Full Payment', '2025-12-02 14:59:18'),
@@ -211,10 +208,10 @@ CREATE TABLE `students` (
 
 INSERT INTO `students` (`student_id`, `reg_number`, `full_name`, `nic`, `dob`, `gender`, `school`, `address`, `student_phone`, `parent_phone`, `email`, `stream`, `batch`, `photo`, `registered_date`, `status`) VALUES
 (1, 'ST2025001', 'janith', '200011234567', '2025-11-04', 'Male', 'richmend', 'galle', '0740614128', '0773093941', 'nuwanthanadee2005@gmail.com', 'Art', '2025', 'ST2025001.png', '2025-11-27 10:39:50', 1),
-(4, 'ST2025003', 'chamudi apsara', '201101501349', '2014-12-29', 'Female', 'sumabgaka', 'galle', '0763117031', '0773093941', 'chamudiapsara@gmail.com', 'Art', '2027', 'ST2025003.png', '2025-11-30 11:51:18', 1),
 (5, 'ST2025004', 'damsara', '200801401349', '2025-12-11', 'Male', 'mahinda college', 'galle', '0773093941', '0773093941', 'janith@gmail.com', 'Tech', '2027', 'ST2025004.jpg', '2025-12-02 11:51:33', 1),
 (6, 'ST2025005', 'ravindu', '200801401349', '2025-12-10', 'Male', 'ff', 'fbcnn', '0773093941', '0773093941', 'janith@gmail.com', 'Tech', '2027', 'ST2025005.jpg', '2025-12-02 11:56:28', 1),
-(7, 'ST2025006', 'Ravindu chandeepa', '200401401349', '2025-12-10', 'Male', 'ff', 'galle', '0773093941', '0773093941', 'Ravindu@gmail.com', 'Maths', '2027', 'ST2025006.jpg', '2025-12-02 14:24:02', 1);
+(7, 'ST2025006', 'Ravindu chandeepa', '200401401349', '2025-12-10', 'Male', 'ff', 'galle', '0773093941', '0773093941', 'Ravindu@gmail.com', 'Maths', '2027', 'ST2025006.jpg', '2025-12-02 14:24:02', 1),
+(8, 'ST2025007', 'chamika', '200612121212', '2025-12-17', 'Male', '', 'baddegama', '0766411887', '0766411887', 'chamika@gmail.com', 'Tech', '2026', 'ST2025007.jpg', '2025-12-04 08:04:07', 1);
 
 -- --------------------------------------------------------
 
@@ -224,6 +221,8 @@ INSERT INTO `students` (`student_id`, `reg_number`, `full_name`, `nic`, `dob`, `
 
 CREATE TABLE `teachers` (
   `teacher_id` int(11) NOT NULL,
+  `teacher_number` varchar(20) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `full_name` varchar(150) NOT NULL,
   `subject` varchar(100) NOT NULL,
   `description` text DEFAULT NULL,
@@ -231,6 +230,13 @@ CREATE TABLE `teachers` (
   `status` int(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `teachers`
+--
+
+INSERT INTO `teachers` (`teacher_id`, `teacher_number`, `password`, `full_name`, `subject`, `description`, `image`, `status`, `created_at`) VALUES
+(1, 'TC2025001', '893411', 'SVFdsfgswre', 'Physics', 'fsdfsedfef', '1764832639_6931357f6f360.jpg', 1, '2025-12-04 07:17:19');
 
 -- --------------------------------------------------------
 
@@ -317,7 +323,8 @@ ALTER TABLE `students`
 -- Indexes for table `teachers`
 --
 ALTER TABLE `teachers`
-  ADD PRIMARY KEY (`teacher_id`);
+  ADD PRIMARY KEY (`teacher_id`),
+  ADD UNIQUE KEY `teacher_number` (`teacher_number`);
 
 --
 -- Indexes for table `users`
@@ -340,7 +347,7 @@ ALTER TABLE `attendance`
 -- AUTO_INCREMENT for table `classes`
 --
 ALTER TABLE `classes`
-  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `enrollments`
@@ -376,13 +383,13 @@ ALTER TABLE `payments`
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `teachers`
 --
 ALTER TABLE `teachers`
-  MODIFY `teacher_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `teacher_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `users`
