@@ -1,7 +1,5 @@
 <?php
 
-require_once '../../includes/connection.php';
-
 include('../includes/student_header.php');
 ?>
 
@@ -9,24 +7,27 @@ include('../includes/student_header.php');
 
     <main class="p-4 md:p-8">
 
-        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white mb-8 shadow-lg relative overflow-hidden">
+        <div
+            class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white mb-8 shadow-lg relative overflow-hidden">
             <div class="relative z-10">
                 <h1 class="text-2xl md:text-3xl font-bold mb-2">Welcome back,
                     <?php echo htmlspecialchars($student['full_name']) ?>! 👋
                 </h1>
-                <p class="opacity-90">You have <span class="font-bold text-yellow-300">2 assignments</span> due this week. Keep up the good work!</p>
+                <p class="opacity-90">You have <span class="font-bold text-yellow-300">2 assignments</span> due this
+                    week. Keep up the good work!</p>
             </div>
             <i class="fas fa-rocket absolute -bottom-4 -right-4 text-9xl text-white opacity-10 transform rotate-12"></i>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
-            <div class="md:col-span-2 relative overflow-hidden bg-gradient-to-br from-amber-300 via-yellow-500 to-amber-600 rounded-2xl p-6 text-white shadow-xl shadow-yellow-500/30 transform transition-all duration-300 border border-yellow-300/50">
-                
+            <div
+                class="md:col-span-2 relative overflow-hidden bg-gradient-to-br from-amber-300 via-yellow-500 to-amber-600 rounded-2xl p-6 text-white shadow-xl shadow-yellow-500/30 transform transition-all duration-300 border border-yellow-300/50">
+
                 <div class="gold-shine-effect"></div>
 
                 <div class="relative z-10 flex flex-col sm:flex-row justify-between items-center gap-6">
-                    
+
                     <div class="text-center sm:text-left">
                         <p class="text-yellow-50 font-semibold text-sm uppercase tracking-wider">Student ID</p>
                         <h3 class="text-3xl sm:text-4xl font-extrabold mt-1 text-white drop-shadow-md tracking-widest">
@@ -35,12 +36,14 @@ include('../includes/student_header.php');
                         <p class="text-sm text-yellow-100 mt-2 font-medium">
                             <?php echo htmlspecialchars($student['full_name']) ?>
                         </p>
-                        <span class="inline-block mt-3 px-3 py-1 bg-white/20 rounded-full text-xs backdrop-blur-sm border border-white/30">
+                        <span
+                            class="inline-block mt-3 px-3 py-1 bg-white/20 rounded-full text-xs backdrop-blur-sm border border-white/30">
                             Active Student
                         </span>
                     </div>
 
-                    <div class="flex flex-col items-center gap-3 bg-white/20 p-4 rounded-xl backdrop-blur-md border border-white/30 shadow-inner">
+                    <div
+                        class="flex flex-col items-center gap-3 bg-white/20 p-4 rounded-xl backdrop-blur-md border border-white/30 shadow-inner">
                         <div id="qrcode" class="bg-white p-2 rounded-lg shadow-sm"></div>
                         <div class="bg-white px-2 py-1 rounded-lg shadow-sm mt-1">
                             <svg id="barcode" class="w-full h-8"></svg>
@@ -57,19 +60,22 @@ include('../includes/student_header.php');
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
 
-            <button
+            <div
                 class="bg-white p-6 rounded-2xl shadow-sm  hover:shadow-md group relative p-4 rounded-2xl backdrop-blur-xl border-2 border-indigo-800/30 bg-gradient-to-br from-white-500/40 via-black-500/60 to-black/80 shadow-2xl hover:shadow-indigo-500/30 hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all duration-500 ease-out cursor-pointer hover:border-indigo-400/60 overflow-hidden">
                 <div class="flex items-center justify-between mb-4">
                     <div class="p-3 bg-blue-100 text-blue-600 rounded-lg"><i class="fas fa-book-open"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-slate-800">Live Class</h3>
                     <p class="text-indigo-600 text-sm font-medium mt-1 flex items-center gap-1">
-                        Join Now <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                        Join Now <i
+                            class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
                     </p>
                 </div>
-                
+
                 <p class="text-blue-500 text-sm">join now</p>
-                <a href="../pages/live_class.php"><h3 class="text-2xl font-bold text-slate-800">Live Class</h3></a>
+                <a href="../pages/live_class.php">
+                    <h3 class="text-2xl font-bold text-slate-800">Live Class</h3>
+                </a>
             </div>
 
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
@@ -88,7 +94,8 @@ include('../includes/student_header.php');
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition flex-1">
+                <div
+                    class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition flex-1">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-slate-500 text-xs uppercase font-bold">Next Class</p>
@@ -111,7 +118,8 @@ include('../includes/student_header.php');
                     <i class="fas fa-calendar-day text-primary"></i> Today's Schedule
                 </h3>
                 <div class="space-y-4">
-                    <div class="flex items-center p-4 bg-slate-50 rounded-xl border-l-4 border-primary hover:bg-indigo-50 transition-colors cursor-pointer">
+                    <div
+                        class="flex items-center p-4 bg-slate-50 rounded-xl border-l-4 border-primary hover:bg-indigo-50 transition-colors cursor-pointer">
                         <div class="w-16 text-center border-r border-slate-200 pr-4">
                             <p class="text-sm font-bold text-slate-800">08:00</p>
                             <p class="text-xs text-slate-500">AM</p>
@@ -119,7 +127,8 @@ include('../includes/student_header.php');
                         <div class="ml-4 flex-1">
                             <h4 class="font-bold text-slate-800">Combined Mathematics</h4>
                             <p class="text-sm text-slate-500 flex items-center gap-2">
-                                <i class="fas fa-user-tie text-xs"></i> Dr. Perera • <i class="fas fa-map-marker-alt text-xs"></i> Hall A
+                                <i class="fas fa-user-tie text-xs"></i> Dr. Perera • <i
+                                    class="fas fa-map-marker-alt text-xs"></i> Hall A
                             </p>
                         </div>
                         <span class="px-3 py-1 bg-green-100 text-green-600 text-xs font-bold rounded-full">Active</span>
@@ -152,7 +161,8 @@ include('../includes/student_header.php');
                         <p class="text-xs text-slate-400 mt-1"><i class="far fa-clock"></i> Yesterday</p>
                     </li>
                     <li class="pt-2">
-                        <button class="w-full py-2.5 text-sm text-primary font-semibold bg-indigo-50 hover:bg-indigo-100 rounded-xl transition flex items-center justify-center gap-2">
+                        <button
+                            class="w-full py-2.5 text-sm text-primary font-semibold bg-indigo-50 hover:bg-indigo-100 rounded-xl transition flex items-center justify-center gap-2">
                             View All Notices <i class="fas fa-arrow-right"></i>
                         </button>
                     </li>
@@ -168,12 +178,12 @@ include('../includes/student_header.php');
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
 
 <script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         // PHP Variable to JS
         var studentID = "<?php echo $student['reg_number']; ?>";
 
         // Check if ID exists before generating
-        if(studentID) {
+        if (studentID) {
             // 1. Generate QR Code
             try {
                 var qrcodeContainer = document.getElementById("qrcode");
@@ -182,9 +192,9 @@ include('../includes/student_header.php');
                     text: studentID,
                     width: 70,
                     height: 70,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
                 });
             } catch (e) {
                 console.error("QR Code Error:", e);
@@ -209,4 +219,5 @@ include('../includes/student_header.php');
 </script>
 
 </body>
+
 </html>
