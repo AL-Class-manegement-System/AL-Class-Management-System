@@ -12,7 +12,7 @@ if (isset($_POST['submit'])) {
     // 2. AUTO GENERATE ID & PASSWORD
     // ==========================================
     
-    // A. Teacher ID එක සැකසීම (TC + Year + Serial)
+    // A. Teacher ID එක සැකසීම (Format: TC + Year + Serial -> TC2025001)
     $current_year = date("Y");
     $prefix = "TC{$current_year}";
     
@@ -23,38 +23,46 @@ if (isset($_POST['submit'])) {
     if ($id_result && $id_result->num_rows > 0) {
         $row = $id_result->fetch_assoc();
         $last_id = $row['teacher_number'];
-        $last_number = intval(substr($last_id, 6)); 
+        $last_number = intval(substr($last_id, 6)); // "TC2025" කොටස ඉවත් කර අංකය ගනී
         $new_number = $last_number + 1;
         $teacher_number = "{$prefix}" . str_pad($new_number, 3, "0", STR_PAD_LEFT);
     } else {
-        $teacher_number = "{$prefix}001"; 
+        $teacher_number = "{$prefix}001"; // පළමු Teacher
     }
 
-    // B. Random Password එකක් සැකසීම
+    // B. Random Password එකක් සැකසීම (ඉලක්කම් 6)
     $auto_password = rand(100000, 999999); 
     
     // ==========================================
     
     // 3. Image Upload Logic
     $target_dir = "../assets/images/teachers/";
-    if (!file_exists($target_dir)) { mkdir($target_dir, 0777, true); }
+    
+    // Folder එක නැත්නම් සාදන්න
+    if (!file_exists($target_dir)) { 
+        mkdir($target_dir, 0777, true); 
+    }
 
     $new_image_name = "";
     $uploadOk = 1;
 
+    // Image එකක් තෝරා ඇත්දැයි බැලීම
     if (!empty($_FILES["image"]["name"])) {
         $file_ext = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
         $allowed_types = ['jpg', 'jpeg', 'png', 'webp'];
 
+        // File Type එක පරීක්ෂා කිරීම
         if (in_array($file_ext, $allowed_types)) {
+            // Unique නමක් ලබා දීම
             $new_image_name = time() . "_" . uniqid() . "." . $file_ext;
+            
             if (!move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir . $new_image_name)) {
                 $msg = "Error uploading image.";
                 $msg_type = "error";
                 $uploadOk = 0;
             }
         } else {
-            $msg = "Invalid file type.";
+            $msg = "Invalid file type. Only JPG, JPEG, PNG & WEBP allowed.";
             $msg_type = "error";
             $uploadOk = 0;
         }
@@ -64,18 +72,27 @@ if (isset($_POST['submit'])) {
         $uploadOk = 0;
     }
 
-    // 4. Database Insert
+    // 4. Database Insert (Using bind_param for Security)
     if ($uploadOk == 1) {
-        $status = 1; 
+        $status = 1; // Active Status
 
+        // Query Prepare කිරීම
         $stmt = $conn->prepare("INSERT INTO teachers (teacher_number, password, full_name, subject, description, image, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
         if ($stmt) {
+            // Data Bind කිරීම (s=string, i=integer)
+            // Order: teacher_number, password, full_name, subject, description, image, status
             $stmt->bind_param("ssssssi", $teacher_number, $auto_password, $name, $subject, $desc, $new_image_name, $status);
 
+            // Execute කිරීම
             if ($stmt->execute()) {
                 // සාර්ථක වූ විට ID සහ Password පෙන්වන පණිවිඩය
-                $msg = "Teacher Added Successfully! <br> <b>ID: $teacher_number</b> <br> <b>Password: $auto_password</b> <br> (Please write this down)";
+                $msg = "Teacher Added Successfully! <br> 
+                        <span class='block mt-2 font-mono text-sm bg-green-50 p-2 rounded'>
+                            <b>User ID:</b> $teacher_number <br> 
+                            <b>Password:</b> $auto_password
+                        </span> 
+                        <span class='text-xs text-red-500 block mt-1'>* Please write this down or share with the teacher immediately.</span>";
                 $msg_type = "success";
             } else {
                 $msg = "Database Error: " . $stmt->error;
@@ -120,7 +137,7 @@ if (isset($_POST['submit'])) {
             <div class="w-full max-w-3xl">
 
                 <?php if(isset($msg)): ?>
-                <div class="<?php echo ($msg_type == 'success') ? 'bg-green-100 text-green-700 border-green-400' : 'bg-red-100 text-red-700 border-red-400'; ?> border px-4 py-3 rounded relative mb-6">
+                <div class="<?php echo ($msg_type == 'success') ? 'bg-green-100 text-green-700 border-green-400' : 'bg-red-100 text-red-700 border-red-400'; ?> border px-4 py-3 rounded relative mb-6 shadow-sm">
                     <span class="block sm:inline"><?php echo $msg; ?></span>
                 </div>
                 <?php endif; ?>
@@ -128,7 +145,7 @@ if (isset($_POST['submit'])) {
                 <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                     <div class="bg-indigo-600 px-8 py-4">
                         <h3 class="text-white font-semibold text-lg">Teacher Details</h3>
-                        <p class="text-indigo-200 text-xs">Fill in the information to add a new lecturer</p>
+                        <p class="text-indigo-200 text-xs">Fill in the information to register a new teacher</p>
                     </div>
                     
                     <form method="POST" action="" enctype="multipart/form-data" class="p-8 space-y-6">
@@ -172,7 +189,7 @@ if (isset($_POST['submit'])) {
 
                         <div class="flex items-center justify-end pt-4 border-t border-gray-100">
                             <button type="submit" name="submit" class="px-8 py-3 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition transform hover:-translate-y-0.5">
-                                <i class="fas fa-save mr-2"></i> Save Teacher
+                                <i class="fas fa-save mr-2"></i> Register Teacher
                             </button>
                         </div>
 
