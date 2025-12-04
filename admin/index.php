@@ -1,4 +1,6 @@
-<?php include('db_con.php'); ?>
+<?php 
+include 'includes/auth.php';
+include('db_con.php'); ?>
 
 <?php
 // 1. Total Students Count
