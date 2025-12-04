@@ -1,3 +1,44 @@
+<?php
+session_start();
+
+
+require_once '../../includes/connection.php';
+
+
+$student_id = $_SESSION['student_id'];
+$full_name = $_SESSION['full_name'];
+
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
+
+$sql = "SELECT * FROM students WHERE reg_number = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $student_id);
+$stmt->execute();
+$student = $stmt->get_result();
+
+if ($student->num_rows === 1) {
+    $student = $student->fetch_assoc();
+
+    $photo_url = $student['photo'];
+    $image_path = "../../assets/images/students/" . $photo_url;
+    if (!empty($photo_url) && file_exists($image_path)) {
+        // ෆොටෝ එක තියෙනවා නම් ඒක ගන්න
+        $profile_pic = $image_path;
+    } else {
+        // ෆොටෝ එකක් නැත්නම්, නමේ අකුරු වලින් හැදෙන පින්තූරයක් (Default) ගන්න
+        $profile_pic = "https://ui-avatars.com/api/?name=" . urlencode($student['full_name']) . "&background=6366f1&color=fff";
+    }
+
+} else {
+    // Handle case where student is not found
+    header("Location: ../../log/login.php");
+    exit();
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 

@@ -1,39 +1,38 @@
 <?php
 session_start();
 
-// Connection එක නිවැරදිව ලබා ගැනීම (Path එක වෙනස් විය හැක, ඔබේ ෆෝල්ඩර ව්‍යුහය අනුව බලන්න)
 require_once '../../includes/connection.php';
 
-// Session Check
-if (!isset($_SESSION['student_id'])) {
-    header("Location: ../../log/login.php");
-    exit();
-}
 
 $student_id = $_SESSION['student_id'];
+$full_name = $_SESSION['full_name'];
 
-// ශිෂ්‍ය තොරතුරු ලබා ගැනීම
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
+
 $sql = "SELECT * FROM students WHERE reg_number = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $student_id);
 $stmt->execute();
-$result_student = $stmt->get_result();
+$student = $stmt->get_result();
 
-if ($result_student->num_rows === 1) {
-    $student = $result_student->fetch_assoc();
+if ($student->num_rows === 1) {
+    $student = $student->fetch_assoc();
 
-    // Profile Picture Logic
     $photo_url = $student['photo'];
     $image_path = "../../assets/images/students/" . $photo_url;
-    
     if (!empty($photo_url) && file_exists($image_path)) {
+        // ෆොටෝ එක තියෙනවා නම් ඒක ගන්න
         $profile_pic = $image_path;
     } else {
+        // ෆොටෝ එකක් නැත්නම්, නමේ අකුරු වලින් හැදෙන පින්තූරයක් (Default) ගන්න
         $profile_pic = "https://ui-avatars.com/api/?name=" . urlencode($student['full_name']) . "&background=6366f1&color=fff";
     }
 
 } else {
-    header("Location: ../../log/login.php");
+    // Handle case where student is not found
+    header("Location: ../log/login.php");
     exit();
 }
 
@@ -85,22 +84,27 @@ include('../includes/student_header.php');
                 </div>
             </div>
 
-            <button class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md group relative overflow-hidden border-2 border-transparent hover:border-indigo-400/60 transition-all duration-300">
-                <div class="absolute inset-0 bg-gradient-to-br from-indigo-50 to-white opacity-50"></div>
-                <div class="relative z-10">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="p-3 bg-blue-100 text-blue-600 rounded-lg group-hover:scale-110 transition-transform">
-                            <i class="fas fa-video"></i>
-                        </div>
-                        <span class="text-xs font-bold text-red-500 bg-red-100 px-2 py-1 rounded animate-pulse">
-                            🔴 Live
-                        </span>
+        </div>
+
+
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+
+            <button
+                class="bg-white p-6 rounded-2xl shadow-sm  hover:shadow-md group relative p-4 rounded-2xl backdrop-blur-xl border-2 border-indigo-800/30 bg-gradient-to-br from-white-500/40 via-black-500/60 to-black/80 shadow-2xl hover:shadow-indigo-500/30 hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all duration-500 ease-out cursor-pointer hover:border-indigo-400/60 overflow-hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-blue-100 text-blue-600 rounded-lg"><i class="fas fa-book-open"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-slate-800">Live Class</h3>
                     <p class="text-indigo-600 text-sm font-medium mt-1 flex items-center gap-1">
                         Join Now <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
                     </p>
                 </div>
+                
+                <h3 class="text-2xl font-bold text-slate-800">Live Class</h3>
+                <p class="text-blue-500 text-sm">join now</p>
+                
             </button>
 
             <div class="flex flex-col gap-6">
