@@ -5,6 +5,7 @@ if (isset($_POST['submit'])) {
     
     // 1. Data ලබා ගැනීම
     $name = $_POST['name'];
+    $phone = $_POST['phone']; // අලුත් Phone Number කොටස
     $subject = $_POST['subject'];
     $desc = $_POST['desc'];
     
@@ -12,50 +13,39 @@ if (isset($_POST['submit'])) {
     // 2. AUTO GENERATE ID & PASSWORD
     // ==========================================
     
-    // A. Teacher ID එක සැකසීම (Format: TC + Year + Serial -> TC2025001)
     $current_year = date("Y");
     $prefix = "TC{$current_year}";
     
-    // අන්තිම Teacher ID එක ලබා ගැනීම
     $id_query = "SELECT teacher_number FROM teachers WHERE teacher_number LIKE '$prefix%' ORDER BY teacher_id DESC LIMIT 1";
     $id_result = $conn->query($id_query);
 
     if ($id_result && $id_result->num_rows > 0) {
         $row = $id_result->fetch_assoc();
         $last_id = $row['teacher_number'];
-        $last_number = intval(substr($last_id, 6)); // "TC2025" කොටස ඉවත් කර අංකය ගනී
+        $last_number = intval(substr($last_id, 6)); 
         $new_number = $last_number + 1;
         $teacher_number = "{$prefix}" . str_pad($new_number, 3, "0", STR_PAD_LEFT);
     } else {
-        $teacher_number = "{$prefix}001"; // පළමු Teacher
+        $teacher_number = "{$prefix}001"; 
     }
 
-    // B. Random Password එකක් සැකසීම (ඉලක්කම් 6)
     $auto_password = rand(100000, 999999); 
     
     // ==========================================
     
     // 3. Image Upload Logic
     $target_dir = "../assets/images/teachers/";
-    
-    // Folder එක නැත්නම් සාදන්න
-    if (!file_exists($target_dir)) { 
-        mkdir($target_dir, 0777, true); 
-    }
+    if (!file_exists($target_dir)) { mkdir($target_dir, 0777, true); }
 
     $new_image_name = "";
     $uploadOk = 1;
 
-    // Image එකක් තෝරා ඇත්දැයි බැලීම
     if (!empty($_FILES["image"]["name"])) {
         $file_ext = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
         $allowed_types = ['jpg', 'jpeg', 'png', 'webp'];
 
-        // File Type එක පරීක්ෂා කිරීම
         if (in_array($file_ext, $allowed_types)) {
-            // Unique නමක් ලබා දීම
             $new_image_name = time() . "_" . uniqid() . "." . $file_ext;
-            
             if (!move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir . $new_image_name)) {
                 $msg = "Error uploading image.";
                 $msg_type = "error";
@@ -72,28 +62,45 @@ if (isset($_POST['submit'])) {
         $uploadOk = 0;
     }
 
-    // 4. Database Insert (Using bind_param for Security)
+    // 4. Database Insert
     if ($uploadOk == 1) {
-        $status = 1; // Active Status
+        $status = 1; 
 
-        // Query Prepare කිරීම
-        $stmt = $conn->prepare("INSERT INTO teachers (teacher_number, password, full_name, subject, description, image, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        // Query එකට 'phone' එකතු කර ඇත
+        $stmt = $conn->prepare("INSERT INTO teachers (teacher_number, password, full_name, phone, subject, description, image, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
         if ($stmt) {
-            // Data Bind කිරීම (s=string, i=integer)
-            // Order: teacher_number, password, full_name, subject, description, image, status
-            $stmt->bind_param("ssssssi", $teacher_number, $auto_password, $name, $subject, $desc, $new_image_name, $status);
+            // Bind Params (Parameters 8ක් ඇත)
+            $stmt->bind_param("sssssssi", $teacher_number, $auto_password, $name, $phone, $subject, $desc, $new_image_name, $status);
 
-            // Execute කිරීම
             if ($stmt->execute()) {
-                // සාර්ථක වූ විට ID සහ Password පෙන්වන පණිවිඩය
+                
+                // ==========================================
+                // WHATSAPP LINK සැකසීම (Free Message)
+                // ==========================================
+                
+                // Phone Number එකේ මුල '0' තිබේ නම් එය ඉවත් කර '94' එකතු කිරීම (Sri Lanka format)
+                $wa_phone = preg_replace('/^0/', '94', $phone);
+                
+                // යවන මැසේජ් එක
+                $wa_message = "Hello $name,\n\nWelcome to Future Minds!\nHere are your login details:\n\nUser ID: *$teacher_number*\nPassword: *$auto_password*\n\nPlease login and change your password.";
+                
+                // URL Encode කිරීම (Link එකට ගැලපෙන ලෙස)
+                $wa_link = "https://wa.me/$wa_phone?text=" . urlencode($wa_message);
+
+                // Success Message එක තුළ WhatsApp Button එක පෙන්වීම
                 $msg = "Teacher Added Successfully! <br> 
-                        <span class='block mt-2 font-mono text-sm bg-green-50 p-2 rounded'>
+                        <span class='block mt-2 font-mono text-sm bg-green-50 p-2 rounded border border-green-200 text-green-800'>
                             <b>User ID:</b> $teacher_number <br> 
                             <b>Password:</b> $auto_password
-                        </span> 
-                        <span class='text-xs text-red-500 block mt-1'>* Please write this down or share with the teacher immediately.</span>";
+                        </span>
+                        <div class='mt-3'>
+                            <a href='$wa_link' target='_blank' class='inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-2 px-4 rounded-lg transition shadow-md'>
+                                <i class='fab fa-whatsapp text-lg'></i> Send to Teacher via WhatsApp
+                            </a>
+                        </div>";
                 $msg_type = "success";
+
             } else {
                 $msg = "Database Error: " . $stmt->error;
                 $msg_type = "error";
@@ -137,7 +144,7 @@ if (isset($_POST['submit'])) {
             <div class="w-full max-w-3xl">
 
                 <?php if(isset($msg)): ?>
-                <div class="<?php echo ($msg_type == 'success') ? 'bg-green-100 text-green-700 border-green-400' : 'bg-red-100 text-red-700 border-red-400'; ?> border px-4 py-3 rounded relative mb-6 shadow-sm">
+                <div class="<?php echo ($msg_type == 'success') ? 'bg-green-50 text-green-700 border-green-400' : 'bg-red-100 text-red-700 border-red-400'; ?> border px-4 py-4 rounded-xl relative mb-6 shadow-sm">
                     <span class="block sm:inline"><?php echo $msg; ?></span>
                 </div>
                 <?php endif; ?>
@@ -151,10 +158,18 @@ if (isset($_POST['submit'])) {
                     <form method="POST" action="" enctype="multipart/form-data" class="p-8 space-y-6">
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                                 <input type="text" name="name" placeholder="Ex: Mr. Amal Perera" required
                                     class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">WhatsApp Number</label>
+                                <input type="text" name="phone" placeholder="Ex: 0771234567" required
+                                    class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                                <p class="text-xs text-gray-400 mt-1">Used to send login details.</p>
                             </div>
 
                             <div>
@@ -173,7 +188,7 @@ if (isset($_POST['submit'])) {
                                 </select>
                             </div>
 
-                            <div>
+                            <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Profile Photo</label>
                                 <input type="file" name="image" accept="image/*" required 
                                     class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition cursor-pointer bg-gray-50 rounded-lg border border-gray-200"/>
