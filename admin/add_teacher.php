@@ -1,11 +1,13 @@
 <?php 
 include 'db_con.php'; 
 
+$wa_link = ""; // WhatsApp Link variable initialization
+
 if (isset($_POST['submit'])) {
     
     // 1. Data ලබා ගැනීම
     $name = $_POST['name'];
-    $phone = $_POST['phone']; // අලුත් Phone Number කොටස
+    $phone = $_POST['phone']; 
     $subject = $_POST['subject'];
     $desc = $_POST['desc'];
     
@@ -32,8 +34,8 @@ if (isset($_POST['submit'])) {
     $auto_password = rand(100000, 999999); 
     
     // ==========================================
-    
     // 3. Image Upload Logic
+    // ==========================================
     $target_dir = "../assets/images/teachers/";
     if (!file_exists($target_dir)) { mkdir($target_dir, 0777, true); }
 
@@ -66,29 +68,35 @@ if (isset($_POST['submit'])) {
     if ($uploadOk == 1) {
         $status = 1; 
 
-        // Query එකට 'phone' එකතු කර ඇත
         $stmt = $conn->prepare("INSERT INTO teachers (teacher_number, password, full_name, phone, subject, description, image, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
         if ($stmt) {
-            // Bind Params (Parameters 8ක් ඇත)
             $stmt->bind_param("sssssssi", $teacher_number, $auto_password, $name, $phone, $subject, $desc, $new_image_name, $status);
 
             if ($stmt->execute()) {
                 
                 // ==========================================
-                // WHATSAPP LINK සැකසීම (Free Message)
+                // WHATSAPP LINK සැකසීම (Improved Logic)
                 // ==========================================
                 
-                // Phone Number එකේ මුල '0' තිබේ නම් එය ඉවත් කර '94' එකතු කිරීම (Sri Lanka format)
-                $wa_phone = preg_replace('/^0/', '94', $phone);
+                // 1. ඉලක්කම් නොවන සියල්ල ඉවත් කිරීම (Remove spaces, +, etc)
+                $clean_phone = preg_replace('/[^0-9]/', '', $phone);
+
+                // 2. අංකය '94'න් පටන් ගන්නා ලෙස සැකසීම
+                if (substr($clean_phone, 0, 2) == '94') {
+                    $wa_phone = $clean_phone;
+                } elseif (substr($clean_phone, 0, 1) == '0') {
+                    $wa_phone = '94' . substr($clean_phone, 1); // 0 ඉවත් කර 94 එකතු කරයි
+                } else {
+                    $wa_phone = '94' . $clean_phone;
+                }
                 
-                // යවන මැසේජ් එක
+                // 3. යවන මැසේජ් එක
                 $wa_message = "Hello $name,\n\nWelcome to Future Minds!\nHere are your login details:\n\nUser ID: *$teacher_number*\nPassword: *$auto_password*\n\nPlease login and change your password.";
                 
-                // URL Encode කිරීම (Link එකට ගැලපෙන ලෙස)
-                $wa_link = "https://wa.me/$wa_phone?text=" . urlencode($wa_message);
+                // 4. Link එක (api.whatsapp.com වඩා විශ්වාසදායකයි)
+                $wa_link = "https://api.whatsapp.com/send?phone=$wa_phone&text=" . urlencode($wa_message);
 
-                // Success Message එක තුළ WhatsApp Button එක පෙන්වීම
                 $msg = "Teacher Added Successfully! <br> 
                         <span class='block mt-2 font-mono text-sm bg-green-50 p-2 rounded border border-green-200 text-green-800'>
                             <b>User ID:</b> $teacher_number <br> 
@@ -96,7 +104,7 @@ if (isset($_POST['submit'])) {
                         </span>
                         <div class='mt-3'>
                             <a href='$wa_link' target='_blank' class='inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-2 px-4 rounded-lg transition shadow-md'>
-                                <i class='fab fa-whatsapp text-lg'></i> Send to Teacher via WhatsApp
+                                <i class='fab fa-whatsapp text-lg'></i> Send Message Now
                             </a>
                         </div>";
                 $msg_type = "success";
@@ -147,6 +155,15 @@ if (isset($_POST['submit'])) {
                 <div class="<?php echo ($msg_type == 'success') ? 'bg-green-50 text-green-700 border-green-400' : 'bg-red-100 text-red-700 border-red-400'; ?> border px-4 py-4 rounded-xl relative mb-6 shadow-sm">
                     <span class="block sm:inline"><?php echo $msg; ?></span>
                 </div>
+                
+                <?php if($msg_type == 'success' && !empty($wa_link)): ?>
+                <script>
+                    setTimeout(function() {
+                        window.open("<?php echo $wa_link; ?>", "_blank");
+                    }, 1000); // 1 second delay
+                </script>
+                <?php endif; ?>
+                
                 <?php endif; ?>
 
                 <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
@@ -169,7 +186,7 @@ if (isset($_POST['submit'])) {
                                 <label class="block text-sm font-medium text-gray-700 mb-2">WhatsApp Number</label>
                                 <input type="text" name="phone" placeholder="Ex: 0771234567" required
                                     class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
-                                <p class="text-xs text-gray-400 mt-1">Used to send login details.</p>
+                                <p class="text-xs text-gray-400 mt-1">Details will be sent to this number.</p>
                             </div>
 
                             <div>
