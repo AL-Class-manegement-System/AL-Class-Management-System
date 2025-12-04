@@ -13,6 +13,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
     <div class="overflow-y-auto overflow-x-hidden flex-grow">
         <ul class="flex flex-col py-4 space-y-1">
+            
             <li class="px-5">
                 <div class="flex flex-row items-center h-8">
                     <div class="text-sm font-light tracking-wide text-gray-400">Menu</div>
@@ -31,7 +32,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
             <li>
                 <a href="student.php"
-                    class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-indigo-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-indigo-400 pr-6 <?php echo ($current_page == 'student.php') ? 'bg-indigo-800 text-white border-indigo-500' : ''; ?>">
+                    class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-indigo-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-indigo-400 pr-6 <?php echo ($current_page == 'student.php' || $current_page == 'student_status.php') ? 'bg-indigo-800 text-white border-indigo-500' : ''; ?>">
                     <span class="inline-flex justify-center items-center ml-4">
                         <i class="fas fa-user-graduate"></i>
                     </span>
@@ -49,6 +50,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </a>
             </li>
 
+            <li>
+                <a href="timetable.php"
+                    class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-indigo-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-indigo-400 pr-6 <?php echo ($current_page == 'timetable.php' || $current_page == 'add_timetable.php' || $current_page == 'edit_timetable.php') ? 'bg-indigo-800 text-white border-indigo-500' : ''; ?>">
+                    <span class="inline-flex justify-center items-center ml-4">
+                        <i class="fas fa-clock"></i>
+                    </span>
+                    <span class="ml-2 text-sm tracking-wide truncate">Time Table</span>
+                </a>
+            </li>
+
             <li class="px-5 mt-5">
                 <div class="flex flex-row items-center h-8">
                     <div class="text-sm font-light tracking-wide text-gray-400">Settings</div>
@@ -56,7 +67,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </li>
 
             <li>
-                <a href="../log/login.php"
+                <a href="../lib/logout.php"
                     class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-red-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-red-400 pr-6">
                     <span class="inline-flex justify-center items-center ml-4">
                         <i class="fas fa-sign-out-alt"></i>

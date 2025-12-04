@@ -1,5 +1,5 @@
 <?php 
-// 1. Connection එක එකතු කිරීම
+
 include('../includes/connection.php'); 
 include('../includes/header.php'); 
 ?>
@@ -21,11 +21,10 @@ include('../includes/header.php');
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
 
             <?php
-            // 2. Query එක ලිවීම
+      
             $sql = "SELECT * FROM teachers WHERE status = 1 ORDER BY teacher_id DESC";
             $result = mysqli_query($conn, $sql);
 
-            // 3. Loop එක පටන්ගැනීම
             if (mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
                     
