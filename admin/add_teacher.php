@@ -37,6 +37,8 @@ if (isset($_POST['submit'])) {
     // 3. Image Upload Logic
     // ==========================================
     $target_dir = "../assets/images/teachers/";
+    
+    // Folder එක නැත්නම් හදනවා
     if (!file_exists($target_dir)) { mkdir($target_dir, 0777, true); }
 
     $new_image_name = "";
@@ -76,7 +78,7 @@ if (isset($_POST['submit'])) {
             if ($stmt->execute()) {
                 
                 // ==========================================
-                // WHATSAPP LINK සැකසීම (Improved Logic)
+                // WHATSAPP LINK සැකසීම (Fixed Logic)
                 // ==========================================
                 
                 // 1. ඉලක්කම් නොවන සියල්ල ඉවත් කිරීම (Remove spaces, +, etc)
@@ -94,9 +96,10 @@ if (isset($_POST['submit'])) {
                 // 3. යවන මැසේජ් එක
                 $wa_message = "Hello $name,\n\nWelcome to Future Minds!\nHere are your login details:\n\nUser ID: *$teacher_number*\nPassword: *$auto_password*\n\nPlease login and change your password.";
                 
-                // 4. Link එක (api.whatsapp.com වඩා විශ්වාසදායකයි)
+                // 4. Link එක
                 $wa_link = "https://api.whatsapp.com/send?phone=$wa_phone&text=" . urlencode($wa_message);
 
+                // Success Message එක සමඟ Button එක පෙන්වීම
                 $msg = "Teacher Added Successfully! <br> 
                         <span class='block mt-2 font-mono text-sm bg-green-50 p-2 rounded border border-green-200 text-green-800'>
                             <b>User ID:</b> $teacher_number <br> 
@@ -155,15 +158,6 @@ if (isset($_POST['submit'])) {
                 <div class="<?php echo ($msg_type == 'success') ? 'bg-green-50 text-green-700 border-green-400' : 'bg-red-100 text-red-700 border-red-400'; ?> border px-4 py-4 rounded-xl relative mb-6 shadow-sm">
                     <span class="block sm:inline"><?php echo $msg; ?></span>
                 </div>
-                
-                <?php if($msg_type == 'success' && !empty($wa_link)): ?>
-                <script>
-                    setTimeout(function() {
-                        window.open("<?php echo $wa_link; ?>", "_blank");
-                    }, 1000); // 1 second delay
-                </script>
-                <?php endif; ?>
-                
                 <?php endif; ?>
 
                 <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
