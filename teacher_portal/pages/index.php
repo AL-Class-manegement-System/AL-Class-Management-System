@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 2. Login Check (ලොග් වී නැත්නම් Login පිටුවට යවන්න)
+//back to login
 if (!isset($_SESSION['teacher_id'])) {
     header("Location: ../../log/login.php");
     exit();
@@ -21,12 +21,11 @@ include("../include/head.php");
 // ==========================================
 $teacher_name = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
 $teacher_pic = isset($_SESSION['profile_pic']) ? $_SESSION['profile_pic'] : '';
-$teacher_subject =isset($_SESSION['subject']) ? $_SESSION['subject'] : ''; // ඔබට අවශ්‍ය නම් Subject එකත් Session එකෙන් ගන්න පුළුවන්
+$teacher_subject =isset($_SESSION['subject']) ? $_SESSION['subject'] : ''; 
 
-// Image Path Logic
-// ගුරුවරයාගේ පින්තූරය තිබේ නම් එය පෙන්වන්න, නැත්නම් Default එක පෙන්වන්න
+// Profile Picture Path 
 $image_folder = "../../assets/images/teachers/";
-$default_image = "../../assests/images/user2.jpg"; // ඔබේ කෝඩ් එකේ තිබුණු Path එක (assests)
+$default_image = "../../assests/images/user2.jpg"; 
 
 if (!empty($teacher_pic) && file_exists($image_folder . $teacher_pic)) {
     $display_image = $image_folder . $teacher_pic;

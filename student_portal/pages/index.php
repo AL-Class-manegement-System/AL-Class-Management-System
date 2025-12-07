@@ -5,7 +5,7 @@ include('../includes/student_header.php');
 
 <div class="flex-1 flex flex-col h-screen overflow-y-auto">
 
-    <main class="p-4 md:p-8">
+    <main class="p-4 pt-0 mt-0 md:p-8">
 
         <div
             class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white mb-8 shadow-lg relative overflow-hidden">
@@ -22,11 +22,11 @@ include('../includes/student_header.php');
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
             <div
-                class="md:col-span-2 relative overflow-hidden bg-gradient-to-br from-amber-300 via-yellow-500 to-amber-600 rounded-2xl p-6 text-white shadow-xl shadow-yellow-500/30 transform transition-all duration-300 border border-yellow-300/50">
+                class=" opacity-80 md:col-span-2 relative overflow-hidden bg-gradient-to-br from-amber-300 via-yellow-500 to-amber-600 rounded-2xl p-6 text-white shadow-xl shadow-yellow-500/30 transform transition-all duration-300 border border-yellow-300/50">
 
                 <div class="gold-shine-effect"></div>
 
-                <div class="relative z-10 flex flex-col sm:flex-row justify-between items-center gap-6">
+                <div class="relative z-10 flex flex-col sm:flex-row justify-between items-center gap-6 opacity-100">
 
                     <div class="text-center sm:text-left">
                         <p class="text-yellow-50 font-semibold text-sm uppercase tracking-wider">Student ID</p>
@@ -52,6 +52,26 @@ include('../includes/student_header.php');
 
                 </div>
             </div>
+            <a href="../pages/live_class.php">
+                <div
+                    class="  bg-white p-6 rounded-2xl shadow-sm  hover:shadow-md group relative p-4 rounded-2xl backdrop-blur-xl border-2 border-indigo-800/30 bg-gradient-to-br from-white-500/40 via-black-500/60 to-black/80 shadow-2xl hover:shadow-indigo-500/30 hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all duration-500 ease-out cursor-pointer hover:border-indigo-400/60 overflow-hidden">
+                    <div class="relative z-10 flex flex-col h-full justify-between">
+                        <div class="p-3 bg-indigo-100 text-blue-600 rounded-lg">
+                            <i class="fas fa-book-open"></i>
+                            <h3 class="text-2xl font-bold text-slate-800">🔴Live Classes</h3>
+                        </div>
+
+                        <p class="text-indigo-600 text-sm font-medium mt-1 flex items-center gap-1">
+                            Join Now <i
+                                class="fas fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
+                        </p>
+                    </div>
+                    <div
+                        class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-400 rounded-full opacity-20 group-hover:opacity-30 transition-opacity transform group-hover:scale-110">
+                    </div>
+
+                </div>
+            </a>
 
         </div>
 
@@ -60,23 +80,7 @@ include('../includes/student_header.php');
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
 
-            <div
-                class="bg-white p-6 rounded-2xl shadow-sm  hover:shadow-md group relative p-4 rounded-2xl backdrop-blur-xl border-2 border-indigo-800/30 bg-gradient-to-br from-white-500/40 via-black-500/60 to-black/80 shadow-2xl hover:shadow-indigo-500/30 hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all duration-500 ease-out cursor-pointer hover:border-indigo-400/60 overflow-hidden">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-blue-100 text-blue-600 rounded-lg"><i class="fas fa-book-open"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-slate-800">Live Class</h3>
-                    <p class="text-indigo-600 text-sm font-medium mt-1 flex items-center gap-1">
-                        Join Now <i
-                            class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
-                    </p>
-                </div>
 
-                <p class="text-blue-500 text-sm">join now</p>
-                <a href="../pages/live_class.php">
-                    <h3 class="text-2xl font-bold text-slate-800">Live Class</h3>
-                </a>
-            </div>
 
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
                 <div class="flex items-center justify-between mb-4">
@@ -221,3 +225,4 @@ include('../includes/student_header.php');
 </body>
 
 </html>
+<?php include("../includes/footer.php"); ?>

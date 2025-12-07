@@ -45,7 +45,7 @@ if ($student->num_rows === 1) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Portal | Dashboard</title>
+
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -53,18 +53,7 @@ if ($student->num_rows === 1) {
 
     <script src="../js/dashboard.js" defer></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#4F46E5',
-                        secondary: '#1E293B',
-                    }
-                }
-            }
-        }
-    </script>
+
 </head>
 
 
@@ -91,7 +80,7 @@ if ($student->num_rows === 1) {
             </div>
 
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
-                <a href="#"
+                <a href="../"
                     class="flex items-center px-4 py-3 bg-primary text-white rounded-xl transition-all shadow-lg shadow-indigo-500/30 group">
                     <i class="fas fa-th-large w-6 text-center"></i>
                     <span class="ms-3 font-medium">Dashboard</span>
@@ -115,7 +104,7 @@ if ($student->num_rows === 1) {
                     <span class="ms-3 font-medium">Time Table</span>
                 </a>
 
-                <a href="#"
+                <a href="../pages/live_class.php"
                     class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group">
                     <i class="fas fa-video w-6 text-center group-hover:scale-110 transition-transform"></i>
                     <span class="ms-3 font-medium">Ongoing Classes</span>
@@ -144,10 +133,13 @@ if ($student->num_rows === 1) {
 
         </aside>
 
+
+
+        <!-- //header -->
         <div class="flex-1 flex flex-col h-screen overflow-y-auto w-full relative">
 
             <header
-                class="mx-4 mt-4 mb-6 rounded-2xl h-20 bg-white shadow-sm flex items-center justify-between px-6 sticky top-4 z-10 border border-gray-100">
+                class="mx-4 mb-0 mt-0 mb-6 rounded-2xl h-20 bg-white shadow-sm flex items-center justify-between px-6 sticky top-4 z-10 border border-gray-100">
 
                 <div class="flex items-center gap-4">
                     <button onclick="toggleSidebar()"
@@ -196,7 +188,7 @@ if ($student->num_rows === 1) {
                                 </div>
 
                                 <div class="py-1">
-                                    <a href="#"
+                                    <a href="../pages/st_profile.php"
                                         class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
                                         <i class="fas fa-user mr-3 w-4 text-gray-400"></i> Your Profile
                                     </a>
