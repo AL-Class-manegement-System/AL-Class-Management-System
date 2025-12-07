@@ -1,9 +1,38 @@
 <?php
-// 1. Path variable setup
+// 1. Session Start (Head.php එකේ නැත්නම් මෙතන අනිවාර්යයි)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 2. Login Check (ලොග් වී නැත්නම් Login පිටුවට යවන්න)
+if (!isset($_SESSION['teacher_id'])) {
+    header("Location: ../../log/login.php");
+    exit();
+}
+
+// 3. Path variable setup
 $path = "../../"; 
 
-// 2. Include Head
+// 4. Include Head
 include("../include/head.php"); 
+
+// ==========================================
+// TEACHER DATA SETUP
+// ==========================================
+$teacher_name = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Teacher';
+$teacher_pic = isset($_SESSION['profile_pic']) ? $_SESSION['profile_pic'] : '';
+$teacher_subject =isset($_SESSION['subject']) ? $_SESSION['subject'] : ''; // ඔබට අවශ්‍ය නම් Subject එකත් Session එකෙන් ගන්න පුළුවන්
+
+// Image Path Logic
+// ගුරුවරයාගේ පින්තූරය තිබේ නම් එය පෙන්වන්න, නැත්නම් Default එක පෙන්වන්න
+$image_folder = "../../assets/images/teachers/";
+$default_image = "../../assests/images/user2.jpg"; // ඔබේ කෝඩ් එකේ තිබුණු Path එක (assests)
+
+if (!empty($teacher_pic) && file_exists($image_folder . $teacher_pic)) {
+    $display_image = $image_folder . $teacher_pic;
+} else {
+    $display_image = $default_image;
+}
 ?>
 
 <?php include("../include/sidebar.php"); ?>
@@ -35,10 +64,10 @@ include("../include/head.php");
           
           <div class="flex items-center space-x-2">
               <div class="text-right hidden md:block">
-                  <p class="text-sm font-semibold text-gray-900">Mr. Teacher Name</p>
-                  <p class="text-xs text-gray-500">Physics Instructor</p>
+                  <p class="text-sm font-semibold text-gray-900"><?php echo htmlspecialchars($teacher_name); ?></p>
+                  <p class="text-xs text-gray-500"><?php echo htmlspecialchars($teacher_subject); ?></p>
               </div>
-              <img class="w-10 h-10 rounded-full border-2 border-gray-200" src="../../assests/images/user2.jpg" alt="User dropdown">
+              <img class="w-10 h-10 rounded-full border-2 border-gray-200 object-cover" src="<?php echo $display_image; ?>" alt="User profile">
           </div>
       </div>
    </div>
