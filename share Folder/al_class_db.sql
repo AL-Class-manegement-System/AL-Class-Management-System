@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2025 at 05:37 PM
+-- Generation Time: Dec 09, 2025 at 05:49 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -194,6 +194,7 @@ INSERT INTO `expenses` (`exp_id`, `description`, `amount`, `date`) VALUES
 CREATE TABLE `notices` (
   `notice_id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
   `content` text DEFAULT NULL,
   `date_posted` datetime DEFAULT current_timestamp(),
   `status` tinyint(1) DEFAULT 1
@@ -203,10 +204,10 @@ CREATE TABLE `notices` (
 -- Dumping data for table `notices`
 --
 
-INSERT INTO `notices` (`notice_id`, `title`, `content`, `date_posted`, `status`) VALUES
-(1, 'All classes are cancelled on Dec 25th', 'Due to Christmas holiday, no classes will be held.', '2025-12-08 14:00:00', 1),
-(2, 'Physics Paper Class starting soon', 'New paper class batch for 2026 AL students begins next week.', '2025-12-09 10:00:00', 1),
-(3, 'Emergency Water Interruption', 'The water supply to Hall C will be disrupted tomorrow from 8 AM to 12 PM.', '2025-12-09 18:00:00', 1);
+INSERT INTO `notices` (`notice_id`, `title`, `description`, `content`, `date_posted`, `status`) VALUES
+(1, 'All classes are cancelled on Dec 25th', NULL, 'Due to Christmas holiday, no classes will be held.', '2025-12-08 14:00:00', 1),
+(2, 'Physics Paper Class starting soon', NULL, 'New paper class batch for 2026 AL students begins next week.', '2025-12-09 10:00:00', 1),
+(3, 'Emergency Water Interruption', NULL, 'The water supply to Hall C will be disrupted tomorrow from 8 AM to 12 PM.', '2025-12-09 18:00:00', 1);
 
 -- --------------------------------------------------------
 
