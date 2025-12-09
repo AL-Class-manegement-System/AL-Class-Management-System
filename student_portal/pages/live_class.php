@@ -1,7 +1,8 @@
 <?php
 include('../includes/student_header.php');
 
-
+// සජීවී පන්තියක URL එකක් මෙලෙස DB එකෙන් ගෙන $live_url විචල්‍යයට පැවරිය යුතුය.
+$live_url = "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"; // Demo URL
 ?>
 
 <div class="flex-1 flex flex-col h-screen overflow-y-auto">
@@ -22,7 +23,7 @@ include('../includes/student_header.php');
             <h2 class="text-2xl font-bold mb-4">Current Live Class</h2>
             <div class="aspect-w-16 aspect-h-9">
                 <iframe
-                    src="@"
+                    src="<?php echo $live_url; ?>"
                     title="Live Class Session"
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -30,11 +31,6 @@ include('../includes/student_header.php');
                     class="w-full h-full rounded-lg">
                 </iframe>
             </div>
-            <!-- <div class="mt-4">
-                <h3 class="text-xl font-semibold">Subject: Introduction to Web Development</h3>
-                <p class="text-gray-600">Instructor: John Doe</p>
-                <p class="text-gray-600">Time: 10:00 AM - 11:30 AM</p>
-            </div> -->
-        </div>
+            </div>
     </main>
 </div>

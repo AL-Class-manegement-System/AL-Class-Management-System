@@ -54,20 +54,20 @@ include('../includes/student_header.php');
             </div>
             <a href="../pages/live_class.php">
                 <div
-                    class="  bg-white p-6 rounded-2xl shadow-sm  hover:shadow-md group relative p-4 rounded-2xl backdrop-blur-xl border-2 border-indigo-800/30 bg-gradient-to-br from-white-500/40 via-black-500/60 to-black/80 shadow-2xl hover:shadow-indigo-500/30 hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all duration-500 ease-out cursor-pointer hover:border-indigo-400/60 overflow-hidden">
+                    class="bg-slate-900/90 p-6 rounded-2xl shadow-xl border border-indigo-700/50 hover:shadow-indigo-500/50 group relative overflow-hidden transition-all duration-300 ease-out cursor-pointer hover:scale-[1.02] active:scale-95">
                     <div class="relative z-10 flex flex-col h-full justify-between">
-                        <div class="p-3 bg-indigo-100 text-blue-600 rounded-lg">
+                        <div class="p-3 bg-indigo-500/10 text-white rounded-lg backdrop-blur-sm border border-indigo-500/20">
                             <i class="fas fa-book-open"></i>
-                            <h3 class="text-2xl font-bold text-slate-800">🔴Live Classes</h3>
+                            <h3 class="text-2xl font-bold text-white mt-1">🔴Live Classes</h3>
                         </div>
 
-                        <p class="text-indigo-600 text-sm font-medium mt-1 flex items-center gap-1">
+                        <p class="text-indigo-400 text-sm font-medium mt-4 flex items-center gap-1">
                             Join Now <i
                                 class="fas fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
                         </p>
                     </div>
                     <div
-                        class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-400 rounded-full opacity-20 group-hover:opacity-30 transition-opacity transform group-hover:scale-110">
+                        class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-400 rounded-full opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110">
                     </div>
 
                 </div>
@@ -80,8 +80,6 @@ include('../includes/student_header.php');
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
 
-
-
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
                 <div class="flex items-center justify-between mb-4">
                     <div class="p-3 bg-green-100 text-green-600 rounded-lg"><i class="fas fa-user-check"></i>
@@ -91,29 +89,21 @@ include('../includes/student_header.php');
                 <h3 class="text-2xl font-bold text-slate-800">85%</h3>
                 <p class="text-slate-500 text-sm">Attendance</p>
             </div>
-
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-purple-100 text-purple-600 rounded-lg"><i class="fas fa-chart-line"></i>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition lg:col-span-2">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-500 text-xs uppercase font-bold">Next Class</p>
+                        <h3 class="text-xl font-bold text-slate-800 mt-1">Mathematics</h3>
+                        <p class="text-xs text-orange-500 font-medium">Starts in 30 mins</p>
                     </div>
-                </div>
-
-                <div
-                    class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition flex-1">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-slate-500 text-xs uppercase font-bold">Next Class</p>
-                            <h3 class="text-xl font-bold text-slate-800 mt-1">Mathematics</h3>
-                            <p class="text-xs text-orange-500 font-medium">Starts in 30 mins</p>
-                        </div>
-                        <div class="p-3 bg-orange-100 text-orange-600 rounded-lg">
-                            <i class="fas fa-clock"></i>
-                        </div>
+                    <div class="p-3 bg-orange-100 text-orange-600 rounded-lg">
+                        <i class="fas fa-clock"></i>
                     </div>
                 </div>
             </div>
-
-        </div>
+            
+            </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
