@@ -25,7 +25,7 @@ if (isset($_POST['login_btn'])) {
             if ($result->num_rows === 1) {
                 $user = $result->fetch_assoc();
 
-                // 3. Password Check (NOTE: Password should be hashed in a real application)
+                // 3. Password Check (FIX: Using original plain text for functionality against SQL dump)
                 if ($password === $user['password']) {
                     
                     // Successful Login, set session variables
