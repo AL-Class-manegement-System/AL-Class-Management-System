@@ -6,17 +6,6 @@ $student_sql = "SELECT COUNT(*) as total FROM students";
 $student_res = $conn->query($student_sql);
 $student_count = $student_res->fetch_assoc()['total'];
 
-// 2. Monthly Income (Current Month)
-$current_month = date('Y-m');
-$income_sql = "SELECT SUM(amount) as total_income FROM payments WHERE DATE_FORMAT(paid_date, '%Y-%m') = '$current_month'";
-$income_res = $conn->query($income_sql);
-$income_row = $income_res->fetch_assoc();
-$monthly_income = $income_row['total_income'] ? $income_row['total_income'] : 0;
-
-// 3. Active Classes
-$class_sql = "SELECT COUNT(*) as total FROM classes WHERE status = 1";
-$class_res = $conn->query($class_sql);
-$class_count = $class_res->fetch_assoc()['total'];
 
 // 4. Total Teachers
 $teacher_sql = "SELECT COUNT(*) as total FROM teachers WHERE status = 1";
