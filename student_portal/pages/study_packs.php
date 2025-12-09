@@ -1,73 +1,76 @@
 <?php
-include('../includes/student_header.php');
+include('../includes/student_header.php'); 
 
 // ==========================================
 // 1. ශිෂ්‍යයා Enroll වී ඇති විෂයන් ලබා ගැනීම (Prepared Statement)
 // ==========================================
-$db_student_id = $student['student_id'];
-$enrolled_subjects = [];
+$db_student_id = $student['student_id']; 
+$enrolled_subjects = []; 
 
-// enrollments table එක හරහා classes table එකට සම්බන්ධ වී විෂය නාම ලබා ගැනීම
+// Enrollments සහ Classes වගු භාවිතා කර ශිෂ්‍යයාගේ විෂය නාම ලබා ගනී
 $sql_subjects = "
     SELECT DISTINCT c.subject
     FROM enrollments e
     JOIN classes c ON e.class_id = c.class_id
     WHERE e.student_id = ?
-";
-$stmt_subjects = $conn->prepare($sql_subjects);
-$stmt_subjects->bind_param("i", $db_student_id);
-$stmt_subjects->execute();
-$result_subjects = $stmt_subjects->get_result();
+"; 
+$stmt_subjects = $conn->prepare($sql_subjects); 
+$stmt_subjects->bind_param("i", $db_student_id); 
+$stmt_subjects->execute(); 
+$result_subjects = $stmt_subjects->get_result(); 
 
-while ($row = $result_subjects->fetch_assoc()) {
-    $enrolled_subjects[] = $row['subject'];
+while ($row = $result_subjects->fetch_assoc()) { 
+    // **වැඩිදියුණු කිරීම:** විෂය නාමයන් නිවැරදිව ගැලපීම සඳහා trim කර ගබඩා කිරීම.
+    $enrolled_subjects[] = trim($row['subject']); 
 }
-$stmt_subjects->close();
+$stmt_subjects->close(); 
 
-// Stream name එකද අමතර විෂයන් සඳහා යොදන්න (Stream based materials)
-$stream_map = [
-    'Maths'    => 'Physical Science',
-    'Bio'      => 'Bio Science',
-    'Tech'     => 'Technology',
-    'Art'      => 'Arts',
-    'Commerce' => 'Commerce'
+// Stream name එකද අමතර විෂයන් සඳහා යොදයි (ඔබගේ DB Schema මත පදනම්ව)
+$stream_map = [ 
+    'Maths'    => 'Physical Science', 
+    'Bio'      => 'Bio Science', 
+    'Tech'     => 'Technology', 
+    'Art'      => 'Arts', 
+    'Commerce' => 'Commerce' 
 ];
-$stream_subject_name = isset($stream_map[$student['stream']]) ? $stream_map[$student['stream']] : $student['stream'];
-$enrolled_subjects[] = $stream_subject_name;
-$enrolled_subjects = array_unique($enrolled_subjects); // Duplicates ඉවත් කිරීම
+$stream_subject_name = isset($stream_map[$student['stream']]) ? $stream_map[$student['stream']] : $student['stream']; 
+$enrolled_subjects[] = trim($stream_subject_name); 
+$enrolled_subjects = array_unique($enrolled_subjects); 
 
-// ==========================================
-// 2. විෂය නාමයන් පාදක කරගෙන Study Materials ලබා ගැනීම (Dynamic Prepared Statement)
-// ==========================================
-$categorized_materials = [];
+if (empty($enrolled_subjects)) {
+    $categorized_materials = [];
+} else {
+    // ==========================================
+    // 2. විෂය නාමයන් පාදක කරගෙන Study Materials ලබා ගැනීම (Dynamic Prepared Statement)
+    // ==========================================
+    $categorized_materials = []; 
 
-if (!empty($enrolled_subjects)) {
-    // සකස් කළ විෂය නාම ලැයිස්තුව, SQL query එකට ගැලපෙන ලෙස සකස් කිරීම
-    $placeholders = implode(',', array_fill(0, count($enrolled_subjects), '?'));
+    $placeholders = implode(',', array_fill(0, count($enrolled_subjects), '?')); 
     
-    // Study Materials table එකේ subject_name මත පදනම්ව filter කිරීම
-    $sql_materials = "SELECT * FROM study_materials WHERE subject_name IN ($placeholders) AND status = 1 ORDER BY subject_name, upload_date DESC";
+    // Status = 1 (Active) materials පමණක් පෙන්වයි.
+    $sql_materials = "SELECT * FROM study_materials WHERE subject_name IN ($placeholders) AND status = 1 ORDER BY subject_name, upload_date DESC"; 
     
-    // Dynamic binding (Prepared Statement)
-    $stmt_materials = $conn->prepare($sql_materials);
-    $types = str_repeat('s', count($enrolled_subjects));
+    $stmt_materials = $conn->prepare($sql_materials); 
     
-    $temp_params = [];
-    foreach ($enrolled_subjects as &$param) {
-        $temp_params[] = &$param;
+    // **වැඩිදියුණු කළ Binding:** dynamic parameters සඳහා නිවැරදි references සකස් කිරීම.
+    $types = str_repeat('s', count($enrolled_subjects)); 
+    $bind_params = array($types);
+    for ($i = 0; $i < count($enrolled_subjects); $i++) {
+        $bind_params[] = &$enrolled_subjects[$i];
     }
-    // call_user_func_array භාවිතයෙන් dynamic bind_param කිරීම
-    call_user_func_array([$stmt_materials, 'bind_param'], array_merge([$types], $temp_params));
 
-    if ($stmt_materials->execute()) {
-        $materials_result = $stmt_materials->get_result();
-        if ($materials_result->num_rows > 0) {
-            while ($material = $materials_result->fetch_assoc()) {
-                $categorized_materials[$material['subject_name']][] = $material;
+    // call_user_func_array භාවිතයෙන් bind_param ක්‍රියාත්මක කරයි.
+    call_user_func_array(array($stmt_materials, 'bind_param'), $bind_params);
+
+    if ($stmt_materials->execute()) { 
+        $materials_result = $stmt_materials->get_result(); 
+        if ($materials_result->num_rows > 0) { 
+            while ($material = $materials_result->fetch_assoc()) { 
+                $categorized_materials[$material['subject_name']][] = $material; 
             }
         }
     }
-    $stmt_materials->close();
+    $stmt_materials->close(); 
 }
 ?>
 
@@ -82,7 +85,7 @@ if (!empty($enrolled_subjects)) {
                     <i class="fas fa-box-open"></i>
                 </div>
                 <h3 class="text-xl font-bold text-gray-500">No Study Materials Found</h3>
-                <p class="text-sm text-gray-400 mt-1">Please enroll in a class first or check back later for available materials.</p>
+                <p class="text-sm text-gray-400 mt-1">Please ensure you are enrolled in classes or check back later for available materials. (Enrolled Subjects checked: <?php echo implode(', ', $enrolled_subjects); ?>)</p>
             </div>
         <?php else: ?>
         
@@ -92,17 +95,17 @@ if (!empty($enrolled_subjects)) {
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Your Subjects</p>
                 <nav class="space-y-1" id="subject-tabs">
                     <?php 
-                    $is_first = true;
+                    $is_first = true; 
                     foreach (array_keys($categorized_materials) as $subject): 
-                        $tab_id = str_replace([' ', '/', '&'], '_', $subject);
+                        $tab_id = str_replace([' ', '/', '&'], '_', $subject); 
                     ?>
-                    <button data-target="<?php echo $tab_id; ?>"
+                    <button data-target="<?php echo htmlspecialchars($tab_id); ?>"
                         class="tab-button w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors 
                         <?php echo $is_first ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'; ?>">
                         <i class="fas fa-book-open mr-2"></i> <?php echo htmlspecialchars($subject); ?>
                     </button>
                     <?php 
-                        $is_first = false;
+                        $is_first = false; 
                     endforeach; 
                     ?>
                 </nav>
@@ -110,26 +113,25 @@ if (!empty($enrolled_subjects)) {
 
             <div class="flex-1">
                 <?php 
-                $is_first = true;
+                $is_first = true; 
                 foreach ($categorized_materials as $subject => $materials): 
-                    $content_id = str_replace([' ', '/', '&'], '_', $subject);
+                    $content_id = str_replace([' ', '/', '&'], '_', $subject); 
                 ?>
-                <div id="<?php echo $content_id; ?>" class="tab-content <?php echo $is_first ? '' : 'hidden'; ?>">
+                <div id="<?php echo htmlspecialchars($content_id); ?>" class="tab-content <?php echo $is_first ? '' : 'hidden'; ?>">
                     <h2 class="text-2xl font-bold text-slate-700 mb-4"><?php echo htmlspecialchars($subject); ?> Materials</h2>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <?php foreach ($materials as $material): 
-                            // File path: student_portal/pages/ සිට project root වෙත යාමට '../../'
-                            $file_url = (isset($material['file_path']) && !empty($material['file_path'])) ? '../../' . htmlspecialchars($material['file_path']) : '#';
+                            $file_url = (isset($material['file_path']) && !empty($material['file_path'])) ? '../../' . htmlspecialchars($material['file_path']) : '#'; 
                         ?>
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition">
                             <span class="text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider mb-2 inline-block 
                                 <?php 
-                                    $type = $material['material_type'] ?? 'General';
-                                    if($type == 'Notes') echo 'bg-blue-100 text-blue-700';
-                                    elseif($type == 'Past Paper') echo 'bg-green-100 text-green-700';
-                                    elseif($type == 'Reading') echo 'bg-orange-100 text-orange-700';
-                                    else echo 'bg-purple-100 text-purple-700';
+                                    $type = $material['material_type'] ?? 'General'; 
+                                    if($type == 'Notes') echo 'bg-blue-100 text-blue-700'; 
+                                    elseif($type == 'Past Paper') echo 'bg-green-100 text-green-700'; 
+                                    elseif($type == 'Reading') echo 'bg-orange-100 text-orange-700'; 
+                                    else echo 'bg-purple-100 text-purple-700'; 
                                 ?>">
                                 <?php echo htmlspecialchars($type); ?>
                             </span>
@@ -137,7 +139,7 @@ if (!empty($enrolled_subjects)) {
                                 <?php echo htmlspecialchars($material['material_title']); ?>
                             </h3>
                             <p class="text-xs text-slate-500 mt-2">
-                                Uploaded: <?php echo date('M d, Y', strtotime($material['upload_date'] ?? 'now')); ?>
+                                Uploaded: <?php echo date('M d, Y', strtotime($material['upload_date'] ?? '2000-01-01')); ?> 
                             </p>
                             
                             <a href="<?php echo $file_url; ?>" 
@@ -150,7 +152,7 @@ if (!empty($enrolled_subjects)) {
                     </div>
                 </div>
                 <?php 
-                    $is_first = false;
+                    $is_first = false; 
                 endforeach; 
                 ?>
             </div>
@@ -175,13 +177,17 @@ if (!empty($enrolled_subjects)) {
                     btn.classList.add('text-slate-600', 'hover:bg-slate-100');
                 });
 
-                document.getElementById(targetId).classList.remove('hidden');
+                const targetContent = document.getElementById(targetId);
+                if (targetContent) {
+                    targetContent.classList.remove('hidden');
+                }
+                
                 button.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
                 button.classList.remove('text-slate-600', 'hover:bg-slate-100');
             });
         });
         
-        if (tabButtons.length > 0 && tabContents.length > 0) {
+        if (tabButtons.length > 0) {
             tabButtons[0].click(); 
         }
     });

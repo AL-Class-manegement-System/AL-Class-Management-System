@@ -24,10 +24,9 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id']))
         
         if ($path_result->num_rows > 0) {
             $row = $path_result->fetch_assoc();
-            // Go up one level from 'admin' to the root
             $file_path = '../' . $row['file_path']; 
             if (!empty($row['file_path']) && file_exists($file_path)) {
-                // unlink($file_path); // Uncomment this line to enable physical file deletion
+                 // unlink($file_path); // Uncomment this line to enable physical file deletion
             }
         }
         $path_stmt->close();
@@ -48,7 +47,6 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id']))
     } else {
         $error = "Database Prepare Error (Delete)";
     }
-    // Redirect with message/error
     header("Location: manage_study_materials.php?msg=" . urlencode($message) . "&err=" . urlencode($error));
     exit();
 }
@@ -75,7 +73,6 @@ if (isset($_GET['action']) && $_GET['action'] == 'toggle_status' && isset($_GET[
     } else {
         $error = "Database Prepare Error (Toggle)";
     }
-    // Redirect with message/error
     header("Location: manage_study_materials.php?msg=" . urlencode($message) . "&err=" . urlencode($error));
     exit();
 }
@@ -89,12 +86,12 @@ if (isset($_GET['err']) && $_GET['err'] !== 'null') $error = htmlspecialchars($_
 // DATA FETCHING: All Study Materials
 // ==========================================
 $materials = [];
-// Join with teachers table to get the teacher's full name
+// **වැඩිදියුණු කළ JOIN:** LEFT JOIN භාවිතයෙන්, teacher_id 0 වුවත් දත්ත පෙන්වයි.
 $sql_materials = "SELECT 
                     sm.*, 
-                    t.full_name AS teacher_name 
+                    COALESCE(t.full_name, 'Unknown (ID: ' || sm.teacher_id || ')') AS teacher_name 
                   FROM study_materials sm
-                  JOIN teachers t ON sm.teacher_id = t.teacher_id
+                  LEFT JOIN teachers t ON sm.teacher_id = t.teacher_id
                   ORDER BY sm.upload_date DESC, sm.material_id DESC"; 
 $result_materials = $conn->query($sql_materials);
 
@@ -155,7 +152,6 @@ if ($result_materials && $result_materials->num_rows > 0) {
                                         $is_active = $material['status'] == 1;
                                         $status_color = $is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
                                         $status_text = $is_active ? 'Active' : 'Inactive';
-                                        // Path to view the file (relative to admin folder)
                                         $view_path = '../' . htmlspecialchars($material['file_path']);
                                     ?>
                                         <tr class="hover:bg-gray-50">
@@ -186,7 +182,7 @@ if ($result_materials && $result_materials->num_rows > 0) {
                                                    onclick="return confirm('Are you sure you want to change the status of this material?');"
                                                    class="<?php echo $is_active ? 'text-red-600 bg-red-50 hover:bg-red-100' : 'text-green-600 bg-green-50 hover:bg-green-100'; ?> p-2 rounded-lg transition" 
                                                    title="<?php echo $is_active ? 'Deactivate (Hide from Students)' : 'Activate (Show to Students)'; ?>">
-                                                    <i class="fas <?php echo $is_active ? 'fa-user-slash' : 'fa-user-check'; ?>"></i>
+                                                    <i class="fas <?php echo $is_active ? 'fa-eye-slash' : 'fa-eye'; ?>"></i>
                                                 </a>
 
                                                 <a href="manage_study_materials.php?action=delete&id=<?php echo $material['material_id']; ?>" 

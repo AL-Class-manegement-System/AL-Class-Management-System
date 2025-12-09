@@ -4,8 +4,15 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// back to login
-if (!isset($_SESSION['teacher_id'])) {
+// ==========================================
+// TEACHER DATA SETUP & SECURITY CHECK
+// ==========================================
+$teacher_id = $_SESSION['teacher_id'] ?? null; 
+$teacher_name = $_SESSION['full_name'] ?? 'Teacher';
+$teacher_subject = $_SESSION['subject'] ?? 'General';
+
+// back to login if no teacher ID or ID is invalid (e.g., 0)
+if (!isset($teacher_id) || !is_numeric($teacher_id) || $teacher_id <= 0) {
     header("Location: ../../log/login.php");
     exit();
 }
@@ -19,18 +26,6 @@ include("../include/head.php");
 require_once $path . 'includes/connection.php'; 
 
 // ==========================================
-// TEACHER DATA SETUP
-// ==========================================
-$teacher_id = $_SESSION['teacher_id'] ?? null; 
-$teacher_name = $_SESSION['full_name'] ?? 'Teacher';
-$teacher_subject = $_SESSION['subject'] ?? 'General';
-
-if (empty($teacher_id)) {
-    header("Location: ../../log/login.php");
-    exit();
-}
-
-// ==========================================
 // FILE UPLOAD AND DB INSERT LOGIC
 // ==========================================
 $message = "";
@@ -41,6 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['upload_material'])) {
     $material_title = trim($_POST['material_title']);
     $material_type = $_POST['material_type'];
     $subject_name = $teacher_subject;
+
+    if (empty($material_title) || strlen($material_title) > 255) {
+        $message = "Error: Material title is required and must be under 255 characters.";
+        $msg_type = "red";
+        goto end_upload_logic;
+    }
 
     if (isset($_FILES['material_file']) && $_FILES['material_file']['error'] == 0) {
         
@@ -78,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['upload_material'])) {
                 
                 $relative_path = "assets/study_materials/" . $subject_folder . "/" . $new_file_name;
 
-                // 🌟 teacher_id ඇතුළත් කිරීම
+                // 🌟 teacher_id ඇතුළත් කිරීම (Valid ID is guaranteed by the initial check)
                 $sql = "INSERT INTO study_materials (teacher_id, subject_name, material_title, material_type, file_path, upload_date, status) VALUES (?, ?, ?, ?, ?, CURDATE(), 1)";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("issss", $teacher_id, $subject_name, $material_title, $material_type, $relative_path);
@@ -93,7 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['upload_material'])) {
                 }
                 $stmt->close();
             } else {
-                $message = "Sorry, there was an error uploading your file. Check server permissions.";
+                $error_code = $_FILES["material_file"]["error"];
+                $message = "Sorry, there was an error uploading your file (Code: {$error_code}). Check server permissions.";
                 $msg_type = "red";
             }
         }
@@ -132,7 +134,7 @@ end_upload_logic:
                 
                 <div>
                     <label for="material_title" class="block mb-2 text-sm font-medium text-gray-900">Material Title</label>
-                    <input type="text" id="material_title" name="material_title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required placeholder="e.g., Integration Past Paper 2023">
+                    <input type="text" id="material_title" name="material_title" maxlength="255" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required placeholder="e.g., Integration Past Paper 2023">
                 </div>
 
                 <div>
