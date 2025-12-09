@@ -90,6 +90,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <span class="ml-2 text-sm tracking-wide truncate">Notice Board Manager</span>
                 </a>
             </li>
+            
+            <li>
+                <a href="manage_study_materials.php"
+                    class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-indigo-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-indigo-400 pr-6 <?php echo ($current_page == 'manage_study_materials.php') ? 'bg-indigo-800 text-white border-indigo-500' : ''; ?>">
+                    <span class="inline-flex justify-center items-center ml-4">
+                        <i class="fas fa-file-alt"></i>
+                    </span>
+                    <span class="ml-2 text-sm tracking-wide truncate">Study Materials</span>
+                </a>
+            </li>
             <li class="px-5 mt-5">
                 <div class="flex flex-row items-center h-8">
                     <div class="text-sm font-light tracking-wide text-gray-400">Finance & Reports</div>
