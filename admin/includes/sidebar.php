@@ -1,8 +1,5 @@
 <?php
-// AL-Class-Management-System/admin/includes/sidebar.php - UPDATED CODE
-// FIX: Logout link path corrected.
 
-// Active Page Check
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
