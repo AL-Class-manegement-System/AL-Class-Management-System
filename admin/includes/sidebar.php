@@ -1,4 +1,7 @@
 <?php
+// AL-Class-Management-System/admin/includes/sidebar.php - UPDATED CODE
+// FIX: Logout link path corrected.
+
 // Active Page Check
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
@@ -42,7 +45,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
             <li>
                 <a href="teachers.php"
-                    class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-indigo-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-indigo-400 pr-6 <?php echo ($current_page == 'teachers.php' || $current_page == 'add_teacher.php') ? 'bg-indigo-800 text-white border-indigo-500' : ''; ?>">
+                    class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-indigo-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-indigo-400 pr-6 <?php echo ($current_page == 'teachers.php' || $current_page == 'add_teacher.php' || $current_page == 'edit_teacher.php' || $current_page == 'delete_teacher.php') ? 'bg-indigo-800 text-white border-indigo-500' : ''; ?>">
                     <span class="inline-flex justify-center items-center ml-4">
                         <i class="fas fa-chalkboard-teacher"></i>
                     </span>
@@ -70,12 +73,46 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
             <li class="px-5 mt-5">
                 <div class="flex flex-row items-center h-8">
-                    <div class="text-sm font-light tracking-wide text-gray-400">Settings</div>
+                    <div class="text-sm font-light tracking-wide text-gray-400">Finance & Reports</div>
                 </div>
             </li>
 
             <li>
-                <a href="../lib/logout.php"
+                <a href="payments.php"
+                    class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-indigo-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-indigo-400 pr-6 <?php echo ($current_page == 'payments.php') ? 'bg-indigo-800 text-white border-indigo-500' : ''; ?>">
+                    <span class="inline-flex justify-center items-center ml-4">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </span>
+                    <span class="ml-2 text-sm tracking-wide truncate">Payment Management</span>
+                </a>
+            </li>
+            <li>
+                <a href="accounting.php"
+                    class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-indigo-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-indigo-400 pr-6 <?php echo ($current_page == 'accounting.php') ? 'bg-indigo-800 text-white border-indigo-500' : ''; ?>">
+                    <span class="inline-flex justify-center items-center ml-4">
+                        <i class="fas fa-chart-line"></i>
+                    </span>
+                    <span class="ml-2 text-sm tracking-wide truncate">Accounting Reports</span>
+                </a>
+            </li>
+
+            <li class="px-5 mt-5">
+                <div class="flex flex-row items-center h-8">
+                    <div class="text-sm font-light tracking-wide text-gray-400">Settings</div>
+                </div>
+            </li>
+            <li>
+                <a href="settings.php"
+                    class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-indigo-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-indigo-400 pr-6 <?php echo ($current_page == 'settings.php') ? 'bg-indigo-800 text-white border-indigo-500' : ''; ?>">
+                    <span class="inline-flex justify-center items-center ml-4">
+                        <i class="fas fa-cog"></i>
+                    </span>
+                    <span class="ml-2 text-sm tracking-wide truncate">System Settings</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="logout.php"
                     class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-red-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-red-400 pr-6">
                     <span class="inline-flex justify-center items-center ml-4">
                         <i class="fas fa-sign-out-alt"></i>

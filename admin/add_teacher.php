@@ -1,11 +1,11 @@
 <?php 
 include 'db_con.php'; 
 
-$wa_link = ""; // WhatsApp Link variable initialization
+$wa_link = ""; 
 
 if (isset($_POST['submit'])) {
     
-    // 1. Data ලබා ගැනීම
+    // 1. Get Data
     $name = $_POST['name'];
     $phone = $_POST['phone']; 
     $subject = $_POST['subject'];
@@ -38,20 +38,19 @@ if (isset($_POST['submit'])) {
     // ==========================================
     $target_dir = "../assets/images/teachers/";
     
-    // Folder එක නැත්නම් හදනවා
     if (!file_exists($target_dir)) { mkdir($target_dir, 0777, true); }
 
     $new_image_name = "";
     $uploadOk = 1;
 
-    if (!empty($_FILES["image"]["name"])) {
+    if (isset($_FILES["image"]) && $_FILES["image"]["error"] === UPLOAD_ERR_OK) {
         $file_ext = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
         $allowed_types = ['jpg', 'jpeg', 'png', 'webp'];
 
         if (in_array($file_ext, $allowed_types)) {
             $new_image_name = time() . "_" . uniqid() . "." . $file_ext;
             if (!move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir . $new_image_name)) {
-                $msg = "Error uploading image.";
+                $msg = "Error uploading image: Failed to move uploaded file.";
                 $msg_type = "error";
                 $uploadOk = 0;
             }
@@ -60,16 +59,21 @@ if (isset($_POST['submit'])) {
             $msg_type = "error";
             $uploadOk = 0;
         }
+    } else if (isset($_FILES["image"]) && $_FILES["image"]["error"] !== UPLOAD_ERR_NO_FILE) {
+         $msg = "Image upload failed with error code: " . $_FILES["image"]["error"];
+         $msg_type = "error";
+         $uploadOk = 0;
     } else {
-        $msg = "Please select an image.";
-        $msg_type = "error";
-        $uploadOk = 0;
+        // No image uploaded
+        $new_image_name = ""; 
     }
+
 
     // 4. Database Insert
     if ($uploadOk == 1) {
         $status = 1; 
 
+        // Use Prepared Statement
         $stmt = $conn->prepare("INSERT INTO teachers (teacher_number, password, full_name, phone, subject, description, image, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
         if ($stmt) {
@@ -78,32 +82,26 @@ if (isset($_POST['submit'])) {
             if ($stmt->execute()) {
                 
                 // ==========================================
-                // WHATSAPP LINK සැකසීම (Fixed Logic)
+                // WHATSAPP LINK GENERATION
                 // ==========================================
                 
-                // 1. ඉලක්කම් නොවන සියල්ල ඉවත් කිරීම (Remove spaces, +, etc)
                 $clean_phone = preg_replace('/[^0-9]/', '', $phone);
-
-                // 2. අංකය '94'න් පටන් ගන්නා ලෙස සැකසීම
                 if (substr($clean_phone, 0, 2) == '94') {
                     $wa_phone = $clean_phone;
                 } elseif (substr($clean_phone, 0, 1) == '0') {
-                    $wa_phone = '94' . substr($clean_phone, 1); // 0 ඉවත් කර 94 එකතු කරයි
+                    $wa_phone = '94' . substr($clean_phone, 1); 
                 } else {
                     $wa_phone = '94' . $clean_phone;
                 }
                 
-                // 3. යවන මැසේජ් එක
-                $wa_message = "Hello $name,\n\nWelcome to Future Minds!\nHere are your login details:\n\nUser ID: *$teacher_number*\nPassword: *$auto_password*\n\nPlease login and change your password.";
+                $wa_message = "Hello ".htmlspecialchars($name).",\n\nWelcome to Future Minds!\nHere are your login details:\n\nUser ID: *$teacher_number*\nPassword: *$auto_password*\n\nPlease login and change your password.";
                 
-                // 4. Link එක
                 $wa_link = "https://api.whatsapp.com/send?phone=$wa_phone&text=" . urlencode($wa_message);
 
-                // Success Message එක සමඟ Button එක පෙන්වීම
                 $msg = "Teacher Added Successfully! <br> 
                         <span class='block mt-2 font-mono text-sm bg-green-50 p-2 rounded border border-green-200 text-green-800'>
-                            <b>User ID:</b> $teacher_number <br> 
-                            <b>Password:</b> $auto_password
+                            <b>User ID:</b> ".htmlspecialchars($teacher_number)." <br> 
+                            <b>Password:</b> ".htmlspecialchars($auto_password)."
                         </span>
                         <div class='mt-3'>
                             <a href='$wa_link' target='_blank' class='inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-2 px-4 rounded-lg transition shadow-md'>

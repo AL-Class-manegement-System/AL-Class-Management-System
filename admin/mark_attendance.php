@@ -1,83 +1,103 @@
 <?php 
+// admin/mark_attendance.php - All Prepared Statements are used for security.
 include 'db_con.php'; 
 
-// Notification List එක තියාගන්න Array එකක්
 $notifications = [];
+$msg = null;
 
 // ==========================================
-// 1. DATA SAVE කිරීමේ LOGIC එක
+// 1. DATA SAVE LOGIC (Secure)
 // ==========================================
 if (isset($_POST['save_attendance'])) {
-    $date = $_POST['date'];
+    // 1. Get Input Data safely
+    $date = $_POST['date']; // We trust the hidden/date input for now, but will bind it.
     $attendance_data = isset($_POST['status']) ? $_POST['status'] : []; 
     $send_whatsapp = isset($_POST['send_whatsapp']); 
     $send_sms = isset($_POST['send_sms']); 
 
-    foreach ($attendance_data as $student_id => $status) {
-        $current_time = date("H:i:s");
+    // Prepare statements outside the loop for efficiency
+    $check_stmt = $conn->prepare("SELECT attendance_id FROM attendance WHERE student_id = ? AND date = ?");
+    $update_stmt = $conn->prepare("UPDATE attendance SET status = ?, time = ? WHERE student_id = ? AND date = ?");
+    $insert_stmt = $conn->prepare("INSERT INTO attendance (student_id, date, status, time) VALUES (?, ?, ?, ?)");
+    $stu_stmt = $conn->prepare("SELECT full_name, parent_phone FROM students WHERE student_id = ?");
 
-        // Database Update / Insert
-        $check_sql = "SELECT * FROM attendance WHERE student_id = '$student_id' AND date = '$date'";
-        $check_res = $conn->query($check_sql);
+    if (!$check_stmt || !$update_stmt || !$insert_stmt || !$stu_stmt) {
+        $msg = "Database Prepare Error: One or more statements failed to prepare.";
+        $msg_type = "error";
+    } else {
 
-        if ($check_res->num_rows > 0) {
-            $sql = "UPDATE attendance SET status = '$status', time = '$current_time' WHERE student_id = '$student_id' AND date = '$date'";
-        } else {
-            $sql = "INSERT INTO attendance (student_id, date, status, time) VALUES ('$student_id', '$date', '$status', '$current_time')";
-        }
-        $conn->query($sql);
+        foreach ($attendance_data as $student_id => $status) {
+            $sid = intval($student_id);
+            $stat = $status;
+            $current_time = date("H:i:s");
 
-        // Notification Links සෑදීම (Present/Absent නම් පමණක්)
-        if (($send_whatsapp || $send_sms) && !empty($status)) {
+            // 2. Database Update / Insert (Using Prepared Statements)
             
-            // ශිෂ්‍යයාගේ විස්තර ලබා ගැනීම
-            $stu_sql = "SELECT full_name, parent_phone FROM students WHERE student_id = '$student_id'";
-            $stu_res = $conn->query($stu_sql);
+            // Check if attendance record exists
+            $check_stmt->bind_param("is", $sid, $date);
+            $check_stmt->execute();
+            $check_res = $check_stmt->get_result();
             
-            if ($stu_res && $stu_res->num_rows > 0) {
-                $stu_data = $stu_res->fetch_assoc();
-                $parent_phone = $stu_data['parent_phone'];
-                $student_name = $stu_data['full_name'];
+            if ($check_res->num_rows > 0) {
+                // Update
+                $update_stmt->bind_param("ssis", $stat, $current_time, $sid, $date);
+                $update_stmt->execute();
+            } else {
+                // Insert
+                $insert_stmt->bind_param("isss", $sid, $date, $stat, $current_time);
+                $insert_stmt->execute();
+            }
 
-                // මැසේජ් එක සකස් කිරීම
-                $icon = ($status == 'Present') ? "✅" : "❌";
-                $message_body = "Future Minds: $student_name is marked $status $icon for the class on $date.";
+            // 3. Notification Links Creation
+            if (($send_whatsapp || $send_sms) && !empty($stat)) {
+                
+                // Fetch student details
+                $stu_stmt->bind_param("i", $sid);
+                $stu_stmt->execute();
+                $stu_res = $stu_stmt->get_result();
+                
+                if ($stu_res && $stu_res->num_rows > 0) {
+                    $stu_data = $stu_res->fetch_assoc();
+                    $parent_phone = $stu_data['parent_phone'];
+                    $student_name = $stu_data['full_name'];
 
-                // Phone Number Format (94xxxxxxxxx)
-                $clean_phone = preg_replace('/[^0-9]/', '', $parent_phone);
-                if (substr($clean_phone, 0, 2) == '94') {
-                    $wa_phone = $clean_phone;
-                } elseif (substr($clean_phone, 0, 1) == '0') {
-                    $wa_phone = '94' . substr($clean_phone, 1);
-                } else {
-                    $wa_phone = '94' . $clean_phone;
+                    $icon = ($stat == 'Present') ? "✅" : "❌";
+                    $message_body = "Future Minds: $student_name is marked $stat $icon for the class on $date.";
+
+                    $clean_phone = preg_replace('/[^0-9]/', '', $parent_phone);
+                    if (substr($clean_phone, 0, 2) == '94') {
+                        $wa_phone = $clean_phone;
+                    } elseif (substr($clean_phone, 0, 1) == '0') {
+                        $wa_phone = '94' . substr($clean_phone, 1);
+                    } else {
+                        $wa_phone = '94' . $clean_phone;
+                    }
+
+                    $wa_link = $send_whatsapp ? "https://api.whatsapp.com/send?phone=$wa_phone&text=" . urlencode($message_body) : "";
+                    $sms_link = $send_sms ? "sms:$wa_phone?&body=" . urlencode($message_body) : "";
+                    
+                    $notifications[] = [
+                        'name' => $student_name,
+                        'status' => $stat,
+                        'phone' => $parent_phone,
+                        'wa_link' => $wa_link,
+                        'sms_link' => $sms_link
+                    ];
                 }
-
-                // Links
-                $wa_link = "";
-                $sms_link = "";
-
-                if ($send_whatsapp) {
-                    $wa_link = "https://api.whatsapp.com/send?phone=$wa_phone&text=" . urlencode($message_body);
-                }
-                if ($send_sms) {
-                    // Mobile phones default SMS app link
-                    $sms_link = "sms:$wa_phone?&body=" . urlencode($message_body); 
-                }
-
-                // List එකට එකතු කිරීම
-                $notifications[] = [
-                    'name' => $student_name,
-                    'status' => $status,
-                    'phone' => $parent_phone,
-                    'wa_link' => $wa_link,
-                    'sms_link' => $sms_link
-                ];
             }
         }
+        
+        // Close statements after loop
+        $check_stmt->close();
+        $update_stmt->close();
+        $insert_stmt->close();
+        $stu_stmt->close();
+        
+        if (!isset($msg)) { // If no prepare error occurred
+            $msg = "Attendance marked successfully!";
+            $msg_type = "success";
+        }
     }
-    $msg = "Attendance marked successfully!";
-    $msg_type = "success";
 }
 ?>
 
@@ -104,8 +124,9 @@ if (isset($_POST['save_attendance'])) {
         <main class="p-8">
             
             <?php if(isset($msg)): ?>
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm">
-                <p class="font-bold">Success</p><p class="text-sm"><?php echo $msg; ?></p>
+            <div class="<?php echo ($msg_type == 'success') ? 'bg-green-100 border-l-4 border-green-500 text-green-700' : 'bg-red-100 border-l-4 border-red-500 text-red-700'; ?> p-4 mb-6 rounded shadow-sm">
+                <p class="font-bold"><?php echo ($msg_type == 'success') ? 'Success' : 'Error'; ?></p>
+                <p class="text-sm"><?php echo $msg; ?></p>
             </div>
             <?php endif; ?>
 
@@ -158,7 +179,7 @@ if (isset($_POST['save_attendance'])) {
                             $class_res = $conn->query($class_sql);
                             while($c_row = $class_res->fetch_assoc()){
                                 $selected = (isset($_GET['class_id']) && $_GET['class_id'] == $c_row['class_id']) ? 'selected' : '';
-                                echo "<option value='{$c_row['class_id']}' $selected>{$c_row['class_name']} ({$c_row['stream']})</option>";
+                                echo "<option value='{$c_row['class_id']}' $selected>".htmlspecialchars($c_row['class_name'])." (".htmlspecialchars($c_row['stream']).")</option>";
                             }
                             ?>
                         </select>
@@ -166,7 +187,7 @@ if (isset($_POST['save_attendance'])) {
 
                     <div class="w-full md:w-48">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
-                        <input type="date" name="date" value="<?php echo isset($_GET['date']) ? $_GET['date'] : date('Y-m-d'); ?>" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="date" name="date" value="<?php echo isset($_GET['date']) ? htmlspecialchars($_GET['date']) : date('Y-m-d'); ?>" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
 
                     <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">
@@ -179,12 +200,12 @@ if (isset($_POST['save_attendance'])) {
             
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <form method="POST" action="">
-                    <input type="hidden" name="date" value="<?php echo $_GET['date']; ?>">
+                    <input type="hidden" name="date" value="<?php echo htmlspecialchars($_GET['date']); ?>">
                     
                     <div class="p-4 bg-gray-50 border-b border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
                         <div>
                             <h3 class="font-bold text-gray-700">Student List</h3>
-                            <span class="text-sm text-gray-500">Date: <?php echo $_GET['date']; ?></span>
+                            <span class="text-sm text-gray-500">Date: <?php echo htmlspecialchars($_GET['date']); ?></span>
                         </div>
 
                         <div class="flex items-center gap-4 bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
@@ -214,52 +235,67 @@ if (isset($_POST['save_attendance'])) {
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <?php
-                                $class_id = $_GET['class_id'];
-                                $search_date = $_GET['date'];
+                                $class_id = $conn->real_escape_string($_GET['class_id']);
+                                $search_date = $conn->real_escape_string($_GET['date']);
 
-                                // 1. Class Data ගැනීම
-                                $cls_qry = "SELECT stream, class_name FROM classes WHERE class_id = '$class_id'";
-                                $cls_res = $conn->query($cls_qry);
+                                // 1. Fetch Class Data (Prepared Statement)
+                                $cls_stmt = $conn->prepare("SELECT stream, class_name FROM classes WHERE class_id = ?");
                                 
-                                if($cls_res && $cls_res->num_rows > 0) {
-                                    $cls_data = $cls_res->fetch_assoc();
-                                    $class_stream_full = $cls_data['stream'];
+                                if($cls_stmt) {
+                                    $cls_stmt->bind_param("i", $class_id);
+                                    $cls_stmt->execute();
+                                    $cls_res = $cls_stmt->get_result();
+                                    
+                                    if($cls_res && $cls_res->num_rows > 0) {
+                                        $cls_data = $cls_res->fetch_assoc();
+                                        $class_stream_full = $cls_data['stream'];
+                                        $cls_stmt->close(); 
 
-                                    // 2. STREAM MAPPING FIX (වැදගත්ම කොටස)
-                                    // Student table එකේ තියෙන්නේ කෙටි නම් (Art, Tech) නිසා අපි ඒවා map කරගන්න ඕන.
-                                    $stream_map = [
-                                        'Physical Science' => 'Maths',
-                                        'Bio Science' => 'Bio',
-                                        'Technology' => 'Tech',
-                                        'Arts' => 'Art',
-                                        'Commerce' => 'Commerce'
-                                    ];
+                                        // 2. Stream Mapping (Converts 'Physical Science' to 'Maths' for student table)
+                                        $stream_map = [
+                                            'Physical Science' => 'Maths',
+                                            'Bio Science' => 'Bio',
+                                            'Technology' => 'Tech',
+                                            'Arts' => 'Art',
+                                            'Commerce' => 'Commerce',
+                                            'ICT (Common)' => 'ICT' // Assuming ICT students are tagged as 'ICT'
+                                        ];
 
-                                    // Map එකේ නම තිබේ නම් එය ගන්න, නැත්නම් මුල් නමම පාවිච්චි කරන්න
-                                    $student_stream_name = isset($stream_map[$class_stream_full]) ? $stream_map[$class_stream_full] : $class_stream_full;
-
-                                    // 3. සිසුන් තේරීම
-                                    $st_sql = "SELECT * FROM students WHERE stream = '$student_stream_name' AND status = 1 ORDER BY reg_number ASC";
-                                    $st_res = $conn->query($st_sql);
-
-                                    if ($st_res->num_rows > 0) {
-                                        while($student = $st_res->fetch_assoc()) {
-                                            $sid = $student['student_id'];
+                                        $student_stream_name = isset($stream_map[$class_stream_full]) ? $stream_map[$class_stream_full] : $class_stream_full;
+                                        
+                                        // 3. Select Students (Prepared Statement)
+                                        $st_stmt = $conn->prepare("SELECT student_id, reg_number, full_name, parent_phone FROM students WHERE stream = ? AND status = 1 ORDER BY reg_number ASC");
+                                        
+                                        if($st_stmt) {
+                                            $st_stmt->bind_param("s", $student_stream_name);
+                                            $st_stmt->execute();
+                                            $st_res = $st_stmt->get_result();
                                             
-                                            // කලින් Attendance දාලද බලනවා
-                                            $att_sql = "SELECT status FROM attendance WHERE student_id = '$sid' AND date = '$search_date'";
-                                            $att_res = $conn->query($att_sql);
-                                            $current_status = ($att_res->num_rows > 0) ? $att_res->fetch_assoc()['status'] : '';
+                                            if ($st_res->num_rows > 0) {
+                                                while($student = $st_res->fetch_assoc()) {
+                                                    $sid = $student['student_id'];
+                                                    
+                                                    // Check previous Attendance (Prepared Statement)
+                                                    $att_stmt = $conn->prepare("SELECT status FROM attendance WHERE student_id = ? AND date = ?");
+                                                    if ($att_stmt) {
+                                                        $att_stmt->bind_param("is", $sid, $search_date);
+                                                        $att_stmt->execute();
+                                                        $att_res = $att_stmt->get_result();
+                                                        $current_status = ($att_res->num_rows > 0) ? $att_res->fetch_assoc()['status'] : '';
+                                                        $att_stmt->close(); 
+                                                    } else {
+                                                        $current_status = ''; // Default if prepare fails
+                                                    }
                                 ?>
                                 <tr class="hover:bg-gray-50 transition">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        <?php echo $student['reg_number']; ?>
+                                        <?php echo htmlspecialchars($student['reg_number']); ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                        <?php echo $student['full_name']; ?>
+                                        <?php echo htmlspecialchars($student['full_name']); ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                                        <?php echo $student['parent_phone']; ?>
+                                        <?php echo htmlspecialchars($student['parent_phone']); ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center">
                                         <div class="inline-flex rounded-md shadow-sm" role="group">
@@ -275,12 +311,15 @@ if (isset($_POST['save_attendance'])) {
                                     </td>
                                 </tr>
                                 <?php 
+                                                }
+                                                $st_stmt->close(); 
+                                            } else {
+                                                echo "<tr><td colspan='4' class='text-center py-6 text-gray-500 bg-gray-50'>
+                                                    No students found for stream: <b>".htmlspecialchars($student_stream_name)."</b>.<br>
+                                                    <span class='text-xs'>Please check if students are registered under this stream.</span>
+                                                </td></tr>";
+                                            }
                                         }
-                                    } else {
-                                        echo "<tr><td colspan='4' class='text-center py-6 text-gray-500 bg-gray-50'>
-                                            No students found for stream: <b>$student_stream_name</b>.<br>
-                                            <span class='text-xs'>Please check if students are registered under this stream.</span>
-                                        </td></tr>";
                                     }
                                 }
                                 ?>

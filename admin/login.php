@@ -2,7 +2,7 @@
 session_start();
 include 'db_con.php'; // Database connection
 
-// Error message ekak thibunoth pennanna variable ekak
+// Variable to display error message
 $error = "";
 
 if (isset($_POST['login_btn'])) {
@@ -12,41 +12,41 @@ if (isset($_POST['login_btn'])) {
 
     // 1. Database Connection Check
     if ($conn->connect_error) {
-        die("Connection Failed: " . $conn->connect_error);
-    }
-
-    // 2. User wa soyanna (Prepared Statement use karala)
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND role = 'Admin' LIMIT 1");
-
-    if ($stmt) {
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows === 1) {
-            $user = $result->fetch_assoc();
-
-            // 3. Password Check (Plain text '123' wage thiyena nisa kelinma check karanawa)
-            if ($password === $user['password']) {
-                
-                // Login Harinam Session start karanawa
-                $_SESSION['admin_id'] = $user['user_id'];
-                $_SESSION['admin_name'] = $user['username'];
-                $_SESSION['is_admin_logged_in'] = true;
-
-                // Dashboard ekata yawanna
-                header("Location: index.php");
-                exit();
-
-            } else {
-                $error = "Incorrect Password!";
-            }
-        } else {
-            $error = "User Not Found or Not an Admin!";
-        }
-        $stmt->close();
+        $error = "Connection Failed: " . $conn->connect_error;
     } else {
-        $error = "Database Query Error!";
+        // 2. Find the user (Using Prepared Statement)
+        $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND role = 'Admin' LIMIT 1");
+
+        if ($stmt) {
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 1) {
+                $user = $result->fetch_assoc();
+
+                // 3. Password Check (NOTE: Password should be hashed in a real application)
+                if ($password === $user['password']) {
+                    
+                    // Successful Login, set session variables
+                    $_SESSION['admin_id'] = $user['user_id'];
+                    $_SESSION['admin_name'] = $user['username'];
+                    $_SESSION['is_admin_logged_in'] = true;
+
+                    // Redirect to Dashboard
+                    header("Location: index.php");
+                    exit();
+
+                } else {
+                    $error = "Incorrect Password!";
+                }
+            } else {
+                $error = "User Not Found or Not an Admin!";
+            }
+            $stmt->close();
+        } else {
+            $error = "Database Query Error!";
+        }
     }
 }
 ?>

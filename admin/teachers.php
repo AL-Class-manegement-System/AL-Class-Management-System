@@ -44,11 +44,11 @@ include 'db_con.php';
             <?php endif; ?>
 
             <?php
-            // 1. සියලුම Active Teachers ලා ලබා ගැනීම (Subject එක අනුව Sort කර)
+            // 1. Fetch all Active Teachers, sorted by Subject
             $sql = "SELECT * FROM teachers WHERE status = 1 ORDER BY subject ASC, teacher_id DESC";
             $result = $conn->query($sql);
 
-            // 2. Teachers ලාව Subject එක අනුව Group කිරීම
+            // 2. Group teachers by Subject
             $teachers_by_subject = [];
             if ($result->num_rows > 0) {
                 while($row = $result->fetch_assoc()) {
@@ -56,7 +56,7 @@ include 'db_con.php';
                 }
             }
 
-            // 3. Data තිබේ නම් Loop කිරීම
+            // 3. Loop through grouped data
             if (!empty($teachers_by_subject)) {
                 
                 foreach ($teachers_by_subject as $subject => $teachers) {

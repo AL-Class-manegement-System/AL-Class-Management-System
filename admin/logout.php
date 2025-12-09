@@ -3,7 +3,7 @@ session_start();
 session_unset();
 session_destroy();
 
-// Login page ekata redirect karanawa
+// Redirect to the login page
 header("Location: login.php");
 exit();
 ?>
