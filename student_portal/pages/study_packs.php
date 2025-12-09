@@ -2,14 +2,12 @@
 include('../includes/student_header.php');
 
 // ==========================================
-// 1. ශිෂ්‍යයා Enroll වී ඇති විෂයන් ලබා ගැනීම
+// 1. ශිෂ්‍යයා Enroll වී ඇති විෂයන් ලබා ගැනීම (Prepared Statement)
 // ==========================================
 $db_student_id = $student['student_id'];
 $enrolled_subjects = [];
 
 // enrollments table එක හරහා classes table එකට සම්බන්ධ වී විෂය නාම ලබා ගැනීම
-// Note: If 'classes' table subject names are different from 'study_materials' subject names, 
-// you need to map them here, similar to the logic in my_classes.php.
 $sql_subjects = "
     SELECT DISTINCT c.subject
     FROM enrollments e
@@ -26,7 +24,7 @@ while ($row = $result_subjects->fetch_assoc()) {
 }
 $stmt_subjects->close();
 
-// Stream name එකද අමතර විෂයන් (ICT වැනි) සඳහා යොදන්න
+// Stream name එකද අමතර විෂයන් සඳහා යොදන්න (Stream based materials)
 $stream_map = [
     'Maths'    => 'Physical Science',
     'Bio'      => 'Bio Science',
@@ -39,32 +37,26 @@ $enrolled_subjects[] = $stream_subject_name;
 $enrolled_subjects = array_unique($enrolled_subjects); // Duplicates ඉවත් කිරීම
 
 // ==========================================
-// 2. විෂය නාමයන් පාදක කරගෙන Study Materials ලබා ගැනීම
+// 2. විෂය නාමයන් පාදක කරගෙන Study Materials ලබා ගැනීම (Dynamic Prepared Statement)
 // ==========================================
 $categorized_materials = [];
 
 if (!empty($enrolled_subjects)) {
     // සකස් කළ විෂය නාම ලැයිස්තුව, SQL query එකට ගැලපෙන ලෙස සකස් කිරීම
-    // Note: This query assumes 'study_materials' table exists with columns: material_title, material_type, file_path, subject_name, upload_date, status.
     $placeholders = implode(',', array_fill(0, count($enrolled_subjects), '?'));
     
+    // Study Materials table එකේ subject_name මත පදනම්ව filter කිරීම
     $sql_materials = "SELECT * FROM study_materials WHERE subject_name IN ($placeholders) AND status = 1 ORDER BY subject_name, upload_date DESC";
     
-    // Dynamic binding
+    // Dynamic binding (Prepared Statement)
     $stmt_materials = $conn->prepare($sql_materials);
     $types = str_repeat('s', count($enrolled_subjects));
     
-    // PHP >= 5.6 සඳහා: $stmt_materials->bind_param($types, ...$enrolled_subjects); 
-    // මෙහිදී bind_param() සඳහා array_map(function($a) { return &$a; }, $enrolled_subjects) වැනි සකස් කිරීමක් අවශ්‍ය වේ.
-    // සරලව, $enrolled_subjects array එකේ references අවශ්‍යයි.
-    // (Actual production code needs proper dynamic binding or a simpler query method if binding fails dynamically.)
-    
-    // For demonstration, assuming $enrolled_subjects is small and contains only strings:
-    // This is a simplified/potentially unsafe way for older PHP versions, but shows the concept:
     $temp_params = [];
     foreach ($enrolled_subjects as &$param) {
         $temp_params[] = &$param;
     }
+    // call_user_func_array භාවිතයෙන් dynamic bind_param කිරීම
     call_user_func_array([$stmt_materials, 'bind_param'], array_merge([$types], $temp_params));
 
     if ($stmt_materials->execute()) {
@@ -102,7 +94,6 @@ if (!empty($enrolled_subjects)) {
                     <?php 
                     $is_first = true;
                     foreach (array_keys($categorized_materials) as $subject): 
-                        // Spaces remove/replace to create a safe HTML ID
                         $tab_id = str_replace([' ', '/', '&'], '_', $subject);
                     ?>
                     <button data-target="<?php echo $tab_id; ?>"
@@ -128,7 +119,7 @@ if (!empty($enrolled_subjects)) {
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <?php foreach ($materials as $material): 
-                            // Set file path, assuming it's relative to the project root or accessible via this path
+                            // File path: student_portal/pages/ සිට project root වෙත යාමට '../../'
                             $file_url = (isset($material['file_path']) && !empty($material['file_path'])) ? '../../' . htmlspecialchars($material['file_path']) : '#';
                         ?>
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition">
@@ -178,19 +169,21 @@ if (!empty($enrolled_subjects)) {
             button.addEventListener('click', () => {
                 const targetId = button.getAttribute('data-target');
 
-                // 1. Hide all content and reset button styles
                 tabContents.forEach(content => content.classList.add('hidden'));
                 tabButtons.forEach(btn => {
                     btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
                     btn.classList.add('text-slate-600', 'hover:bg-slate-100');
                 });
 
-                // 2. Show the target content and set active button style
                 document.getElementById(targetId).classList.remove('hidden');
                 button.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
                 button.classList.remove('text-slate-600', 'hover:bg-slate-100');
             });
         });
+        
+        if (tabButtons.length > 0 && tabContents.length > 0) {
+            tabButtons[0].click(); 
+        }
     });
 </script>
 

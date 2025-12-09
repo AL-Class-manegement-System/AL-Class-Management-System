@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2025 at 11:09 AM
+-- Generation Time: Dec 09, 2025 at 02:39 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -45,7 +45,7 @@ INSERT INTO `attendance` (`attendance_id`, `student_id`, `date`, `status`, `time
 (4, 9, '2025-12-08', 'Present', '10:52:06'),
 (5, 7, '2025-12-08', 'Present', '07:42:48'),
 (6, 1, '2025-12-09', 'Present', '12:30:22'),
-(7, 7, '2025-12-09', 'Absent', '08:03:07'),
+(7, 7, '2025-12-09', 'Absent', '11:28:48'),
 (8, 5, '2025-12-09', 'Present', '09:28:59');
 
 -- --------------------------------------------------------
@@ -99,7 +99,8 @@ CREATE TABLE `enrollments` (
 INSERT INTO `enrollments` (`enrollment_id`, `student_id`, `class_id`, `joined_date`) VALUES
 (1, 7, 4, '2025-12-07 10:44:50'),
 (7, 7, 1, '2025-12-07 11:02:54'),
-(8, 1, 6, '2025-12-07 11:12:55');
+(8, 1, 6, '2025-12-07 11:12:55'),
+(9, 1, 7, '2025-12-09 18:27:20');
 
 -- --------------------------------------------------------
 
@@ -256,6 +257,32 @@ INSERT INTO `students` (`student_id`, `reg_number`, `full_name`, `nic`, `dob`, `
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `study_materials`
+--
+
+CREATE TABLE `study_materials` (
+  `material_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `subject_name` varchar(100) NOT NULL,
+  `material_title` varchar(255) NOT NULL,
+  `material_type` enum('Notes','Past Paper','Model Paper','Reading','Assignment') NOT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `upload_date` date NOT NULL,
+  `status` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `study_materials`
+--
+
+INSERT INTO `study_materials` (`material_id`, `teacher_id`, `subject_name`, `material_title`, `material_type`, `file_path`, `upload_date`, `status`, `created_at`) VALUES
+(1, 0, 'General', '2024-AL-ICT-PART-I-MCQ-PAPER-SINHALA-MEDIUM2024-AL-ICT-PART-I-MCQ-PAPER-SINHALA-MEDIUM', 'Past Paper', 'assets/study_materials/general/material_693823b71af02.pdf', '2025-12-09', 1, '2025-12-09 13:27:19'),
+(2, 0, 'General', '2024-AL-ICT-PART-I-MCQ-PAPER-SINHALA-MEDIUM', 'Past Paper', 'assets/study_materials/general/material_69382442d503e.pdf', '2025-12-09', 1, '2025-12-09 13:29:38');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `system_settings`
 --
 
@@ -394,6 +421,12 @@ ALTER TABLE `students`
   ADD UNIQUE KEY `reg_number` (`reg_number`);
 
 --
+-- Indexes for table `study_materials`
+--
+ALTER TABLE `study_materials`
+  ADD PRIMARY KEY (`material_id`);
+
+--
 -- Indexes for table `system_settings`
 --
 ALTER TABLE `system_settings`
@@ -433,7 +466,7 @@ ALTER TABLE `classes`
 -- AUTO_INCREMENT for table `enrollments`
 --
 ALTER TABLE `enrollments`
-  MODIFY `enrollment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `enrollment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `exams`
@@ -470,6 +503,12 @@ ALTER TABLE `salaries`
 --
 ALTER TABLE `students`
   MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `study_materials`
+--
+ALTER TABLE `study_materials`
+  MODIFY `material_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `teachers`

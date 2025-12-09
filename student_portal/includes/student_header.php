@@ -14,7 +14,7 @@ if (!isset($_SESSION['student_id'])) {
 $student_id = $_SESSION['student_id'];
 $full_name = $_SESSION['full_name'];
 
-// Fetch Student Data
+// Fetch Student Data (Prepared Statement භාවිතයෙන්)
 $sql = "SELECT * FROM students WHERE reg_number = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $student_id);
@@ -132,26 +132,26 @@ function getActiveClass($page_name, $current_page) {
 
                 <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6">Academics</p>
 
-                <a href="#"
-                    class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group">
+                <a href="exam_results.php"
+                    class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('exam_results.php', $current_page); ?>">
                     <i class="fas fa-clipboard-list w-6 text-center group-hover:scale-110 transition-transform"></i>
                     <span class="ms-3 font-medium">Exam Results</span>
                 </a>
 
-                <a href="#"
-                    class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group">
+                <a href="time_table.php"
+                    class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('time_table.php', $current_page); ?>">
                     <i class="fas fa-calendar-alt w-6 text-center group-hover:scale-110 transition-transform"></i>
                     <span class="ms-3 font-medium">Time Table</span>
                 </a>
 
-                <a href="../pages/live_class.php"
-                    class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group">
+                <a href="past_lessons.php"
+                    class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('past_lessons.php', $current_page); ?>">
                     <i class="fas fa-history w-6 text-center group-hover:scale-110 transition-transform"></i>
                     <span class="ms-3 font-medium">Past Lessons</span>
                 </a>
 
                 <a href="study_packs.php"
-                    class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group">
+                    class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('study_packs.php', $current_page); ?>">
                     <i class="fas fa-box-open w-6 text-center group-hover:scale-110 transition-transform"></i>
                     <span class="ms-3 font-medium">Study Packs</span>
                 </a>
@@ -182,7 +182,9 @@ function getActiveClass($page_name, $current_page) {
                             if($current_page == 'index.php') echo 'Dashboard';
                             elseif($current_page == 'my_classes.php') echo 'My Classes';
                             elseif($current_page == 'live_class.php') echo 'Live Session';
-                            elseif($current_page == 'st_profile.php') echo 'Student Profile'; // Profile page name added
+                            elseif($current_page == 'time_table.php') echo 'Time Table'; 
+                            elseif($current_page == 'st_profile.php') echo 'Student Profile'; 
+                            elseif($current_page == 'study_packs.php') echo 'Study Materials'; 
                             else echo 'Student Portal';
                         ?>
                     </h2>
