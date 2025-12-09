@@ -1,260 +1,79 @@
-<?php include('../includes/header.php'); ?>
+<?php 
+// 1. Connection එක එකතු කිරීම
+include('../includes/connection.php'); 
+include('../includes/header.php'); 
+?>
 
-<div class="p-3">
-    <div
-        class="flex items-center mt-20 w-full p-2 text-orange-500 p-6 backdrop-blur-sm bg-orange-50 opacity-100 rounded-2xl text-xl font-bold font-10 mb-5 outline-[#243c5a] shadow-lg text-shadow-lg border-solid">
-        <!-- <span class="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center text-xl mb-4">
-            <i class="fas fa-calculator"></i>
-        </span> -->
-        <h1>Physical Science</h1>
-    </div>
-
-
-    <div class="flex w-full ">
-        <div class="group relative w-full h-[400px]">
-            <!-- Blob Effect -->
-            <div
-                class="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200">
-            </div>
-
-            <div
-                class="relative w-full h-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition-all duration-300 transform group-hover:-translate-y-2 group-hover:shadow-2xl ring-1 ring-slate-900/5">
-                <!-- Image Section -->
-                <div class="h-48 overflow-hidden relative">
-                    <img src="../assests/images/2.jpg" alt="Technology"
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        onerror="this.src='#'">
-                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm">
-                        <i data-lucide="heart" class="w-5 h-5 text-rose-500 fill-rose-500/20"></i>
-                    </div>
-                </div>
-
-                <!-- Content Section -->
-                <div class="p-6 flex flex-col flex-1 justify-between">
-                    <div>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span
-                                class="px-2 py-1 text-xs font-semibold text-purple-600 bg-purple-50 rounded-md uppercase tracking-wider">New</span>
-                            <span class="text-xs text-slate-400">2 mins ago</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-orange-500 transition-colors">
-                            Digital Retro</h3>
-                        <p class="text-slate-500 text-sm leading-relaxed line-clamp-3">
-                            Experience the nostalgia of 80s technology fused with modern performance. A perfect blend of
-                            style and substance for the creative professional.
-                        </p>
-                    </div>
-
-                    <button
-                        class="mt-4 w-full py-3 rounded-lg bg-slate-900 text-white font-medium text-sm flex items-center justify-center gap-2 transition-all duration-300 hover:bg-purple-600 group-hover:translate-x-1">
-                        View Details <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </button>
-                </div>
-            </div>
+<div class="min-h-screen bg-gray-50/50 pb-20">
+    
+    <div class="relative pt-32 pb-12 px-6">
+        <div class="container mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6">
+                Our <span class="text-indigo-600">Teachers</span>
+            </h1>
+            <p class="max-w-2xl mx-auto text-gray-500">
+                Meet the expert panel dedicated to your success.
+            </p>
         </div>
     </div>
 
-    <div
-        class="mt-20 w-full p-2 text-purple-800 p-6 backdrop-blur-sm bg-indigo-50 opacity-100 rounded-2xl text-xl font-bold font-10 mb-5 outline-[#243c5a] shadow-lg text-shadow-lg border-solid">
-        <h1>Physical Science</h1>
-    </div>
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
 
+            <?php
+            // 2. Query එක ලිවීම
+            $sql = "SELECT * FROM teachers WHERE status = 1 ORDER BY teacher_id DESC";
+            $result = mysqli_query($conn, $sql);
 
-    <div class="grid w-full ">
-        <div class="group relative w-full h-[400px]">
-            <!-- Blob Effect -->
-            <div
-                class="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200">
-            </div>
+            // 3. Loop එක පටන්ගැනීම
+            if (mysqli_num_rows($result) > 0) {
+                while ($row = mysqli_fetch_assoc($result)) {
+                    
+                    // Image validation
+                    $img = $row['image'];
+                    $imagePath = "../assets/images/teachers/$img";
+                    
+                    if (empty($img) || !file_exists("../assets/images/teachers/" . $img)) {
+                        $imagePath = "https://ui-avatars.com/api/?name=" . urlencode($row['full_name']) . "&background=random";
+                    }
+            ?>
 
-            <div
-                class="relative w-full h-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition-all duration-300 transform group-hover:-translate-y-2 group-hover:shadow-2xl ring-1 ring-slate-900/5">
-                <!-- Image Section -->
-                <div class="h-48 overflow-hidden relative">
-                    <img src="../assests/images/2.jpg" alt="Technology"
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        onerror="this.src='#'">
-                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm">
-                        <i data-lucide="heart" class="w-5 h-5 text-rose-500 fill-rose-500/20"></i>
+            <div class="group relative bg-white rounded-3xl shadow-sm hover:shadow-xl border border-gray-100 overflow-hidden transition-all duration-300">
+                
+                <div class="relative h-72 overflow-hidden">
+                    <img src="<?php echo $imagePath; ?>" 
+                         alt="<?php echo $row['full_name']; ?>"
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    
+                    <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-indigo-700">
+                        <?php echo $row['subject']; ?>
                     </div>
                 </div>
 
-                <!-- Content Section -->
-                <div class="p-6 flex flex-col flex-1 justify-between">
-                    <div>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span
-                                class="px-2 py-1 text-xs font-semibold text-purple-600 bg-purple-50 rounded-md uppercase tracking-wider">New</span>
-                            <span class="text-xs text-slate-400">2 mins ago</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-purple-600 transition-colors">
-                            Digital Retro</h3>
-                        <p class="text-slate-500 text-sm leading-relaxed line-clamp-3">
-                            Experience the nostalgia of 80s technology fused with modern performance. A perfect blend of
-                            style and substance for the creative professional.
-                        </p>
-                    </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">
+                        <?php echo $row['full_name']; ?>
+                    </h3>
+                    
+                    <p class="text-gray-500 text-sm line-clamp-3 mb-4">
+                        <?php echo $row['description']; ?>
+                    </p>
 
-                    <button
-                        class="mt-4 w-full py-3 rounded-lg bg-slate-900 text-white font-medium text-sm flex items-center justify-center gap-2 transition-all duration-300 hover:bg-purple-600 group-hover:translate-x-1">
-                        View Details <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </button>
+                    <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
+                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Lecturer</span>
+                        <a href="#" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">View Profile →</a>
+                    </div>
                 </div>
             </div>
+            <?php 
+                } // Loop end
+            } else {
+                echo '<div class="col-span-full text-center text-gray-500 py-10">No teachers added yet.</div>';
+            }
+            ?>
+
         </div>
     </div>
-
-    <div
-        class="mt-20 w-full p-2 text-purple-800 p-6 backdrop-blur-sm bg-indigo-50 opacity-100 rounded-2xl text-xl font-bold font-10 mb-5 outline-[#243c5a] shadow-lg text-shadow-lg border-solid">
-        <h1>Physical Science</h1>
-    </div>
-
-
-    <div class="grid w-full ">
-        <div class="group relative w-full h-[400px]">
-            <!-- Blob Effect -->
-            <div
-                class="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200">
-            </div>
-
-            <div
-                class="relative w-full h-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition-all duration-300 transform group-hover:-translate-y-2 group-hover:shadow-2xl ring-1 ring-slate-900/5">
-                <!-- Image Section -->
-                <div class="h-48 overflow-hidden relative">
-                    <img src="../assests/images/2.jpg" alt="Technology"
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        onerror="this.src='#'">
-                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm">
-                        <i data-lucide="heart" class="w-5 h-5 text-rose-500 fill-rose-500/20"></i>
-                    </div>
-                </div>
-
-                <!-- Content Section -->
-                <div class="p-6 flex flex-col flex-1 justify-between">
-                    <div>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span
-                                class="px-2 py-1 text-xs font-semibold text-purple-600 bg-purple-50 rounded-md uppercase tracking-wider">New</span>
-                            <span class="text-xs text-slate-400">2 mins ago</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-purple-600 transition-colors">
-                            Digital Retro</h3>
-                        <p class="text-slate-500 text-sm leading-relaxed line-clamp-3">
-                            Experience the nostalgia of 80s technology fused with modern performance. A perfect blend of
-                            style and substance for the creative professional.
-                        </p>
-                    </div>
-
-                    <button
-                        class="mt-4 w-full py-3 rounded-lg bg-slate-900 text-white font-medium text-sm flex items-center justify-center gap-2 transition-all duration-300 hover:bg-purple-600 group-hover:translate-x-1">
-                        View Details <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div
-        class="mt-20 w-full p-2 text-purple-800 p-6 backdrop-blur-sm bg-indigo-50 opacity-100 rounded-2xl text-xl font-bold font-10 mb-5 outline-[#243c5a] shadow-lg text-shadow-lg border-solid">
-        <h1>Physical Science</h1>
-    </div>
-
-
-    <div class="grid w-full ">
-        <div class="group relative w-full h-[400px]">
-            <!-- Blob Effect -->
-            <div
-                class="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200">
-            </div>
-
-            <div
-                class="relative w-full h-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition-all duration-300 transform group-hover:-translate-y-2 group-hover:shadow-2xl ring-1 ring-slate-900/5">
-                <!-- Image Section -->
-                <div class="h-48 overflow-hidden relative">
-                    <img src="../assests/images/2.jpg" alt="Technology"
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        onerror="this.src='#'">
-                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm">
-                        <i data-lucide="heart" class="w-5 h-5 text-rose-500 fill-rose-500/20"></i>
-                    </div>
-                </div>
-
-                <!-- Content Section -->
-                <div class="p-6 flex flex-col flex-1 justify-between">
-                    <div>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span
-                                class="px-2 py-1 text-xs font-semibold text-purple-600 bg-purple-50 rounded-md uppercase tracking-wider">New</span>
-                            <span class="text-xs text-slate-400">2 mins ago</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-purple-600 transition-colors">
-                            Digital Retro</h3>
-                        <p class="text-slate-500 text-sm leading-relaxed line-clamp-3">
-                            Experience the nostalgia of 80s technology fused with modern performance. A perfect blend of
-                            style and substance for the creative professional.
-                        </p>
-                    </div>
-
-                    <button
-                        class="mt-4 w-full py-3 rounded-lg bg-slate-900 text-white font-medium text-sm flex items-center justify-center gap-2 transition-all duration-300 hover:bg-purple-600 group-hover:translate-x-1">
-                        View Details <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div
-        class="mt-20 w-full p-2 text-purple-800 p-6 backdrop-blur-sm bg-indigo-50 opacity-100 rounded-2xl text-xl font-bold font-10 mb-5 outline-[#243c5a] shadow-lg text-shadow-lg border-solid">
-        <h1>Physical Science</h1>
-    </div>
-
-
-    <div class="grid w-full ">
-        <div class="group relative w-full h-[400px]">
-            <!-- Blob Effect -->
-            <div
-                class="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200">
-            </div>
-
-            <div
-                class="relative w-full h-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col transition-all duration-300 transform group-hover:-translate-y-2 group-hover:shadow-2xl ring-1 ring-slate-900/5">
-                <!-- Image Section -->
-                <div class="h-48 overflow-hidden relative">
-                    <img src="../assests/images/2.jpg" alt="Technology"
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        onerror="this.src='#'">
-                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm">
-                        <i data-lucide="heart" class="w-5 h-5 text-rose-500 fill-rose-500/20"></i>
-                    </div>
-                </div>
-
-                <!-- Content Section -->
-                <div class="p-6 flex flex-col flex-1 justify-between">
-                    <div>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span
-                                class="px-2 py-1 text-xs font-semibold text-purple-600 bg-purple-50 rounded-md uppercase tracking-wider">New</span>
-                            <span class="text-xs text-slate-400">2 mins ago</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-purple-600 transition-colors">
-                            Digital Retro</h3>
-                        <p class="text-slate-500 text-sm leading-relaxed line-clamp-3">
-                            Experience the nostalgia of 80s technology fused with modern performance. A perfect blend of
-                            style and substance for the creative professional.
-                        </p>
-                    </div>
-
-                    <button
-                        class="mt-4 w-full py-3 rounded-lg bg-slate-900 text-white font-medium text-sm flex items-center justify-center gap-2 transition-all duration-300 hover:bg-purple-600 group-hover:translate-x-1">
-                        View Details <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>
-
 
 <?php include('../includes/footer.php'); ?>

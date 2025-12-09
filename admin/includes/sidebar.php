@@ -38,6 +38,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <span class="ml-2 text-sm tracking-wide truncate">Students</span>
                 </a>
             </li>
+            
+            <li>
+                <a href="teachers.php"
+                    class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-indigo-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-indigo-400 pr-6 <?php echo ($current_page == 'teachers.php' || $current_page == 'add_teacher.php') ? 'bg-indigo-800 text-white border-indigo-500' : ''; ?>">
+                    <span class="inline-flex justify-center items-center ml-4">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </span>
+                    <span class="ml-2 text-sm tracking-wide truncate">Teachers</span>
+                </a>
+            </li>
 
             <li class="px-5 mt-5">
                 <div class="flex flex-row items-center h-8">
