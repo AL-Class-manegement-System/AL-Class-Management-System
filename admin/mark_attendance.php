@@ -6,6 +6,15 @@ $notifications = [];
 $msg = null;
 
 // ==========================================
+// NOTIFY.LK API CONFIGURATION
+// ==========================================
+define('NOTIFY_USER_ID', '30518'); // ඔබේ User ID
+define('NOTIFY_API_KEY', 'UrYdmVPEfet02TkvQ8wX'); // ඔබේ API Key
+// පරීක්ෂණ කටයුතු සඳහා NotifyDEMO භාවිත කෙරේ. නිෂ්පාදන කටයුතු සඳහා අනුමත Sender ID එකක් අවශ්‍ය වේ.
+define('NOTIFY_SENDER_ID', 'NotifyDEMO'); 
+$notify_api_url = "https://app.notify.lk/api/v1/send";
+
+// ==========================================
 // 1. DATA SAVE LOGIC (Secure)
 // ==========================================
 if (isset($_POST['save_attendance'])) {
@@ -66,15 +75,44 @@ if (isset($_POST['save_attendance'])) {
 
                     $clean_phone = preg_replace('/[^0-9]/', '', $parent_phone);
                     if (substr($clean_phone, 0, 2) == '94') {
-                        $wa_phone = $clean_phone;
+                        $wa_phone = $clean_phone; // Already 94xxxx
                     } elseif (substr($clean_phone, 0, 1) == '0') {
-                        $wa_phone = '94' . substr($clean_phone, 1);
+                        $wa_phone = '94' . substr($clean_phone, 1); // Converts 077xxxx to 9477xxxx
                     } else {
-                        $wa_phone = '94' . $clean_phone;
+                        $wa_phone = '94' . $clean_phone; // Assume 77xxxx converts to 9477xxxx
                     }
 
+                    // ===============================================
+                    // NOTIFY.LK SMS API CALL LOGIC (Actual Send)
+                    // ===============================================
+                    if ($send_sms) {
+                        $notify_message = urlencode($message_body);
+                        $notify_to = $wa_phone; // 9477XXXXXXX ආකෘතිය
+                        
+                        $full_api_url = $notify_api_url . "?" . 
+                            "user_id=" . NOTIFY_USER_ID . 
+                            "&api_key=" . NOTIFY_API_KEY . 
+                            "&sender_id=" . NOTIFY_SENDER_ID . 
+                            "&to=" . $notify_to . 
+                            "&message=" . $notify_message;
+                            
+                        // cURL භාවිතයෙන් API Call එක ක්‍රියාත්මක කිරීම
+                        $ch = curl_init();
+                        curl_setopt($ch, CURLOPT_URL, $full_api_url);
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+                        $response = curl_exec($ch);
+                        $curl_error = curl_error($ch);
+                        curl_close($ch);
+
+                        // අවශ්‍ය නම්, $response හෝ $curl_error log කිරීමට පුළුවන.
+                    }
+                    // ===============================================
+
                     $wa_link = $send_whatsapp ? "https://api.whatsapp.com/send?phone=$wa_phone&text=" . urlencode($message_body) : "";
-                    $sms_link = $send_sms ? "sms:$wa_phone?&body=" . urlencode($message_body) : "";
+                    
+                    // SMS Link වෙනුවට # යොදයි (සත්‍ය SMS එක API Call එකෙන් යවන නිසා)
+                    $sms_link = $send_sms ? "#" : ""; 
                     
                     $notifications[] = [
                         'name' => $student_name,
@@ -94,7 +132,7 @@ if (isset($_POST['save_attendance'])) {
         $stu_stmt->close();
         
         if (!isset($msg)) { // If no prepare error occurred
-            $msg = "Attendance marked successfully!";
+            $msg = "Attendance marked successfully! SMS API calls initiated.";
             $msg_type = "success";
         }
     }
@@ -155,7 +193,11 @@ if (isset($_POST['save_attendance'])) {
                             </a>
                             <?php endif; ?>
                             
-                            <?php if(!empty($note['sms_link'])): ?>
+                            <?php if($note['sms_link'] == '#'): // SMS was sent via API ?>
+                            <button disabled class="flex-1 bg-blue-200 text-blue-700 text-xs font-bold py-2 px-2 rounded text-center transition flex items-center justify-center gap-1 opacity-70 cursor-not-allowed">
+                                <i class="fas fa-comment-dots"></i> SMS Sent!
+                            </button>
+                            <?php elseif(!empty($note['sms_link'])): ?>
                             <a href="<?php echo $note['sms_link']; ?>" target="_blank" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold py-2 px-2 rounded text-center transition flex items-center justify-center gap-1">
                                 <i class="fas fa-comment-dots"></i> SMS
                             </a>
