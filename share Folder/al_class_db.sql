@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2025 at 04:39 AM
+-- Generation Time: Dec 09, 2025 at 11:09 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -43,7 +43,10 @@ INSERT INTO `attendance` (`attendance_id`, `student_id`, `date`, `status`, `time
 (2, 5, '2025-12-02', 'Present', '16:31:06'),
 (3, 7, '2025-12-05', 'Absent', '15:45:53'),
 (4, 9, '2025-12-08', 'Present', '10:52:06'),
-(5, 7, '2025-12-08', 'Present', '07:42:48');
+(5, 7, '2025-12-08', 'Present', '07:42:48'),
+(6, 1, '2025-12-09', 'Present', '12:30:22'),
+(7, 7, '2025-12-09', 'Absent', '08:03:07'),
+(8, 5, '2025-12-09', 'Present', '09:28:59');
 
 -- --------------------------------------------------------
 
@@ -167,6 +170,8 @@ CREATE TABLE `payments` (
   `month` varchar(20) NOT NULL,
   `year` int(4) NOT NULL DEFAULT 2025,
   `amount` decimal(10,2) NOT NULL,
+  `payment_status` enum('paid','pending','failed') NOT NULL DEFAULT 'paid',
+  `transaction_id` varchar(100) DEFAULT NULL,
   `method` varchar(20) NOT NULL DEFAULT 'Cash',
   `payment_type` varchar(20) NOT NULL DEFAULT 'Full',
   `paid_date` datetime DEFAULT current_timestamp()
@@ -176,24 +181,40 @@ CREATE TABLE `payments` (
 -- Dumping data for table `payments`
 --
 
-INSERT INTO `payments` (`payment_id`, `student_id`, `class_id`, `month`, `year`, `amount`, `method`, `payment_type`, `paid_date`) VALUES
-(2, 1, 1, 'November', 2025, 2500.00, 'Card', 'Full', '2025-11-30 12:28:35'),
-(3, 1, 1, 'May', 2025, 2500.00, 'Card', 'Half', '2025-11-30 12:39:16'),
-(6, 1, 1, 'November', 2025, 2500.00, 'Cash', 'Full', '2025-11-30 13:36:13'),
-(7, 1, 1, 'December', 2025, 2500.00, 'Cash', 'Full', '2025-12-01 17:32:52'),
-(8, 6, 1, 'December', 2025, 2500.00, 'Cash', 'Full', '2025-12-02 12:16:38'),
-(11, 1, 1, 'January', 2025, 2500.00, 'Cash', 'Full', '2025-12-02 14:29:26'),
-(12, 1, 1, 'January', 2025, 2500.00, 'Cash', 'Full Payment', '2025-12-02 14:43:59'),
-(13, 1, 1, 'January', 2025, 2500.00, 'Cash', 'Full Payment', '2025-12-02 14:59:18'),
-(14, 1, 1, 'April', 2025, 2500.00, 'Cash', 'Full Payment', '2025-12-02 15:09:39'),
-(15, 1, 1, 'February', 2025, 2500.00, 'Cash', 'Full Payment', '2025-12-02 15:09:49'),
-(16, 7, 1, 'January', 2025, 2500.00, 'Cash', 'Full Payment', '2025-12-02 15:15:59'),
-(17, 7, 1, 'November', 2025, 2500.00, 'Cash', 'Full Payment', '2025-12-02 15:29:37'),
-(18, 5, 1, 'January', 2025, 2500.00, 'Cash', 'Full Payment', '2025-12-02 15:54:19'),
-(19, 1, 1, 'August', 2025, 2500.00, 'Cash', 'Full Payment', '2025-12-08 09:46:17'),
-(20, 5, 1, 'September', 2025, 1250.00, 'Cash', 'Half Payment', '2025-12-08 09:48:34'),
-(21, 5, 1, 'February', 2025, 2500.00, 'Cash', 'Full Payment', '2025-12-08 10:44:37'),
-(22, 9, 1, 'January', 2025, 2500.00, 'Cash', 'Full Payment', '2025-12-08 10:51:58');
+INSERT INTO `payments` (`payment_id`, `student_id`, `class_id`, `month`, `year`, `amount`, `payment_status`, `transaction_id`, `method`, `payment_type`, `paid_date`) VALUES
+(2, 1, 1, 'November', 2025, 2500.00, 'paid', NULL, 'Card', 'Full', '2025-11-30 12:28:35'),
+(3, 1, 1, 'May', 2025, 2500.00, 'paid', NULL, 'Card', 'Half', '2025-11-30 12:39:16'),
+(6, 1, 1, 'November', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full', '2025-11-30 13:36:13'),
+(7, 1, 1, 'December', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full', '2025-12-01 17:32:52'),
+(8, 6, 1, 'December', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full', '2025-12-02 12:16:38'),
+(11, 1, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full', '2025-12-02 14:29:26'),
+(12, 1, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 14:43:59'),
+(13, 1, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 14:59:18'),
+(14, 1, 1, 'April', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 15:09:39'),
+(15, 1, 1, 'February', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 15:09:49'),
+(16, 7, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 15:15:59'),
+(17, 7, 1, 'November', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 15:29:37'),
+(18, 5, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 15:54:19'),
+(19, 1, 1, 'August', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-08 09:46:17'),
+(20, 5, 1, 'September', 2025, 1250.00, 'paid', NULL, 'Cash', 'Half Payment', '2025-12-08 09:48:34'),
+(21, 5, 1, 'February', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-08 10:44:37'),
+(22, 9, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-08 10:51:58'),
+(23, 1, 1, 'March', 2025, 1250.00, 'paid', NULL, 'Cash', 'Half Payment', '2025-12-09 12:29:37');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `salaries`
+--
+
+CREATE TABLE `salaries` (
+  `salary_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `payment_month` varchar(7) NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `payment_date` datetime DEFAULT current_timestamp(),
+  `status` enum('paid','pending') NOT NULL DEFAULT 'paid'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -231,6 +252,27 @@ INSERT INTO `students` (`student_id`, `reg_number`, `full_name`, `nic`, `dob`, `
 (7, 'ST2025006', 'Ravindu chandeepa', '200401401349', '2025-12-10', 'Male', 'ff', 'galle', '0773093941', '0773093941', 'Ravindu@gmail.com', 'Maths', '2027', 'ST2025006.jpg', '2025-12-02 14:24:02', 1),
 (8, 'ST2025007', 'chamika', '200612121212', '2025-12-17', 'Male', '', 'baddegama', '0766411887', '0766411887', 'chamika@gmail.com', 'Tech', '2026', 'ST2025007.jpg', '2025-12-04 08:04:07', 1),
 (9, 'ST2025008', 'iruja pasandul', '200530301877', '2025-10-29', 'Male', 'siridhamma college', 'bangalawatta', '0774258282', '0774258282', 'iruja@gmail.com', 'Tech', '2025', 'ST2025008.jpg', '2025-12-08 10:51:35', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `system_settings`
+--
+
+CREATE TABLE `system_settings` (
+  `setting_key` varchar(50) NOT NULL,
+  `setting_value` varchar(255) NOT NULL,
+  `description` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `system_settings`
+--
+
+INSERT INTO `system_settings` (`setting_key`, `setting_value`, `description`) VALUES
+('allow_registration', 'yes', 'නව ශිෂ්‍ය ලියාපදිංචියට අවසර දෙන්න (yes/no)'),
+('monthly_fee_default', '1500.00', 'පෙරනිමි මාසික ගාස්තු මුදල'),
+('system_name', 'AL Class Management System', 'පද්ධතියේ නම');
 
 -- --------------------------------------------------------
 
@@ -338,11 +380,24 @@ ALTER TABLE `payments`
   ADD KEY `class_id` (`class_id`);
 
 --
+-- Indexes for table `salaries`
+--
+ALTER TABLE `salaries`
+  ADD PRIMARY KEY (`salary_id`),
+  ADD KEY `teacher_id` (`teacher_id`);
+
+--
 -- Indexes for table `students`
 --
 ALTER TABLE `students`
   ADD PRIMARY KEY (`student_id`),
   ADD UNIQUE KEY `reg_number` (`reg_number`);
+
+--
+-- Indexes for table `system_settings`
+--
+ALTER TABLE `system_settings`
+  ADD PRIMARY KEY (`setting_key`);
 
 --
 -- Indexes for table `teachers`
@@ -366,7 +421,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `attendance`
 --
 ALTER TABLE `attendance`
-  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `attendance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `classes`
@@ -402,7 +457,13 @@ ALTER TABLE `expenses`
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT for table `salaries`
+--
+ALTER TABLE `salaries`
+  MODIFY `salary_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `students`
@@ -452,6 +513,12 @@ ALTER TABLE `exam_marks`
 ALTER TABLE `payments`
   ADD CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `payments_ibfk_2` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `salaries`
+--
+ALTER TABLE `salaries`
+  ADD CONSTRAINT `salaries_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`teacher_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
