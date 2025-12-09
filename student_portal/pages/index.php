@@ -109,29 +109,29 @@ if ($attendance_percentage !== 'N/A') {
 
 
 // c) Notice Board Data (Prepared Statement)
-$notices = [];
-$sql_notices = "SELECT title, created_at FROM notices WHERE status = 1 ORDER BY created_at DESC LIMIT 3";
-$stmt_notices = $conn->prepare($sql_notices);
+// $notices = [];
+// $sql_notices = "SELECT title, created_at FROM notices WHERE status = 1 ORDER BY created_at DESC LIMIT 3";
+// $stmt_notices = $conn->prepare($sql_notices);
 
-if ($stmt_notices) { // Check if prepare succeeded
-    if ($stmt_notices->execute()) {
-        $notices_result = $stmt_notices->get_result();
+// if ($stmt_notices) { // Check if prepare succeeded
+//     if ($stmt_notices->execute()) {
+//         $notices_result = $stmt_notices->get_result();
 
-        while ($row = $notices_result->fetch_assoc()) {
-            // 'time ago' ගණනය කිරීම
-            $time_ago = time() - strtotime($row['created_at']);
-            if ($time_ago < 60) $time_display = $time_ago . " seconds ago";
-            elseif ($time_ago < 3600) $time_display = floor($time_ago / 60) . " minutes ago";
-            elseif ($time_ago < 86400) $time_display = floor($time_ago / 3600) . " hours ago";
-            else $time_display = date('M d, Y', strtotime($row['created_at'])); 
+//         while ($row = $notices_result->fetch_assoc()) {
+//             // 'time ago' ගණනය කිරීම
+//             $time_ago = time() - strtotime($row['created_at']);
+//             if ($time_ago < 60) $time_display = $time_ago . " seconds ago";
+//             elseif ($time_ago < 3600) $time_display = floor($time_ago / 60) . " minutes ago";
+//             elseif ($time_ago < 86400) $time_display = floor($time_ago / 3600) . " hours ago";
+//             else $time_display = date('M d, Y', strtotime($row['created_at'])); 
 
-            $row['time_display'] = $time_display;
-            $notices[] = $row;
-        }
-    }
-    $stmt_notices->close();
-}
-?>
+//             $row['time_display'] = $time_display;
+//             $notices[] = $row;
+//         }
+//     }
+//     $stmt_notices->close();
+// }
+// ?>
 
 <div class="flex-1 flex flex-col h-screen overflow-y-auto">
 
