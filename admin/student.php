@@ -1,4 +1,6 @@
 <?php 
+// admin/student.php - Fixed to use prepared statements for secure filtering.
+
 include 'db_con.php'; 
 ?>
 
@@ -40,12 +42,22 @@ include 'db_con.php';
             </div>
             <?php endif; ?>
 
+            <?php if(isset($_GET['error'])): ?>
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded shadow-sm flex justify-between items-center">
+                <div>
+                    <p class="font-bold">Error</p>
+                    <p class="text-sm"><?php echo htmlspecialchars($_GET['error']); ?></p>
+                </div>
+                <button onclick="this.parentElement.style.display='none'" class="text-red-700"><i class="fas fa-times"></i></button>
+            </div>
+            <?php endif; ?>
+
             <form method="GET" action="" class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6">
                 <div class="flex flex-col md:flex-row gap-4 items-end">
                     
                     <div class="w-full md:flex-1">
                         <label class="text-xs font-semibold text-gray-500 mb-1 block">Search Student</label>
-                        <input type="text" name="search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>" 
+                        <input type="text" name="search" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>" 
                             class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" 
                             placeholder="Name or Reg No...">
                     </div>
@@ -102,40 +114,55 @@ include 'db_con.php';
                         <tbody class="bg-white divide-y divide-gray-200">
                             
                             <?php
-                            // ==========================================
-                            // UPDATED SEARCH LOGIC
-                            // ==========================================
-                            
-                            // 1. මූලික Query එක (Where 1=1 ලියන්නේ ඉදිරියට එන කොන්දේසි පහසුවෙන් අමුණන්නයි)
+                            // 1. Base Query
                             $sql = "SELECT * FROM students WHERE 1=1";
+                            $params = [];
+                            $types = '';
 
-                            // 2. නම හෝ Reg No සෙවීම
+                            // 2. Safely add search conditions (Prepared Statements)
                             if(isset($_GET['search']) && !empty($_GET['search'])){
-                                $search = $conn->real_escape_string($_GET['search']);
-                                $sql .= " AND (full_name LIKE '%$search%' OR reg_number LIKE '%$search%')";
+                                $search = "%" . $_GET['search'] . "%";
+                                $sql .= " AND (full_name LIKE ? OR reg_number LIKE ?)";
+                                $types .= "ss";
+                                $params[] = $search;
+                                $params[] = $search;
                             }
 
-                            // 3. Stream එක අනුව ෆිල්ටර් කිරීම
                             if(isset($_GET['stream']) && !empty($_GET['stream'])){
-                                $stream = $conn->real_escape_string($_GET['stream']);
-                                $sql .= " AND stream = '$stream'";
+                                $stream = $_GET['stream'];
+                                $sql .= " AND stream = ?";
+                                $types .= "s";
+                                $params[] = $stream;
                             }
 
-                            // 4. Batch එක අනුව ෆිල්ටර් කිරීම
                             if(isset($_GET['batch']) && !empty($_GET['batch'])){
-                                $batch = $conn->real_escape_string($_GET['batch']);
-                                $sql .= " AND batch = '$batch'";
+                                $batch = $_GET['batch'];
+                                $sql .= " AND batch = ?";
+                                $types .= "s";
+                                $params[] = $batch;
                             }
 
-                            // 5. අවසාන වශයෙන් Order එක එකතු කිරීම
                             $sql .= " ORDER BY student_id DESC";
+                            
+                            $result = false;
+                            $stmt = $conn->prepare($sql);
 
-                            $result = $conn->query($sql);
+                            if ($stmt) {
+                                if (!empty($params)) {
+                                    $stmt->bind_param($types, ...$params); 
+                                }
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                $stmt->close();
+                            } else {
+                                // If prepare fails, set an error message
+                                echo "<tr><td colspan='5' class='text-center py-8 text-red-500'>Database Query Error. Please check SQL syntax.</td></tr>";
+                            }
 
-                            if ($result->num_rows > 0) {
+
+                            if ($result && $result->num_rows > 0) {
                                 while($row = $result->fetch_assoc()) {
                                     
-                                    // Status Logic
                                     $status_val = isset($row['status']) ? $row['status'] : 1; 
                                     $is_active = ($status_val == 1);
                                     
@@ -144,11 +171,9 @@ include 'db_con.php';
                                     
                                     // Image Path Logic
                                     $photo_name = $row['photo'];
-                                    if (!empty($photo_name) && file_exists("../assets/images/students/" . $photo_name)) {
-                                        $photo_path = "../assets/images/students/" . $photo_name;
-                                    } else {
-                                        $photo_path = "../assets/images/user2.jpg"; 
-                                    }
+                                    $photo_path = (!empty($photo_name) && file_exists("../assets/images/students/" . $photo_name)) 
+                                        ? "../assets/images/students/" . $photo_name 
+                                        : "../assets/images/user2.jpg"; // Default image path
                             ?>
 
                             <tr class="hover:bg-gray-50 transition">
@@ -193,7 +218,7 @@ include 'db_con.php';
 
                             <?php 
                                 }
-                            } else {
+                            } else if ($result !== false) {
                                 echo "<tr><td colspan='5' class='text-center py-8 text-gray-500'>No students found matching your filters.</td></tr>";
                             }
                             ?>

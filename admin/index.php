@@ -4,7 +4,7 @@ include 'includes/auth.php';
 include 'db_con.php'; 
 
 // ==========================================
-// 1. DATA FETCHING LOGIC
+// 1. DATA FETCHING LOGIC (Secure)
 // ==========================================
 
 // A. Total Students (Active Only)
@@ -13,11 +13,21 @@ $student_res = $conn->query($student_sql);
 $student_count = $student_res->fetch_assoc()['total'];
 
 // B. Monthly Income (Calculated from payments table based on paid_date)
-$current_month = date('Y-m'); // Ex: 2025-12
-$income_sql = "SELECT SUM(amount) as total FROM payments WHERE DATE_FORMAT(paid_date, '%Y-%m') = '$current_month'";
-$income_res = $conn->query($income_sql);
-$row_income = $income_res->fetch_assoc();
-$monthly_income = $row_income['total'] ? $row_income['total'] : 0;
+$current_month = date('Y-m'); 
+// Prepared Statement for Monthly Income
+$income_stmt = $conn->prepare("SELECT SUM(amount) as total FROM payments WHERE DATE_FORMAT(paid_date, '%Y-%m') = ? AND payment_status = 'paid'");
+
+if ($income_stmt) {
+    $income_stmt->bind_param("s", $current_month);
+    $income_stmt->execute();
+    $income_res = $income_stmt->get_result();
+    $row_income = $income_res->fetch_assoc();
+    $monthly_income = $row_income['total'] ? $row_income['total'] : 0;
+    $income_stmt->close();
+} else {
+    $monthly_income = 0; // Handle error silently on dashboard
+}
+
 
 // C. Active Classes Count
 $class_sql = "SELECT COUNT(*) as total FROM classes WHERE status = 1";
@@ -33,20 +43,26 @@ $teacher_count = $teacher_res->fetch_assoc()['total'];
 $new_students_sql = "SELECT * FROM students ORDER BY student_id DESC LIMIT 5";
 $new_students_res = $conn->query($new_students_sql);
 
-// F. Chart Data (Last 6 Months Income)
+// F. Chart Data (Last 6 Months Income) - Prepared Statement
 $chart_labels = [];
 $chart_data = [];
 
-for ($i = 5; $i >= 0; $i--) {
-    $month_filter = date("Y-m", strtotime("-$i months")); // For DB Query
-    $display_label = date("M", strtotime("-$i months"));  // For Chart Label
-    
-    $chart_sql = "SELECT SUM(amount) as total FROM payments WHERE DATE_FORMAT(paid_date, '%Y-%m') = '$month_filter'";
-    $chart_res = $conn->query($chart_sql);
-    $row = $chart_res->fetch_assoc();
-    
-    $chart_labels[] = $display_label;
-    $chart_data[] = $row['total'] ? $row['total'] : 0;
+$chart_stmt = $conn->prepare("SELECT SUM(amount) as total FROM payments WHERE DATE_FORMAT(paid_date, '%Y-%m') = ? AND payment_status = 'paid'");
+
+if ($chart_stmt) {
+    for ($i = 5; $i >= 0; $i--) {
+        $month_filter = date("Y-m", strtotime("-$i months")); // For DB Query
+        $display_label = date("M", strtotime("-$i months"));  // For Chart Label
+        
+        $chart_stmt->bind_param("s", $month_filter);
+        $chart_stmt->execute();
+        $chart_res = $chart_stmt->get_result();
+        $row = $chart_res->fetch_assoc();
+        
+        $chart_labels[] = $display_label;
+        $chart_data[] = $row['total'] ? (float)$row['total'] : 0; // Float cast for JSON
+    }
+    $chart_stmt->close();
 }
 ?>
 
@@ -84,7 +100,7 @@ for ($i = 5; $i >= 0; $i--) {
                 </div>
                 <div class="flex items-center gap-3 cursor-pointer">
                     <div class="text-right hidden md:block">
-                        <div class="text-sm font-bold text-gray-700"><?php echo isset($_SESSION['admin_name']) ? $_SESSION['admin_name'] : 'Admin'; ?></div>
+                        <div class="text-sm font-bold text-gray-700"><?php echo isset($_SESSION['admin_name']) ? htmlspecialchars($_SESSION['admin_name']) : 'Admin'; ?></div>
                         <div class="text-xs text-gray-500">Administrator</div>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold shadow-md ring-2 ring-indigo-100">
@@ -112,7 +128,7 @@ for ($i = 5; $i >= 0; $i--) {
                 
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-lg transition-all duration-300 group">
                     <div>
-                        <div class="text-gray-500 text-sm font-medium mb-1">Monthly Income</div>
+                        <div class="text-gray-500 text-sm font-medium mb-1">Monthly Income (<?php echo date('M'); ?>)</div>
                         <div class="text-3xl font-bold text-gray-800 group-hover:text-green-600 transition-colors">
                             Rs. <?php echo number_format($monthly_income / 1000, 1); ?>k
                         </div>
@@ -206,7 +222,7 @@ for ($i = 5; $i >= 0; $i--) {
         
         // PHP Arrays to JS
         const labels = <?php echo json_encode($chart_labels); ?>;
-        const data = <?php echo json_encode($chart_data); ?>;
+        const data = <?php echo json_encode($chart_data, JSON_NUMERIC_CHECK); ?>; 
 
         // Gradient for chart
         let gradient = ctx.createLinearGradient(0, 0, 0, 400);

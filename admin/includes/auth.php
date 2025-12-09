@@ -1,12 +1,14 @@
 <?php
-// Session eka patan aran nathnam patan gannawa
+// AL-Class-Management-System/admin/includes/auth.php - Authentication Check
+
+// Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Admin kenek log wela nathnam Login page ekata yawanna
+// If admin is not logged in, redirect to the login page
 if (!isset($_SESSION['is_admin_logged_in']) || $_SESSION['is_admin_logged_in'] !== true) {
-    // Dan inna thana anuwa path eka hadaganna
+    // Redirect to the login page
     header("Location: login.php");
     exit();
 }

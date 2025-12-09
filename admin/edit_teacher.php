@@ -1,18 +1,23 @@
 <?php 
 include 'db_con.php'; 
 
-// ID එක හරහා Teacher ගේ විස්තර ලබා ගැනීම
+// Fetch Teacher Details by ID
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
-    $query = "SELECT * FROM teachers WHERE teacher_id = $id";
-    $result = $conn->query($query);
+    
+    // Use Prepared Statement
+    $stmt_select = $conn->prepare("SELECT * FROM teachers WHERE teacher_id = ?");
+    $stmt_select->bind_param("i", $id);
+    $stmt_select->execute();
+    $result = $stmt_select->get_result();
 
     if ($result->num_rows > 0) {
         $teacher = $result->fetch_assoc();
     } else {
-        header("Location: teachers.php");
+        header("Location: teachers.php?error=Teacher not found.");
         exit();
     }
+    $stmt_select->close();
 } else {
     header("Location: teachers.php");
     exit();
@@ -36,28 +41,39 @@ if (isset($_POST['update'])) {
         
         if (move_uploaded_file($_FILES['image']['tmp_name'], $target_dir . $unique_name)) {
             $final_image = $unique_name;
-            // පරණ ෆොටෝ එක මැකීම (අවශ්‍ය නම්)
+            // Delete old photo (if exists)
             if (!empty($old_image) && file_exists($target_dir . $old_image)) {
                 unlink($target_dir . $old_image);
             }
+        } else {
+            $msg = "Error uploading new image.";
+            $msg_type = "error";
+            $final_image = $old_image; // Revert to old image path on upload failure
         }
     }
 
-    // Database Update
-    $stmt = $conn->prepare("UPDATE teachers SET full_name=?, subject=?, description=?, image=? WHERE teacher_id=?");
-    $stmt->bind_param("ssssi", $name, $subject, $desc, $final_image, $id);
+    // Database Update (Using Prepared Statement)
+    $stmt_update = $conn->prepare("UPDATE teachers SET full_name=?, subject=?, description=?, image=? WHERE teacher_id=?");
+    
+    if($stmt_update) {
+        $stmt_update->bind_param("ssssi", $name, $subject, $desc, $final_image, $id);
 
-    if ($stmt->execute()) {
-        $msg = "Teacher details updated successfully!";
-        $msg_type = "success";
-        // Update වූ දත්ත නැවත ලබා ගැනීම
-        $teacher['full_name'] = $name;
-        $teacher['subject'] = $subject;
-        $teacher['description'] = $desc;
-        $teacher['image'] = $final_image;
+        if ($stmt_update->execute()) {
+            $msg = "Teacher details updated successfully!";
+            $msg_type = "success";
+            // Update local data array
+            $teacher['full_name'] = $name;
+            $teacher['subject'] = $subject;
+            $teacher['description'] = $desc;
+            $teacher['image'] = $final_image;
+        } else {
+            $msg = "Error updating details: " . $conn->error;
+            $msg_type = "error";
+        }
+        $stmt_update->close();
     } else {
-        $msg = "Error updating details: " . $conn->error;
-        $msg_type = "error";
+         $msg = "Database Prepare Error: " . $conn->error;
+         $msg_type = "error";
     }
 }
 ?>
@@ -97,7 +113,7 @@ if (isset($_POST['update'])) {
                 <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                     <div class="bg-indigo-600 px-8 py-4 flex justify-between items-center">
                         <h3 class="text-white font-semibold text-lg">Update Information</h3>
-                        <span class="bg-indigo-500 text-indigo-100 text-xs px-2 py-1 rounded">ID: <?php echo $teacher['teacher_number']; ?></span>
+                        <span class="bg-indigo-500 text-indigo-100 text-xs px-2 py-1 rounded">ID: <?php echo htmlspecialchars($teacher['teacher_number']); ?></span>
                     </div>
                     
                     <form method="POST" action="" enctype="multipart/form-data" class="p-8 space-y-6">
@@ -126,13 +142,15 @@ if (isset($_POST['update'])) {
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Profile Photo</label>
                                 <div class="flex items-center gap-4">
                                     <?php 
-                                    $imgShow = (!empty($teacher['image'])) ? "../assets/images/teachers/".$teacher['image'] : "https://ui-avatars.com/api/?name=".$teacher['full_name']; 
+                                    $imgShow = (!empty($teacher['image']) && file_exists("../assets/images/teachers/".$teacher['image'])) 
+                                        ? "../assets/images/teachers/".$teacher['image'] 
+                                        : "https://ui-avatars.com/api/?name=".urlencode($teacher['full_name']); 
                                     ?>
                                     <img src="<?php echo $imgShow; ?>" class="w-12 h-12 rounded-full object-cover border">
                                     <input type="file" name="image" accept="image/*" 
                                         class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition"/>
                                 </div>
-                                <input type="hidden" name="old_image" value="<?php echo $teacher['image']; ?>">
+                                <input type="hidden" name="old_image" value="<?php echo htmlspecialchars($teacher['image']); ?>">
                             </div>
                         </div>
 
