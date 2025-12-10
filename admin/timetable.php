@@ -52,10 +52,11 @@ include 'db_con.php';
                         <tbody class="bg-white divide-y divide-gray-200">
                             
                             <?php
+                            // The query below is low risk as it does not use user input.
                             $sql = "SELECT * FROM classes ORDER BY class_id DESC";
                             $result = $conn->query($sql);
 
-                            if ($result->num_rows > 0) {
+                            if ($result && $result->num_rows > 0) {
                                 while($row = $result->fetch_assoc()) {
                             ?>
 
@@ -76,9 +77,9 @@ include 'db_con.php';
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                        <?php echo $row['day']; ?>
+                                        <?php echo htmlspecialchars($row['day']); ?>
                                     </span>
-                                    <div class="text-xs text-gray-500 mt-1 pl-1"><i class="far fa-clock mr-1"></i><?php echo $row['time']; ?></div>
+                                    <div class="text-xs text-gray-500 mt-1 pl-1"><i class="far fa-clock mr-1"></i><?php echo htmlspecialchars($row['time']); ?></div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-bold">
                                     Rs. <?php echo number_format($row['fee'], 2); ?>

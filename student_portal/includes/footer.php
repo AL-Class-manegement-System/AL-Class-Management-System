@@ -1,4 +1,4 @@
-<footer class=" bottom-0 right-0 left-0 sm:left-64 z-30 bg-white border-t border-gray-200 text-gray-500 py-4">
+<footer class="bg-white border-t border-gray-200 text-gray-500 py-4 mt-auto">
     <div class="px-6 flex flex-col md:flex-row justify-between items-center gap-2 text-xs">
         
         <p>&copy; 2024 Future Minds A/L Institute. All rights reserved.</p>
@@ -10,8 +10,6 @@
         
     </div>
 </footer>
-
-<script src="../js/home.js"></script>
 
 </body>
 </html>

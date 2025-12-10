@@ -21,7 +21,7 @@ $stream_map = [
 $filter_stream = isset($stream_map[$my_stream_code]) ? $stream_map[$my_stream_code] : $my_stream_code;
 
 // ==========================================
-// 2. Enroll වීමේ Logic එක (Form Submit වූ විට)
+// 2. Enroll වීමේ Logic එක (Form Submit වූ විට - Prepared Statements)
 // ==========================================
 $message = "";
 $msg_type = "";
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['class_id'])) {
 
     if ($action == 'enroll') {
         
-        // --- විෂයන් ගණන පරීක්ෂා කිරීම (Max 3) ---
+        // --- විෂයන් ගණන පරීක්ෂා කිරීම (Max 3) --- (Prepared Statement)
         $count_sql = "SELECT COUNT(*) as total FROM enrollments WHERE student_id = ?";
         $count_stmt = $conn->prepare($count_sql);
         $count_stmt->bind_param("i", $db_student_id);
@@ -50,14 +50,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['class_id'])) {
         } else {
             // 3ට අඩු නම් පමණක් Enroll වීමට ඉඩ දීම
             
-            // දැනටමත් Enroll වී ඇත්දැයි බලමු (Duplicate Check)
+            // දැනටමත් Enroll වී ඇත්දැයි බලමු (Duplicate Check - Prepared Statement)
             $check_sql = "SELECT * FROM enrollments WHERE student_id = ? AND class_id = ?";
             $check_stmt = $conn->prepare($check_sql);
             $check_stmt->bind_param("ii", $db_student_id, $class_id);
             $check_stmt->execute();
             
             if ($check_stmt->get_result()->num_rows == 0) {
-                // Enroll කිරීම
+                // Enroll කිරීම (Prepared Statement)
                 $enroll_sql = "INSERT INTO enrollments (student_id, class_id) VALUES (?, ?)";
                 $enroll_stmt = $conn->prepare($enroll_sql);
                 $enroll_stmt->bind_param("ii", $db_student_id, $class_id);
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['class_id'])) {
         }
 
     } elseif ($action == 'unenroll') {
-        // පන්තියෙන් ඉවත් වීම
+        // පන්තියෙන් ඉවත් වීම (Prepared Statement)
         $del_sql = "DELETE FROM enrollments WHERE student_id = ? AND class_id = ?";
         $del_stmt = $conn->prepare($del_sql);
         $del_stmt->bind_param("ii", $db_student_id, $class_id);
@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['class_id'])) {
 }
 
 // ==========================================
-// 3. දැනට Enroll වී ඇති පන්ති වල ID ලබා ගැනීම
+// 3. දැනට Enroll වී ඇති පන්ති වල ID ලබා ගැනීම (Prepared Statement)
 // ==========================================
 $enrolled_classes = [];
 $enr_sql = "SELECT class_id FROM enrollments WHERE student_id = ?";
@@ -144,7 +144,7 @@ $enr_stmt->close();
 
             <?php
             // ==========================================
-            // FILTERED QUERY: Stream එකට අදාළ Active පන්ති + ICT පන්ති
+            // FILTERED QUERY: Stream එකට අදාළ Active පන්ති + ICT පන්ති (Prepared Statement)
             // ==========================================
             $sql = "SELECT * FROM classes WHERE status = 1 AND (stream = ? OR stream = 'ICT') ORDER BY day ASC";
             $stmt = $conn->prepare($sql);

@@ -14,7 +14,7 @@ if (!isset($_SESSION['student_id'])) {
 $student_id = $_SESSION['student_id'];
 $full_name = $_SESSION['full_name'];
 
-// Fetch Student Data
+// Fetch Student Data (Prepared Statement භාවිතයෙන්)
 $sql = "SELECT * FROM students WHERE reg_number = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $student_id);
@@ -60,20 +60,13 @@ function getActiveClass($page_name, $current_page) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< Updated upstream
-
-=======
     <title>Student Portal | Future Minds</title>
->>>>>>> Stashed changes
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script src="../js/dashboard.js" defer></script>
 
-<<<<<<< Updated upstream
-
-=======
     <script>
         tailwind.config = {
             theme: {
@@ -91,7 +84,6 @@ function getActiveClass($page_name, $current_page) {
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style> body { font-family: 'Inter', sans-serif; } </style>
->>>>>>> Stashed changes
 </head>
 
 <body class="bg-gray-50 text-slate-800">
@@ -117,16 +109,11 @@ function getActiveClass($page_name, $current_page) {
             </div>
 
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
-<<<<<<< Updated upstream
-                <a href="../"
-                    class="flex items-center px-4 py-3 bg-primary text-white rounded-xl transition-all shadow-lg shadow-indigo-500/30 group">
-=======
                 
                 <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-2">Menu</p>
 
                 <a href="index.php"
                     class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('index.php', $current_page); ?>">
->>>>>>> Stashed changes
                     <i class="fas fa-th-large w-6 text-center"></i>
                     <span class="ms-3 font-medium">Dashboard</span>
                 </a>
@@ -145,26 +132,26 @@ function getActiveClass($page_name, $current_page) {
 
                 <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6">Academics</p>
 
-                <a href="#"
-                    class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group">
+                <a href="exam_results.php"
+                    class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('exam_results.php', $current_page); ?>">
                     <i class="fas fa-clipboard-list w-6 text-center group-hover:scale-110 transition-transform"></i>
                     <span class="ms-3 font-medium">Exam Results</span>
                 </a>
 
-                <a href="#"
-                    class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group">
+                <a href="time_table.php"
+                    class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('time_table.php', $current_page); ?>">
                     <i class="fas fa-calendar-alt w-6 text-center group-hover:scale-110 transition-transform"></i>
                     <span class="ms-3 font-medium">Time Table</span>
                 </a>
 
-                <a href="../pages/live_class.php"
-                    class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group">
+                <a href="past_lessons.php"
+                    class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('past_lessons.php', $current_page); ?>">
                     <i class="fas fa-history w-6 text-center group-hover:scale-110 transition-transform"></i>
                     <span class="ms-3 font-medium">Past Lessons</span>
                 </a>
 
-                <a href="#"
-                    class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all group">
+                <a href="study_packs.php"
+                    class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('study_packs.php', $current_page); ?>">
                     <i class="fas fa-box-open w-6 text-center group-hover:scale-110 transition-transform"></i>
                     <span class="ms-3 font-medium">Study Packs</span>
                 </a>
@@ -180,19 +167,9 @@ function getActiveClass($page_name, $current_page) {
 
         </aside>
 
-<<<<<<< Updated upstream
-
-
-        <!-- //header -->
-        <div class="flex-1 flex flex-col h-screen overflow-y-auto w-full relative">
-
-            <header
-                class="mx-4 mb-0 mt-0 mb-6 rounded-2xl h-20 bg-white shadow-sm flex items-center justify-between px-6 sticky top-4 z-10 border border-gray-100">
-=======
         <div class="flex-1 flex flex-col h-screen overflow-y-auto w-full relative bg-gray-50">
 
             <header class="h-20 bg-white shadow-sm border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-20">
->>>>>>> Stashed changes
 
                 <div class="flex items-center gap-4">
                     <button onclick="toggleSidebar()"
@@ -205,6 +182,9 @@ function getActiveClass($page_name, $current_page) {
                             if($current_page == 'index.php') echo 'Dashboard';
                             elseif($current_page == 'my_classes.php') echo 'My Classes';
                             elseif($current_page == 'live_class.php') echo 'Live Session';
+                            elseif($current_page == 'time_table.php') echo 'Time Table'; 
+                            elseif($current_page == 'st_profile.php') echo 'Student Profile'; 
+                            elseif($current_page == 'study_packs.php') echo 'Study Materials'; 
                             else echo 'Student Portal';
                         ?>
                     </h2>
@@ -242,14 +222,9 @@ function getActiveClass($page_name, $current_page) {
                                 </div>
 
                                 <div class="py-1">
-<<<<<<< Updated upstream
                                     <a href="../pages/st_profile.php"
                                         class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
-                                        <i class="fas fa-user mr-3 w-4 text-gray-400"></i> Your Profile
-=======
-                                    <a href="#" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">
-                                        <i class="far fa-user mr-3 w-4 text-gray-400"></i> Profile
->>>>>>> Stashed changes
+                                        <i class="far fa-user mr-3 w-4 text-gray-400"></i> Your Profile
                                     </a>
                                     <a href="#" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">
                                         <i class="fas fa-cog mr-3 w-4 text-gray-400"></i> Settings
@@ -266,5 +241,3 @@ function getActiveClass($page_name, $current_page) {
                     </div>
                 </div>
             </header>
-            
-

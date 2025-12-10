@@ -1,6 +1,8 @@
 <?php 
 include 'db_con.php'; 
 
+$error = null;
+
 if (isset($_POST['submit'])) {
     
     // Data Variables
@@ -13,7 +15,7 @@ if (isset($_POST['submit'])) {
     $fee = $_POST['fee'];
     $status = 1;
 
-    // Insert Query
+    // Insert Query (Prepared Statement - Secure)
     $stmt = $conn->prepare("INSERT INTO classes (class_name, stream, subject, teacher_name, fee, day, time, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     
     if ($stmt) {
@@ -27,7 +29,7 @@ if (isset($_POST['submit'])) {
         }
         $stmt->close();
     } else {
-        $error = "Database Error: " . $conn->error;
+        $error = "Database Prepare Error: " . $conn->error;
     }
 }
 ?>
@@ -59,7 +61,7 @@ if (isset($_POST['submit'])) {
                 </div>
                 
                 <form method="POST" action="" class="p-8 space-y-6">
-                    <?php if(isset($error)) echo "<p class='text-red-500 bg-red-100 p-3 rounded'>$error</p>"; ?>
+                    <?php if(isset($error)) echo "<p class='text-red-500 bg-red-100 p-3 rounded'>".htmlspecialchars($error)."</p>"; ?>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
@@ -75,13 +77,13 @@ if (isset($_POST['submit'])) {
                                 <option value="Commerce">Commerce</option>
                                 <option value="Arts">Arts</option>
                                 <option value="Technology">Technology</option>
-                                <option value="ICT">ICT (Common)</option>
-                            </select>
+                                <option value="ICT">ICT (Common)</option> 
+                                </select>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                            <input type="text" name="subject" placeholder="Ex: Physics" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200">
+                            <input type="text" name="subject" placeholder="Ex: Physics" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
 
                         <div>
@@ -91,8 +93,10 @@ if (isset($_POST['submit'])) {
                                 <?php
                                 $t_sql = "SELECT full_name FROM teachers WHERE status=1";
                                 $t_res = $conn->query($t_sql);
-                                while($t_row = $t_res->fetch_assoc()){
-                                    echo "<option value='".$t_row['full_name']."'>".$t_row['full_name']."</option>";
+                                if ($t_res) {
+                                    while($t_row = $t_res->fetch_assoc()){
+                                        echo "<option value='".htmlspecialchars($t_row['full_name'])."'>".htmlspecialchars($t_row['full_name'])."</option>";
+                                    }
                                 }
                                 ?>
                             </select>
@@ -100,7 +104,7 @@ if (isset($_POST['submit'])) {
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Monthly Fee (LKR)</label>
-                            <input type="number" name="fee" placeholder="2500.00" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200">
+                            <input type="number" name="fee" placeholder="2500.00" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
 
                         <div>
@@ -118,7 +122,7 @@ if (isset($_POST['submit'])) {
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Time</label>
-                            <input type="text" name="time" placeholder="Ex: 08:00 AM - 12:00 PM" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200">
+                            <input type="text" name="time" placeholder="Ex: 08:00 AM - 12:00 PM" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
                     </div>
 

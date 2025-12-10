@@ -27,20 +27,20 @@
                <span class="ms-3">Students</span>
             </a>
          </li>
+         
          <li>
-            <a href="#" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
-               <i class="ph ph-users-three text-xl text-gray-400 group-hover:text-white"></i>
-               <span class="ms-3">Papers</span>
+            <a href="upload_materials.php" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
+               <i class="ph ph-note-pencil text-xl text-gray-400 group-hover:text-white"></i>
+               <span class="ms-3">Study Materials</span>
             </a>
          </li>
-
          <li>
             <a href="#" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
                <i class="ph ph-files text-xl text-gray-400 group-hover:text-white"></i>
                <span class="ms-3">Assignments</span>
             </a>
          </li>
-
+         
          <li class="pt-4 mt-4 border-t border-gray-700">
              <span class="px-3 text-xs font-semibold text-gray-500 uppercase">Settings</span>
          </li>
