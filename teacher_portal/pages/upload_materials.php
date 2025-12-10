@@ -7,12 +7,13 @@ if (session_status() === PHP_SESSION_NONE) {
 // ==========================================
 // TEACHER DATA SETUP & SECURITY CHECK
 // ==========================================
-$teacher_id = $_SESSION['teacher_id'] ?? null; 
+// DB ID එක ලබා ගැනීම: loginbackend.php මගින් සකසන ලද numeric ID එක
+$teacher_db_id = $_SESSION['teacher_db_id'] ?? null; 
 $teacher_name = $_SESSION['full_name'] ?? 'Teacher';
-$teacher_subject = $_SESSION['subject'] ?? 'General';
+$teacher_subject = $_SESSION['subject'] ?? 'General'; // මෙම විෂය Session එකේ set කර ඇත්දැයි පරීක්ෂා කරන්න
 
-// back to login if no teacher ID or ID is invalid (e.g., 0)
-if (!isset($teacher_id) || !is_numeric($teacher_id) || $teacher_id <= 0) {
+// back to login if no teacher DB ID or ID is invalid
+if (!isset($teacher_db_id) || !is_numeric($teacher_db_id) || $teacher_db_id <= 0) {
     header("Location: ../../log/login.php");
     exit();
 }
@@ -23,7 +24,7 @@ $page_title = "Upload Study Materials";
 
 // 4. Include Head and Connection
 include("../include/head.php"); 
-require_once $path . 'includes/connection.php'; 
+require_once $path . 'includes/connection.php'; // Database connection ($conn)
 
 // ==========================================
 // FILE UPLOAD AND DB INSERT LOGIC
@@ -79,10 +80,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['upload_material'])) {
                 
                 $relative_path = "assets/study_materials/" . $subject_folder . "/" . $new_file_name;
 
-                // 🌟 teacher_id ඇතුළත් කිරීම (Valid ID is guaranteed by the initial check)
+                // 🌟 DB INSERT: teacher_id ලෙස $teacher_db_id භාවිතා කරයි.
                 $sql = "INSERT INTO study_materials (teacher_id, subject_name, material_title, material_type, file_path, upload_date, status) VALUES (?, ?, ?, ?, ?, CURDATE(), 1)";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("issss", $teacher_id, $subject_name, $material_title, $material_type, $relative_path);
+                $stmt->bind_param("issss", $teacher_db_id, $subject_name, $material_title, $material_type, $relative_path); // 'i' is used for DB ID
 
                 if ($stmt->execute()) {
                     $message = "Study material '" . htmlspecialchars($material_title) . "' uploaded successfully!";
@@ -166,10 +167,10 @@ end_upload_logic:
         <h5 class="text-lg font-bold leading-none text-gray-900 mb-6">Your Recently Uploaded Materials</h5>
         
         <?php
-        // 🌟 teacher_id මත පදනම්ව filter කිරීම
+        // 🌟 LIST SELECT: teacher_id මත පදනම්ව filter කිරීම
         $list_sql = "SELECT material_title, material_type, upload_date, file_path FROM study_materials WHERE teacher_id = ? AND status = 1 ORDER BY upload_date DESC LIMIT 10";
         $list_stmt = $conn->prepare($list_sql);
-        $list_stmt->bind_param("i", $teacher_id);
+        $list_stmt->bind_param("i", $teacher_db_id); // $teacher_db_id is used for filtering
         $list_stmt->execute();
         $list_result = $list_stmt->get_result();
 
