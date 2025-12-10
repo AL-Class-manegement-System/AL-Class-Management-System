@@ -1,5 +1,6 @@
 <?php
-include('../includes/student_header.php'); 
+// AL-Class-Management-System/student_portal/pages/study_packs.php
+include('../includes/student_header.php'); // student_header.php මගින් $student විස්තර සහ $conn දත්ත සමුදා සම්බන්ධතාවය සපයයි.
 
 // ==========================================
 // 1. ශිෂ්‍යයා Enroll වී ඇති විෂයන් ලබා ගැනීම (Prepared Statement)
@@ -48,11 +49,12 @@ if (empty($enrolled_subjects)) {
     $placeholders = implode(',', array_fill(0, count($enrolled_subjects), '?')); 
     
     // Status = 1 (Active) materials පමණක් පෙන්වයි.
+    // **සටහන:** study_materials වගුවේ ඇති subject_name ක්ෂේත්‍රය student ගේ enrolled_subjects අරාය සමග ගලපයි.
     $sql_materials = "SELECT * FROM study_materials WHERE subject_name IN ($placeholders) AND status = 1 ORDER BY subject_name, upload_date DESC"; 
     
     $stmt_materials = $conn->prepare($sql_materials); 
     
-    // **වැඩිදියුණු කළ Binding:** dynamic parameters සඳහා නිවැරදි references සකස් කිරීම.
+    // dynamic parameters සඳහා නිවැරදි references සකස් කිරීම.
     $types = str_repeat('s', count($enrolled_subjects)); 
     $bind_params = array($types);
     for ($i = 0; $i < count($enrolled_subjects); $i++) {
