@@ -27,7 +27,7 @@ if ($student_res->num_rows === 1) {
     // Profile Pic Logic
     $photo_url = $student['photo'];
     $image_path = "../../assets/images/students/" . $photo_url;
-    
+
     if (!empty($photo_url) && file_exists($image_path)) {
         $profile_pic = $image_path;
     } else {
@@ -45,7 +45,8 @@ if ($student_res->num_rows === 1) {
 $current_page = basename($_SERVER['PHP_SELF']);
 
 // Active Link එකට අදාළ CSS Class
-function getActiveClass($page_name, $current_page) {
+function getActiveClass($page_name, $current_page)
+{
     if ($page_name === $current_page) {
         return 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30';
     } else {
@@ -64,7 +65,7 @@ function getActiveClass($page_name, $current_page) {
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <script src="../js/dashboard.js" defer></script>
 
     <script>
@@ -83,7 +84,11 @@ function getActiveClass($page_name, $current_page) {
         }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Inter', sans-serif; } </style>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-50 text-slate-800">
@@ -97,7 +102,25 @@ function getActiveClass($page_name, $current_page) {
         <aside id="sidebar"
             class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 text-white flex flex-col shadow-2xl transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:static md:inset-auto md:transform-none border-r border-slate-800">
 
-            <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800 bg-slate-950">
+
+            <div class="flex items-center gap-2 p-4 bg-white rounded-lg inline-block">
+                <div
+                    class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 shadow-lg shadow-blue-500/30">
+                    <span class="text-white font-bold text-xl">F</span>
+                    <div class="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full border-2 border-white">
+                    </div>
+                </div>
+
+                <div class="flex flex-col justify-center">
+                    <h1 class="text-2xl font-extrabold tracking-tight text-gray-900 leading-none">
+                        Future<span
+                            class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Minds</span>
+                    </h1>
+                    <span class="text-[0.65rem] font-semibold text-gray-400 tracking-widest uppercase ml-0.5">Education
+                        Portal</span>
+                </div>
+            </div>
+            <!-- <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800 bg-slate-950">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">F</div>
                     <span class="text-lg font-bold tracking-wide text-gray-100">Future Minds</span>
@@ -106,10 +129,10 @@ function getActiveClass($page_name, $current_page) {
                     class="md:hidden text-slate-400 hover:text-white focus:outline-none transition-colors p-1 rounded-lg hover:bg-slate-800">
                     <i class="fas fa-times text-lg"></i>
                 </button>
-            </div>
+            </div> -->
 
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
-                
+
                 <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-2">Menu</p>
 
                 <a href="index.php"
@@ -169,7 +192,8 @@ function getActiveClass($page_name, $current_page) {
 
         <div class="flex-1 flex flex-col h-screen overflow-y-auto w-full relative bg-gray-50">
 
-            <header class="h-20 bg-white shadow-sm border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-20">
+            <header
+                class="h-20 bg-white shadow-sm border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-20">
 
                 <div class="flex items-center gap-4">
                     <button onclick="toggleSidebar()"
@@ -178,20 +202,28 @@ function getActiveClass($page_name, $current_page) {
                     </button>
 
                     <h2 class="text-xl font-bold text-slate-800 hidden sm:block">
-                        <?php 
-                            if($current_page == 'index.php') echo 'Dashboard';
-                            elseif($current_page == 'my_classes.php') echo 'My Classes';
-                            elseif($current_page == 'live_class.php') echo 'Live Session';
-                            elseif($current_page == 'time_table.php') echo 'Time Table'; 
-                            elseif($current_page == 'st_profile.php') echo 'Student Profile'; 
-                            elseif($current_page == 'study_packs.php') echo 'Study Materials'; 
-                            else echo 'Student Portal';
+                        <?php
+                        if ($current_page == 'index.php')
+                            echo 'Dashboard';
+                        elseif ($current_page == 'my_classes.php')
+                            echo 'My Classes';
+                        elseif ($current_page == 'live_class.php')
+                            echo 'Live Session';
+                        elseif ($current_page == 'time_table.php')
+                            echo 'Time Table';
+                        elseif ($current_page == 'st_profile.php')
+                            echo 'Student Profile';
+                        elseif ($current_page == 'study_packs.php')
+                            echo 'Study Materials';
+                        else
+                            echo 'Student Portal';
                         ?>
                     </h2>
                 </div>
 
                 <div class="flex items-center gap-4 md:gap-6">
-                    <button class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition relative border border-gray-200">
+                    <button
+                        class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition relative border border-gray-200">
                         <i class="far fa-bell text-lg"></i>
                         <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
                     </button>
@@ -215,10 +247,12 @@ function getActiveClass($page_name, $current_page) {
 
                             <div id="userDropdown"
                                 class="hidden absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl py-2 z-50 ring-1 ring-black ring-opacity-5 border border-gray-100 transform origin-top-right transition-all">
-                                
+
                                 <div class="px-4 py-3 border-b border-gray-100 md:hidden bg-gray-50">
-                                    <p class="text-sm font-semibold text-gray-900 truncate"><?php echo htmlspecialchars($student['full_name']); ?></p>
-                                    <p class="text-xs text-gray-500 truncate"><?php echo htmlspecialchars($student['reg_number']); ?></p>
+                                    <p class="text-sm font-semibold text-gray-900 truncate">
+                                        <?php echo htmlspecialchars($student['full_name']); ?></p>
+                                    <p class="text-xs text-gray-500 truncate">
+                                        <?php echo htmlspecialchars($student['reg_number']); ?></p>
                                 </div>
 
                                 <div class="py-1">
@@ -226,14 +260,16 @@ function getActiveClass($page_name, $current_page) {
                                         class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
                                         <i class="far fa-user mr-3 w-4 text-gray-400"></i> Your Profile
                                     </a>
-                                    <a href="#" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">
+                                    <a href="#"
+                                        class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">
                                         <i class="fas fa-cog mr-3 w-4 text-gray-400"></i> Settings
                                     </a>
                                 </div>
 
                                 <div class="border-t border-gray-100 my-1"></div>
 
-                                <a href="../../lib/logout.php" class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 hover:text-red-700">
+                                <a href="../../lib/logout.php"
+                                    class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 hover:text-red-700">
                                     <i class="fas fa-sign-out-alt mr-3 w-4"></i> Sign out
                                 </a>
                             </div>

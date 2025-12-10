@@ -28,7 +28,7 @@
                     class="px-8 py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:bg-indigo-700 hover:shadow-indigo-500/40 transition transform hover:-translate-y-1 flex items-center justify-center gap-2">
                     Register Now <i class="fas fa-arrow-right"></i>
                 </a>
-                <a href="#"
+                <a href="time_table.php"
                     class="px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold hover:bg-gray-50 hover:border-gray-300 transition flex items-center justify-center gap-2">
                     <i class="fas fa-calendar-alt text-indigo-500 text-xl"></i> View Timetable
                 </a>

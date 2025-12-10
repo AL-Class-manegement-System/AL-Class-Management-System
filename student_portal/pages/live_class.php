@@ -16,19 +16,20 @@ $sql_live = "
     WHERE e.student_id = ? AND c.is_live = 1 
     LIMIT 1 
 ";
-$stmt_live = $conn->prepare($sql_live);
-if ($stmt_live) {
-    $stmt_live->bind_param("i", $db_student_id);
-    $stmt_live->execute();
-    $result_live = $stmt_live->get_result();
+
+// $stmt_live = $conn->prepare($sql_live);
+// if ($stmt_live) {
+//     $stmt_live->bind_param("i", $db_student_id);
+//     $stmt_live->execute();
+//     $result_live = $stmt_live->get_result();
     
-    if ($result_live->num_rows > 0) {
-        $class_details = $result_live->fetch_assoc();
-        // URL එකට autoplay and mute පරාමිතීන් එකතු කිරීම
-        $live_url = htmlspecialchars($class_details['live_url']) . "?autoplay=1&mute=1";
-    }
-    $stmt_live->close();
-}
+//     if ($result_live->num_rows > 0) {
+//         $class_details = $result_live->fetch_assoc();
+//         // URL එකට autoplay and mute පරාමිතීන් එකතු කිරීම
+//         $live_url = htmlspecialchars($class_details['live_url']) . "?autoplay=1&mute=1";
+//     }
+//     $stmt_live->close();
+// }
 
 // Live Status/Title
 $class_title = $class_details ? htmlspecialchars($class_details['subject']) . ' by ' . htmlspecialchars($class_details['teacher_name']) : 'No Live Class Currently Available';

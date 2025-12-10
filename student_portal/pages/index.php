@@ -188,10 +188,10 @@ if ($attendance_percentage !== 'N/A') {
             </div>
             <a href="../pages/live_class.php">
                 <div
-                    class="bg-slate-900/90 p-6 rounded-2xl shadow-xl border border-indigo-700/50 hover:shadow-indigo-500/50 group relative overflow-hidden transition-all duration-300 ease-out cursor-pointer hover:scale-[1.02] active:scale-95">
+                    class="bg-white-900/90 p-6 rounded-2xl shadow-xl border border-indigo-500/50 hover:shadow-indigo-500/50 group relative overflow-hidden transition-all duration-300 ease-out cursor-pointer hover:scale-[1.02] active:scale-95">
                     <div class="relative z-10 flex flex-col h-full justify-between">
                         <div class="p-3 bg-indigo-500/10 text-white rounded-lg backdrop-blur-sm border border-indigo-500/20">
-                            <i class="fas fa-book-open"></i>
+                            <i class="bg-indigo fas fa-book-open"></i>
                             <h3 class="text-2xl font-bold text-white mt-1">🔴Live Classes</h3>
                         </div>
 
