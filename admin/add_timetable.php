@@ -75,6 +75,7 @@ if (isset($_POST['submit'])) {
                                 <option value="Commerce">Commerce</option>
                                 <option value="Arts">Arts</option>
                                 <option value="Technology">Technology</option>
+                                <option value="ICT">ICT (Common)</option>
                             </select>
                         </div>
 
