@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2025 at 05:49 PM
+-- Generation Time: Dec 10, 2025 at 09:02 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,30 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `al_class_db`
 --
-
--- --------------------------------------------------------
-
---
--- Table structure for table `assignments`
---
-
-CREATE TABLE `assignments` (
-  `assignment_id` int(11) NOT NULL,
-  `class_id` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `due_date` date NOT NULL,
-  `file_path` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `assignments`
---
-
-INSERT INTO `assignments` (`assignment_id`, `class_id`, `title`, `due_date`, `file_path`, `created_at`) VALUES
-(1, 1, 'Vectors Theory Practice Sheet', '2025-12-15', 'assets/assignments/cm_vectors_sheet.pdf', '2025-12-09 15:44:31'),
-(2, 6, 'Guttila Kavya Critical Essay', '2025-12-12', 'assets/assignments/sinhala_essay.pdf', '2025-12-09 15:44:31'),
-(3, 7, 'Database Design Project', '2025-12-20', 'assets/assignments/ict_db_project.pdf', '2025-12-09 15:44:31');
 
 -- --------------------------------------------------------
 
@@ -69,7 +45,7 @@ INSERT INTO `attendance` (`attendance_id`, `student_id`, `date`, `status`, `time
 (4, 9, '2025-12-08', 'Present', '10:52:06'),
 (5, 7, '2025-12-08', 'Present', '07:42:48'),
 (6, 1, '2025-12-09', 'Present', '12:30:22'),
-(7, 7, '2025-12-09', 'Absent', '11:28:48'),
+(7, 7, '2025-12-09', 'Absent', '08:03:07'),
 (8, 5, '2025-12-09', 'Present', '09:28:59');
 
 -- --------------------------------------------------------
@@ -87,8 +63,6 @@ CREATE TABLE `classes` (
   `fee` decimal(10,2) NOT NULL,
   `day` varchar(20) DEFAULT NULL,
   `time` varchar(20) DEFAULT NULL,
-  `hall_number` varchar(50) DEFAULT NULL,
-  `live_url` varchar(255) DEFAULT NULL,
   `status` tinyint(4) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -96,14 +70,14 @@ CREATE TABLE `classes` (
 -- Dumping data for table `classes`
 --
 
-INSERT INTO `classes` (`class_id`, `class_name`, `stream`, `subject`, `teacher_name`, `fee`, `day`, `time`, `hall_number`, `live_url`, `status`) VALUES
-(1, '2025 Revision', 'Physical Science', 'Combined Maths', 'Mr. Perera', 2500.00, 'Saturday', '08:00 AM', 'Hall A', 'https://youtube.com/embed/cm_live_01?autoplay=1&mute=1', 1),
-(2, '2026 Theory', 'Bio Science', 'Biology', 'Mrs. Silva', 2000.00, 'Sunday', '10:00 AM', 'Online', 'https://zoom.us/live_bio_02', 1),
-(3, '2025 Paper Class', 'Commerce', 'Econ', 'Mr. Kamal', 1500.00, 'Friday', '02:30 PM', 'Hall C', NULL, 1),
-(4, 'Bio Revision class', 'Bio Science', 'Bio Revision', 'Dinesh Muthugala', 2500.00, 'Friday', '08:00 AM', 'Lab B', NULL, 1),
-(5, 'ET for Srimal Wijesinghe', 'Technology', 'Engineering Technology ', 'Srimal Wijesinghe', 2500.00, 'Friday', '08:00 AM', 'Hall A', NULL, 1),
-(6, 'akila vimanga senevirathna  Sinhala class', 'Arts', 'Sinhala class', 'akila vimanga senevirathna', 2500.00, 'Wednesday', '08:00 AM', 'Hall D', 'https://youtube.com/embed/sinhala_live_06', 1),
-(7, 'ICT fron abc', 'ICT', 'ICT', 'Mr.Ravindu bandaranayake', 3000.00, 'Saturday', '12:00 PM', 'Online', 'https://meet.google.com/ict_live', 1);
+INSERT INTO `classes` (`class_id`, `class_name`, `stream`, `subject`, `teacher_name`, `fee`, `day`, `time`, `status`) VALUES
+(1, '2025 Revision', 'Physical Science', 'Combined Maths', 'Mr. Perera', 2500.00, 'Saturday', '08:00 AM', 1),
+(2, '2026 Theory', 'Bio Science', 'Biology', 'Mrs. Silva', 2000.00, 'Sunday', '10:00 AM', 1),
+(3, '2025 Paper Class', 'Commerce', 'Econ', 'Mr. Kamal', 1500.00, 'Friday', '02:30 PM', 1),
+(4, 'Bio Revision class', 'Bio Science', 'Bio Revision', 'Dinesh Muthugala', 2500.00, 'Friday', '08:00 am to 02:00 pm', 1),
+(5, 'ET for Srimal Wijesinghe', 'Technology', 'Engineering Technology ', 'Srimal Wijesinghe', 2500.00, 'Friday', '08:00 am to 02:00 pm', 1),
+(6, 'akila vimanga senevirathna  Sinhala class', 'Arts', 'Sinhala class', 'akila vimanga senevirathna', 2500.00, 'Wednesday', '08:00 to 12:00', 1),
+(7, 'ICT fron abc', 'ICT', 'ICT', 'Mr.Ravindu bandaranayake', 3000.00, 'Saturday', '12:00 pm to 04:00 pm', 1);
 
 -- --------------------------------------------------------
 
@@ -125,9 +99,7 @@ CREATE TABLE `enrollments` (
 INSERT INTO `enrollments` (`enrollment_id`, `student_id`, `class_id`, `joined_date`) VALUES
 (1, 7, 4, '2025-12-07 10:44:50'),
 (7, 7, 1, '2025-12-07 11:02:54'),
-(8, 1, 6, '2025-12-07 11:12:55'),
-(9, 1, 7, '2025-12-09 18:27:20'),
-(10, 7, 7, '2025-12-09 21:38:09');
+(8, 1, 6, '2025-12-07 11:12:55');
 
 -- --------------------------------------------------------
 
@@ -184,30 +156,6 @@ CREATE TABLE `expenses` (
 
 INSERT INTO `expenses` (`exp_id`, `description`, `amount`, `date`) VALUES
 (1, 'fff', 120000.00, '2025-12-02 16:18:01');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `notices`
---
-
-CREATE TABLE `notices` (
-  `notice_id` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
-  `content` text DEFAULT NULL,
-  `date_posted` datetime DEFAULT current_timestamp(),
-  `status` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `notices`
---
-
-INSERT INTO `notices` (`notice_id`, `title`, `description`, `content`, `date_posted`, `status`) VALUES
-(1, 'All classes are cancelled on Dec 25th', NULL, 'Due to Christmas holiday, no classes will be held.', '2025-12-08 14:00:00', 1),
-(2, 'Physics Paper Class starting soon', NULL, 'New paper class batch for 2026 AL students begins next week.', '2025-12-09 10:00:00', 1),
-(3, 'Emergency Water Interruption', NULL, 'The water supply to Hall C will be disrupted tomorrow from 8 AM to 12 PM.', '2025-12-09 18:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -308,54 +256,6 @@ INSERT INTO `students` (`student_id`, `reg_number`, `full_name`, `nic`, `dob`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `study_materials`
---
-
-CREATE TABLE `study_materials` (
-  `material_id` int(11) NOT NULL,
-  `teacher_id` int(11) NOT NULL,
-  `subject_name` varchar(100) NOT NULL,
-  `material_title` varchar(255) NOT NULL,
-  `material_type` enum('Notes','Past Paper','Model Paper','Reading','Assignment') NOT NULL,
-  `file_path` varchar(255) NOT NULL,
-  `upload_date` date NOT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `study_materials`
---
-
-INSERT INTO `study_materials` (`material_id`, `teacher_id`, `subject_name`, `material_title`, `material_type`, `file_path`, `upload_date`, `status`, `created_at`) VALUES
-(1, 0, 'General', '2024-AL-ICT-PART-I-MCQ-PAPER-SINHALA-MEDIUM2024-AL-ICT-PART-I-MCQ-PAPER-SINHALA-MEDIUM', 'Past Paper', 'assets/study_materials/general/material_693823b71af02.pdf', '2025-12-09', 1, '2025-12-09 13:27:19'),
-(2, 0, 'General', '2024-AL-ICT-PART-I-MCQ-PAPER-SINHALA-MEDIUM', 'Past Paper', 'assets/study_materials/general/material_69382442d503e.pdf', '2025-12-09', 1, '2025-12-09 13:29:38');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `submissions`
---
-
-CREATE TABLE `submissions` (
-  `submission_id` int(11) NOT NULL,
-  `assignment_id` int(11) NOT NULL,
-  `student_id` int(11) NOT NULL,
-  `submitted_date` datetime DEFAULT current_timestamp(),
-  `file_path` varchar(255) DEFAULT NULL,
-  `marks` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `submissions`
---
-
-INSERT INTO `submissions` (`submission_id`, `assignment_id`, `student_id`, `submitted_date`, `file_path`, `marks`) VALUES
-(1, 1, 1, '2025-12-09 18:00:00', 'assets/submissions/st001_cm_vectors.pdf', 85);
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `system_settings`
 --
 
@@ -398,13 +298,18 @@ CREATE TABLE `teachers` (
 --
 
 INSERT INTO `teachers` (`teacher_id`, `teacher_number`, `password`, `full_name`, `phone`, `subject`, `description`, `image`, `status`, `created_at`) VALUES
-(2, 'TC2025002', '295001', ' Mr.Dinesh Muthugala', '', 'Biology', 'In addition to his academic qualifications, Muthugala is a well-known Biology lecturer in Sri Lanka and is the founder of DM Education Private Limited. He is also an entrepreneur and film producer. ', '1764837787_6931499b53340.jpg', 1, '2025-12-04 08:43:07'),
-(3, 'TC2025003', '770370', 'Mr.Ravindu bandaranayake', '0713510441', 'ICT', 'He holds a B.Sc. (Hons) in Cybersecurity and Forensics from the University of Gloucestershire, United Kingdom. He previously studied Software Engineering at the Sri Lanka Institute of Information Technology (SLIIT) and Electronics at Wayamba University of Sri Lanka (WUSL).', '1764839145_69314ee93cd88.jpg', 1, '2025-12-04 09:05:45'),
-(4, 'TC2025004', '243687', 'Darshana Ukuwela', '0713510441', 'Physics', 'ssddddd', '1764841703_693158e753420.jpg', 1, '2025-12-04 09:48:23'),
-(5, 'TC2025005', '880619', 'sahashra janith ', '0773099341', 'Biology', 'www', '1764943866_6932e7fa5c249.jpg', 1, '2025-12-05 14:11:06'),
-(6, 'TC2025006', '101937', 'akila vimanga senevirathna', '0716548262', 'Arts', 'Thinking\r\nSearching\r\nAkila Vimanga Senevirathna is a\r\ntutor and teacher known for offering classes in the Sinhala language, and a search result indicates he holds a B.A. degree. His specific area of focus is teaching Sinhala language for GCE Ordinary Level (O/L) and Advanced Level (A/L) students in Sri Lanka.', '1765085853_6935129d42433.jpg', 1, '2025-12-07 05:37:33'),
-(7, 'TC2025007', '878802', 'Prasanna Baddewithana', '0773093941', 'Chemistry', 'Prasanna Baddewithana ', '1765297079_69384bb798204.jpg', 1, '2025-12-08 03:23:28'),
-(8, 'TC2025008', '819942', 'krishantha ranathunga', '0773093941', 'Arts', 'Krishantha Ranathunga is a prominent Media Studies teacher (often referred to as \"Media Sir\") in Sri Lanka, primarily offering classes for General Certificate of Education (G.C.E.) Advanced Level (A/L) students', '1765297219_69384c43353e9.jpg', 1, '2025-12-09 16:20:19');
+(2, 'TC2025002', '295001', 'Dinesh Muthugala', '', 'Biology', 'In addition to his academic qualifications, Muthugala is a well-known Biology lecturer in Sri Lanka and is the founder of DM Education Private Limited. He is also an entrepreneur and film producer. ', '1765341990_6938fb26a3253.jpg', 1, '2025-12-04 08:43:07'),
+(3, 'TC2025003', '770370', 'Ravindu bandaranayake', '0713510441', 'ICT', 'He holds a B.Sc. (Hons) in Cybersecurity and Forensics from the University of Gloucestershire, United Kingdom. He previously studied Software Engineering at the Sri Lanka Institute of Information Technology (SLIIT) and Electronics at Wayamba University of Sri Lanka (WUSL).', '1765342852_6938fe84f3f0c.jpg', 1, '2025-12-04 09:05:45'),
+(4, 'TC2025004', '243687', 'Darshana Ukuwela', '0713510441', 'Physics', 'BSc (Hons) Physics | University Of Peradeniya', '1765345145_6939077937bbd.jpg', 1, '2025-12-04 09:48:23'),
+(5, 'TC2025005', '880619', 'Tissa Jananayake', '0773099341', 'Biology', 'B.Sc. Hon\'s (Microbiology) Sp. (Kelaniya) P.G. Dip. in Psychological Counseling (Colombo), PhD(USSR)', '1765341762_6938fa42caec4.jpg', 1, '2025-12-05 14:11:06'),
+(6, 'TC2025006', '101937', 'Akila Vimanga Senevirathna', '0716548262', 'Arts', 'Thinking\r\nSearching\r\nAkila Vimanga Senevirathna is a\r\ntutor and teacher known for offering classes in the Sinhala language, and a search result indicates he holds a B.A. degree. His specific area of focus is teaching Sinhala language for GCE Ordinary Level (O/L) and Advanced Level (A/L) students in Sri Lanka.', '1765085853_6935129d42433.jpg', 1, '2025-12-07 05:37:33'),
+(7, 'TC2025007', '878802', 'Amith Pussella', '0773093941', 'Physics', 'Mr. Amit Pussella is an experienced lecturer with nearly 30 years of experience in the field of Physics, having entered the field from the University of Colombo. Since it is possible to connect in any way, both online and physical, a child from any part of the country can easily participate in this course.', '1765342736_6938fe106295b.jpg', 1, '2025-12-08 03:23:28'),
+(8, 'TC2025008', '740853', 'Madushan Neranjan', '0704849142', 'Combined Maths', 'BSc (Hons) in T&LM Faculty of Engineering | University of Moratuwa', '1765341287_6938f8676626c.jpg', 1, '2025-12-10 04:34:47'),
+(10, 'TC2025009', '444475', 'Anuradha Perera', '0741785456', 'Physics', 'University of Moratuwa - Faculty of Engineering', '1765349676_6939192c316e0.jpg', 1, '2025-12-10 06:54:36'),
+(12, 'TC2025010', '150448', 'Kelum Senanayake', '0767287752', 'Chemistry', 'B.Sc (Hons) U.S.J, P.G Dip in Edu', '1765350270_69391b7ede088.jpg', 1, '2025-12-10 07:04:30'),
+(13, 'TC2025011', '179098', 'Amila Dasanayake', '0741785456', 'Chemistry', 'Faculty of Medicine, University of Colombo', '1765350516_69391c7463ba6.jpg', 1, '2025-12-10 07:08:36'),
+(14, 'TC2025012', '786434', 'Bhanuka Ekanayaka', ' 0711039004', 'ICT', 'B.Sc(ICT) Hons - University of Moratuwa ', '1765350998_69391e56e33fd.png', 1, '2025-12-10 07:16:38'),
+(15, 'TC2025013', '575395', 'Janaka Abeywardana', '0781452430', 'Combined Maths', 'B.Sc (Mathematics) Hons University of Moratuwa', '1765351375_69391fcfedeca.jpg', 1, '2025-12-10 07:22:55');
 
 -- --------------------------------------------------------
 
@@ -430,13 +335,6 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `role`, `created_at`) VA
 --
 -- Indexes for dumped tables
 --
-
---
--- Indexes for table `assignments`
---
-ALTER TABLE `assignments`
-  ADD PRIMARY KEY (`assignment_id`),
-  ADD KEY `class_id` (`class_id`);
 
 --
 -- Indexes for table `attendance`
@@ -480,12 +378,6 @@ ALTER TABLE `expenses`
   ADD PRIMARY KEY (`exp_id`);
 
 --
--- Indexes for table `notices`
---
-ALTER TABLE `notices`
-  ADD PRIMARY KEY (`notice_id`);
-
---
 -- Indexes for table `payments`
 --
 ALTER TABLE `payments`
@@ -506,20 +398,6 @@ ALTER TABLE `salaries`
 ALTER TABLE `students`
   ADD PRIMARY KEY (`student_id`),
   ADD UNIQUE KEY `reg_number` (`reg_number`);
-
---
--- Indexes for table `study_materials`
---
-ALTER TABLE `study_materials`
-  ADD PRIMARY KEY (`material_id`);
-
---
--- Indexes for table `submissions`
---
-ALTER TABLE `submissions`
-  ADD PRIMARY KEY (`submission_id`),
-  ADD KEY `assignment_id` (`assignment_id`),
-  ADD KEY `student_id` (`student_id`);
 
 --
 -- Indexes for table `system_settings`
@@ -546,12 +424,6 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT for table `assignments`
---
-ALTER TABLE `assignments`
-  MODIFY `assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
 -- AUTO_INCREMENT for table `attendance`
 --
 ALTER TABLE `attendance`
@@ -567,7 +439,7 @@ ALTER TABLE `classes`
 -- AUTO_INCREMENT for table `enrollments`
 --
 ALTER TABLE `enrollments`
-  MODIFY `enrollment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `enrollment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `exams`
@@ -588,12 +460,6 @@ ALTER TABLE `expenses`
   MODIFY `exp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `notices`
---
-ALTER TABLE `notices`
-  MODIFY `notice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
@@ -612,22 +478,10 @@ ALTER TABLE `students`
   MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT for table `study_materials`
---
-ALTER TABLE `study_materials`
-  MODIFY `material_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT for table `submissions`
---
-ALTER TABLE `submissions`
-  MODIFY `submission_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT for table `teachers`
 --
 ALTER TABLE `teachers`
-  MODIFY `teacher_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `teacher_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -638,12 +492,6 @@ ALTER TABLE `users`
 --
 -- Constraints for dumped tables
 --
-
---
--- Constraints for table `assignments`
---
-ALTER TABLE `assignments`
-  ADD CONSTRAINT `assignments_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `attendance`
@@ -677,13 +525,6 @@ ALTER TABLE `payments`
 --
 ALTER TABLE `salaries`
   ADD CONSTRAINT `salaries_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`teacher_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `submissions`
---
-ALTER TABLE `submissions`
-  ADD CONSTRAINT `submissions_ibfk_1` FOREIGN KEY (`assignment_id`) REFERENCES `assignments` (`assignment_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `submissions_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
