@@ -60,7 +60,7 @@ include('../includes/header.php');
 
                     <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
                         <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Lecturer</span>
-                        <a href="#" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">View Profile →</a>
+                       <a href="teacher-profile.php?id=<?php echo $row['teacher_id']; ?>" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">View Profile →</a>
                     </div>
                 </div>
             </div>
