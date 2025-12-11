@@ -5,77 +5,132 @@ include('../includes/student_header.php');
 
 
 
+<div class="container mx-auto p-4 lg:p-8 max-w-4xl">
 
-<body class="bg-slate-50 font-sans text-slate-800">
-
-    <div class="w-full max-w-3xl mx-auto my-10 bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
-        
-        <div class="bg-primary px-8 py-6 flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-white"><i class="fas fa-user-edit mr-2"></i> Update Profile</h1>
-            <a href="profile.php" class="text-indigo-100 hover:text-white transition"><i class="fas fa-times text-xl"></i></a>
-        </div>
-
-        <form action="update_profile_process.php" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
-
-            <div class="flex items-center gap-6 pb-6 border-b border-slate-100">
-                <div class="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden">
-                    <img id="preview" src="#" alt="" class="w-full h-full object-cover hidden">
-                    <i id="placeholder" class="fas fa-camera text-slate-400 text-2xl"></i>
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Change Profile Photo</label>
-                    <input type="file" name="photo" accept="image/*" onchange="previewImage(this)" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"/>
-                    <p class="text-xs text-slate-400 mt-1">JPG, PNG only. Max 2MB.</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Full Name</label>
-                    <input type="text" name="full_name" value="<?php echo htmlspecialchars($student['full_name']); ?>" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Email Address</label>
-                    <input type="email" name="email" value="<?php echo htmlspecialchars($student['email']); ?>" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Student Phone</label>
-                    <input type="text" name="student_phone" value="<?php echo htmlspecialchars($student['student_phone']); ?>" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Parent Phone</label>
-                    <input type="text" name="parent_phone" value="<?php echo htmlspecialchars($student['parent_phone']); ?>" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition">
-                </div>
-
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Home Address</label>
-                    <textarea name="address" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition"><?php echo htmlspecialchars($student['address']); ?></textarea>
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                <a href="profile.php" class="px-6 py-2.5 rounded-lg text-slate-600 font-bold hover:bg-slate-100 transition">Cancel</a>
-                <button type="submit" class="px-6 py-2.5 rounded-lg bg-primary text-white font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition transform hover:-translate-y-0.5">
-                    Save Changes
-                </button>
-            </div>
-        </form>
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Account Settings</h1>
+        <p class="text-gray-500 mt-1">Manage your profile details and security.</p>
     </div>
 
-    <script>
-        function previewImage(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('preview').src = e.target.result;
-                    document.getElementById('preview').classList.remove('hidden');
-                    document.getElementById('placeholder').classList.add('hidden');
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-    </script>
-</body>
+    <form action="" method="POST" enctype="multipart/form-data">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            <div class="md:col-span-1">
+                <div class="bg-white rounded-2xl shadow-sm p-6 text-center border border-gray-100">
+                    <div class="relative w-32 h-32 mx-auto mb-4 group">
+                        <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff" alt="Profile"
+                            class="w-full h-full rounded-full object-cover border-4 border-white shadow-lg">
+
+                        <div
+                            class="absolute inset-0 bg-black bg-opacity-40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer">
+                            <i class="fas fa-camera text-white text-2xl"></i>
+                        </div>
+                        <input type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            name="profile_pic">
+                    </div>
+
+                    <h2 class="text-xl font-bold text-gray-900">John Doe</h2>
+                    <p class="text-sm text-gray-500 mb-4">Student / Developer</p>
+
+                    <div class="border-t pt-4">
+                        <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium">
+                            <i class="fas fa-trash-alt mr-1"></i> Remove Photo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 space-y-6">
+
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Personal Information</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                            <input type="text" value="John"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                placeholder="Enter first name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                            <input type="text" value="Doe"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                placeholder="Enter last name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                            <input type="text" value="+94 77 123 4567"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                placeholder="Enter phone number">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                            <input type="date"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input type="email" value="johndoe@example.com"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-gray-50"
+                            readonly>
+                        <p class="text-xs text-gray-500 mt-1">Email cannot be changed contact admin.</p>
+                    </div>
+
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                        <textarea rows="3"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                            placeholder="Tell something about yourself..."></textarea>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Change Password</h3>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                            <input type="password"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                placeholder="********">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                                <input type="password"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                    placeholder="********">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                                <input type="password"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                    placeholder="********">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-4 pt-4">
+                    <button type="button"
+                        class="px-6 py-2.5 rounded-lg text-gray-700 font-medium hover:bg-gray-200 transition">Cancel</button>
+                    <button type="submit"
+                        class="px-6 py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5">
+                        Save Changes
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<?php
+include('../includes/footer.php');
+
+?>
