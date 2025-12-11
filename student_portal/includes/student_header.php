@@ -103,21 +103,10 @@ function getActiveClass($page_name, $current_page)
             class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 text-white flex flex-col shadow-2xl transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:static md:inset-auto md:transform-none border-r border-slate-800">
 
 
-            <div class="flex items-center gap-2 p-4 bg-white rounded-lg inline-block">
-                <div
-                    class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 shadow-lg shadow-blue-500/30">
-                    <span class="text-white font-bold text-xl">F</span>
-                    <div class="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full border-2 border-white">
-                    </div>
-                </div>
-
-                <div class="flex flex-col justify-center">
-                    <h1 class="text-2xl font-extrabold tracking-tight text-gray-900 leading-none">
-                        Future<span
-                            class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Minds</span>
-                    </h1>
-                    <span class="text-[0.65rem] font-semibold text-gray-400 tracking-widest uppercase ml-0.5">Education
-                        Portal</span>
+            <div class="flex items-center justify-center h-20 border-b border-gray-800">
+                <div class="text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-university text-indigo-500"></i>
+                    <span>Future Minds</span>
                 </div>
             </div>
             <!-- <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800 bg-slate-950">
@@ -250,9 +239,11 @@ function getActiveClass($page_name, $current_page)
 
                                 <div class="px-4 py-3 border-b border-gray-100 md:hidden bg-gray-50">
                                     <p class="text-sm font-semibold text-gray-900 truncate">
-                                        <?php echo htmlspecialchars($student['full_name']); ?></p>
+                                        <?php echo htmlspecialchars($student['full_name']); ?>
+                                    </p>
                                     <p class="text-xs text-gray-500 truncate">
-                                        <?php echo htmlspecialchars($student['reg_number']); ?></p>
+                                        <?php echo htmlspecialchars($student['reg_number']); ?>
+                                    </p>
                                 </div>
 
                                 <div class="py-1">
