@@ -38,7 +38,12 @@
                <span class="ms-3">Create Exam</span>
             </a>
          </li>
-         
+         <li>
+            <a href="../pages/exam_results.php" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
+               <i class="ph ph-chart-bar text-xl text-gray-400 group-hover:text-white"></i>
+               <span class="ms-3">Exam Results</span>
+            </a>
+         </li>
          <li>
             <a href="../pages/upload_materials.php" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
                <i class="ph ph-folder-open text-xl text-gray-400 group-hover:text-white"></i>
