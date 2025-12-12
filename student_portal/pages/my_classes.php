@@ -1,14 +1,17 @@
 <?php
+// student_portal/pages/my_classes.php
+// Updated: Redirects to enroll_class.php for payment/slip upload
+
 include('../includes/student_header.php');
-// connection.php දැනටමත් student_header.php හරහා include වී ඇත.
+// connection.php is already included via student_header.php
 
 // ==========================================
-// 1. ශිෂ්‍යයාගේ දත්ත ලබා ගැනීම
+// 1. Get Student Data
 // ==========================================
 $db_student_id = $student['student_id'];
-$my_stream_code = $student['stream']; // උදා: Maths, Bio, Tech
+$my_stream_code = $student['stream']; // e.g., Maths, Bio, Tech
 
-// Stream Mapping (ශිෂ්‍යයාගේ Stream Code එක Class Table එකේ නමට ගැලපීම)
+// Stream Mapping
 $stream_map = [
     'Maths'    => 'Physical Science',
     'Bio'      => 'Bio Science',
@@ -17,11 +20,11 @@ $stream_map = [
     'Commerce' => 'Commerce'
 ];
 
-// අදාළ Stream එක තෝරා ගැනීම
+// Select relevant stream
 $filter_stream = isset($stream_map[$my_stream_code]) ? $stream_map[$my_stream_code] : $my_stream_code;
 
 // ==========================================
-// 2. Enroll වීමේ Logic එක (Form Submit වූ විට - Prepared Statements)
+// 2. Handle Actions (Only Unenroll is handled here now)
 // ==========================================
 $message = "";
 $msg_type = "";
@@ -31,54 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['class_id'])) {
     $class_id = intval($_POST['class_id']);
     $action = $_POST['action'];
 
-    if ($action == 'enroll') {
-        
-        // --- විෂයන් ගණන පරීක්ෂා කිරීම (Max 3) --- (Prepared Statement)
-        $count_sql = "SELECT COUNT(*) as total FROM enrollments WHERE student_id = ?";
-        $count_stmt = $conn->prepare($count_sql);
-        $count_stmt->bind_param("i", $db_student_id);
-        $count_stmt->execute();
-        $count_result = $count_stmt->get_result();
-        $count_row = $count_result->fetch_assoc();
-        $current_subjects = $count_row['total'];
-        $count_stmt->close();
-
-        if ($current_subjects >= 3) {
-            // දැනටමත් විෂයන් 3ක් තෝරාගෙන ඇත්නම්
-            $message = "You can only select up to 3 main subjects! Please unenroll from a class to choose another.";
-            $msg_type = "red";
-        } else {
-            // 3ට අඩු නම් පමණක් Enroll වීමට ඉඩ දීම
-            
-            // දැනටමත් Enroll වී ඇත්දැයි බලමු (Duplicate Check - Prepared Statement)
-            $check_sql = "SELECT * FROM enrollments WHERE student_id = ? AND class_id = ?";
-            $check_stmt = $conn->prepare($check_sql);
-            $check_stmt->bind_param("ii", $db_student_id, $class_id);
-            $check_stmt->execute();
-            
-            if ($check_stmt->get_result()->num_rows == 0) {
-                // Enroll කිරීම (Prepared Statement)
-                $enroll_sql = "INSERT INTO enrollments (student_id, class_id) VALUES (?, ?)";
-                $enroll_stmt = $conn->prepare($enroll_sql);
-                $enroll_stmt->bind_param("ii", $db_student_id, $class_id);
-                
-                if ($enroll_stmt->execute()) {
-                    $message = "Successfully enrolled in the class!";
-                    $msg_type = "green";
-                } else {
-                    $message = "Error enrolling: " . $conn->error;
-                    $msg_type = "red";
-                }
-                $enroll_stmt->close();
-            } else {
-                $message = "You are already enrolled in this class!";
-                $msg_type = "yellow";
-            }
-            $check_stmt->close();
-        }
-
-    } elseif ($action == 'unenroll') {
-        // පන්තියෙන් ඉවත් වීම (Prepared Statement)
+    // Note: 'enroll' action is removed from here because we now redirect to enroll_class.php
+    
+    if ($action == 'unenroll') {
+        // Unenroll Logic
         $del_sql = "DELETE FROM enrollments WHERE student_id = ? AND class_id = ?";
         $del_stmt = $conn->prepare($del_sql);
         $del_stmt->bind_param("ii", $db_student_id, $class_id);
@@ -95,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['class_id'])) {
 }
 
 // ==========================================
-// 3. දැනට Enroll වී ඇති පන්ති වල ID ලබා ගැනීම (Prepared Statement)
+// 3. Get IDs of Currently Enrolled Classes
 // ==========================================
 $enrolled_classes = [];
 $enr_sql = "SELECT class_id FROM enrollments WHERE student_id = ?";
@@ -144,7 +103,7 @@ $enr_stmt->close();
 
             <?php
             // ==========================================
-            // FILTERED QUERY: Stream එකට අදාළ Active පන්ති + ICT පන්ති (Prepared Statement)
+            // FILTERED QUERY: Active classes for the stream + ICT
             // ==========================================
             $sql = "SELECT * FROM classes WHERE status = 1 AND (stream = ? OR stream = 'ICT') ORDER BY day ASC";
             $stmt = $conn->prepare($sql);
@@ -157,12 +116,11 @@ $enr_stmt->close();
                     $class_id = $row['class_id'];
                     $is_enrolled = in_array($class_id, $enrolled_classes);
                     
-                    // Card Styling
+                    // Card Styling based on Stream
                     $border_color = 'border-indigo-100';
                     $badge_color = 'bg-indigo-100 text-indigo-600';
                     $btn_color = 'bg-indigo-600 hover:bg-indigo-700';
                     
-                    // Stream එක අනුව පාට වෙනස් කිරීම
                     if($row['stream'] == 'Bio Science') { 
                         $badge_color = 'bg-green-100 text-green-600'; $border_color = 'border-green-100'; $btn_color = 'bg-green-600 hover:bg-green-700';
                     }
@@ -218,23 +176,23 @@ $enr_stmt->close();
                 </div>
 
                 <div class="mt-auto">
-                    <form method="POST" action="">
-                        <input type="hidden" name="class_id" value="<?php echo $class_id; ?>">
-                        
-                        <?php if($is_enrolled): ?>
+                    
+                    <?php if($is_enrolled): ?>
+                        <form method="POST" action="">
+                            <input type="hidden" name="class_id" value="<?php echo $class_id; ?>">
                             <input type="hidden" name="action" value="unenroll">
                             <button type="submit" onclick="return confirm('Are you sure you want to unenroll from this class?')" 
                                 class="w-full py-2.5 rounded-xl border border-red-100 text-red-500 text-sm font-bold hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-center gap-2 group-hover:border-red-200">
                                 <i class="fas fa-sign-out-alt"></i> Unenroll
                             </button>
-                        <?php else: ?>
-                            <input type="hidden" name="action" value="enroll">
-                            <button type="submit" 
-                                class="w-full py-2.5 rounded-xl <?php echo $btn_color; ?> text-white text-sm font-bold shadow-lg shadow-indigo-500/20 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2">
-                                Enroll Now <i class="fas fa-arrow-right"></i>
-                            </button>
-                        <?php endif; ?>
-                    </form>
+                        </form>
+                    <?php else: ?>
+                        <a href="enroll_class.php?class_id=<?php echo $class_id; ?>" 
+                            class="w-full py-2.5 rounded-xl <?php echo $btn_color; ?> text-white text-sm font-bold shadow-lg shadow-indigo-500/20 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 text-center decoration-0">
+                            Enroll Now <i class="fas fa-arrow-right"></i>
+                        </a>
+                    <?php endif; ?>
+                    
                 </div>
 
             </div>
@@ -255,3 +213,5 @@ $enr_stmt->close();
         </div>
     </main>
 </div>
+
+<?php include('../includes/footer.php'); ?>
