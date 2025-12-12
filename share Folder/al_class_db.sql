@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 10, 2025 at 10:51 AM
+-- Generation Time: Dec 12, 2025 at 05:21 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -156,6 +156,18 @@ CREATE TABLE `expenses` (
 
 INSERT INTO `expenses` (`exp_id`, `description`, `amount`, `date`) VALUES
 (1, 'fff', 120000.00, '2025-12-02 16:18:01');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `newsletter_subs`
+--
+
+CREATE TABLE `newsletter_subs` (
+  `id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `subscribed_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -378,6 +390,12 @@ ALTER TABLE `expenses`
   ADD PRIMARY KEY (`exp_id`);
 
 --
+-- Indexes for table `newsletter_subs`
+--
+ALTER TABLE `newsletter_subs`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `payments`
 --
 ALTER TABLE `payments`
@@ -458,6 +476,12 @@ ALTER TABLE `exam_marks`
 --
 ALTER TABLE `expenses`
   MODIFY `exp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `newsletter_subs`
+--
+ALTER TABLE `newsletter_subs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `payments`
