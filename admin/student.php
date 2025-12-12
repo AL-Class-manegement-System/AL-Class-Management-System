@@ -202,6 +202,10 @@ include 'db_con.php';
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
                                     
+                                    <a href="print_id_card.php?id=<?php echo $row['student_id']; ?>" target="_blank" class="p-2 rounded-lg text-purple-600 bg-purple-50 hover:bg-purple-100 transition" title="Print ID Card">
+                                        <i class="fas fa-id-card"></i>
+                                    </a>
+
                                     <a href="#" class="p-2 rounded-lg text-indigo-600 bg-indigo-50 hover:bg-indigo-100" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
