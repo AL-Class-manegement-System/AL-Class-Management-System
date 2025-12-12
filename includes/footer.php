@@ -57,9 +57,11 @@
             <div>
                 <h3 class="text-white font-semibold text-lg mb-6">Newsletter</h3>
                 <p class="text-sm text-slate-400 mb-4">Subscribe to get the latest updates on class schedules and special seminars.</p>
-                <form class="space-y-3">
-                    <input type="email" placeholder="Your Email Address" class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
-                    <button type="submit" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition shadow-lg shadow-indigo-500/20">
+
+
+                <form class="space-y-3" action="subscribe_process.php" method="POST">
+                    <input type="email" required placeholder="Your Email Address" class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+                    <button type="submit" name="subscribe_btn" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition shadow-lg shadow-indigo-500/20">
                         Subscribe Now
                     </button>
                 </form>
