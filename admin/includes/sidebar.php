@@ -1,6 +1,5 @@
 <?php
-// AL-Class-Management-System/admin/includes/sidebar.php - UPDATED CODE
-// FIX: Logout link path corrected.
+// admin/includes/sidebar.php
 
 // Active Page Check
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -52,6 +51,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <span class="ml-2 text-sm tracking-wide truncate">Teachers</span>
                 </a>
             </li>
+            
             <li>
                 <a href="mark_attendance.php"
                     class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-indigo-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-indigo-400 pr-6 <?php echo ($current_page == 'mark_attendance.php') ? 'bg-indigo-800 text-white border-indigo-500' : ''; ?>">
@@ -61,6 +61,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <span class="ml-2 text-sm tracking-wide truncate">Mark Attendance</span>
                 </a>
             </li>
+            
             <li>
                 <a href="timetable.php"
                     class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-indigo-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-indigo-400 pr-6 <?php echo ($current_page == 'timetable.php' || $current_page == 'add_timetable.php' || $current_page == 'edit_timetable.php') ? 'bg-indigo-800 text-white border-indigo-500' : ''; ?>">
@@ -68,6 +69,30 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <i class="fas fa-clock"></i>
                     </span>
                     <span class="ml-2 text-sm tracking-wide truncate">Time Table</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="approve_exams.php"
+                    class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-indigo-600 text-gray-300 hover:text-white border-l-4 border-transparent hover:border-indigo-400 pr-6 <?php echo ($current_page == 'approve_exams.php') ? 'bg-indigo-800 text-white border-indigo-500' : ''; ?>">
+                    <span class="inline-flex justify-center items-center ml-4">
+                        <i class="fas fa-check-double"></i>
+                    </span>
+                    <span class="ml-2 text-sm tracking-wide truncate">Approve Exams</span>
+                    
+                    <?php
+                    // Pending Exams Count Badge
+                    if(isset($conn)) {
+                        $pending_sql = "SELECT COUNT(*) as count FROM online_exams WHERE approval_status = 'Pending'";
+                        $pending_res = $conn->query($pending_sql);
+                        if($pending_res) {
+                            $pending_count = $pending_res->fetch_assoc()['count'];
+                            if ($pending_count > 0) {
+                                echo '<span class="px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-red-500 bg-red-100 rounded-full">' . $pending_count . '</span>';
+                            }
+                        }
+                    }
+                    ?>
                 </a>
             </li>
             
@@ -100,6 +125,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <span class="ml-2 text-sm tracking-wide truncate">Study Materials</span>
                 </a>
             </li>
+
             <li class="px-5 mt-5">
                 <div class="flex flex-row items-center h-8">
                     <div class="text-sm font-light tracking-wide text-gray-400">Finance & Reports</div>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 12, 2025 at 05:21 AM
+-- Generation Time: Dec 12, 2025 at 10:17 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -140,6 +140,38 @@ CREATE TABLE `exam_marks` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `exam_questions`
+--
+
+CREATE TABLE `exam_questions` (
+  `question_id` int(11) NOT NULL,
+  `exam_id` int(11) NOT NULL,
+  `question_text` text NOT NULL,
+  `option_1` varchar(255) NOT NULL,
+  `option_2` varchar(255) NOT NULL,
+  `option_3` varchar(255) NOT NULL,
+  `option_4` varchar(255) NOT NULL,
+  `correct_option` int(1) NOT NULL COMMENT '1, 2, 3, or 4'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `exam_results`
+--
+
+CREATE TABLE `exam_results` (
+  `result_id` int(11) NOT NULL,
+  `exam_id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `score` int(11) NOT NULL,
+  `total_questions` int(11) NOT NULL,
+  `attempted_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `expenses`
 --
 
@@ -167,6 +199,31 @@ CREATE TABLE `newsletter_subs` (
   `id` int(11) NOT NULL,
   `email` varchar(255) NOT NULL,
   `subscribed_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `newsletter_subs`
+--
+
+INSERT INTO `newsletter_subs` (`id`, `email`, `subscribed_at`) VALUES
+(1, 'sahashrajanith@gmail.com', '2025-12-12 04:22:35'),
+(2, 'janith@gmail.com', '2025-12-12 04:26:04');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `online_exams`
+--
+
+CREATE TABLE `online_exams` (
+  `exam_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `stream` varchar(50) NOT NULL,
+  `subject` varchar(100) NOT NULL,
+  `duration` int(11) NOT NULL COMMENT 'Minutes',
+  `approval_status` enum('Pending','Approved','Rejected') DEFAULT 'Pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -300,6 +357,7 @@ CREATE TABLE `teachers` (
   `phone` varchar(20) NOT NULL,
   `subject` varchar(100) NOT NULL,
   `description` text DEFAULT NULL,
+  `qualifications` text DEFAULT NULL,
   `image` varchar(255) DEFAULT NULL,
   `status` int(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
@@ -309,19 +367,19 @@ CREATE TABLE `teachers` (
 -- Dumping data for table `teachers`
 --
 
-INSERT INTO `teachers` (`teacher_id`, `teacher_number`, `password`, `full_name`, `phone`, `subject`, `description`, `image`, `status`, `created_at`) VALUES
-(2, 'TC2025002', '295001', 'Dinesh Muthugala', '', 'Biology', 'In addition to his academic qualifications, Muthugala is a well-known Biology lecturer in Sri Lanka and is the founder of DM Education Private Limited. He is also an entrepreneur and film producer. ', '1765341990_6938fb26a3253.jpg', 1, '2025-12-04 08:43:07'),
-(3, 'TC2025003', '770370', 'Ravindu bandaranayake', '0713510441', 'ICT', 'He holds a B.Sc. (Hons) in Cybersecurity and Forensics from the University of Gloucestershire, United Kingdom. He previously studied Software Engineering at the Sri Lanka Institute of Information Technology (SLIIT) and Electronics at Wayamba University of Sri Lanka (WUSL).', '1765342852_6938fe84f3f0c.jpg', 1, '2025-12-04 09:05:45'),
-(4, 'TC2025004', '243687', 'Darshana Ukuwela', '0713510441', 'Physics', 'BSc (Hons) Physics | University Of Peradeniya', '1765345145_6939077937bbd.jpg', 1, '2025-12-04 09:48:23'),
-(5, 'TC2025005', '880619', 'Tissa Jananayake', '0773099341', 'Biology', 'B.Sc. Hon\'s (Microbiology) Sp. (Kelaniya) P.G. Dip. in Psychological Counseling (Colombo), PhD(USSR)', '1765341762_6938fa42caec4.jpg', 1, '2025-12-05 14:11:06'),
-(6, 'TC2025006', '101937', 'Akila Vimanga Senevirathna', '0716548262', 'Arts', 'Thinking\r\nSearching\r\nAkila Vimanga Senevirathna is a\r\ntutor and teacher known for offering classes in the Sinhala language, and a search result indicates he holds a B.A. degree. His specific area of focus is teaching Sinhala language for GCE Ordinary Level (O/L) and Advanced Level (A/L) students in Sri Lanka.', '1765085853_6935129d42433.jpg', 1, '2025-12-07 05:37:33'),
-(7, 'TC2025007', '878802', 'Amith Pussella', '0773093941', 'Physics', 'Mr. Amit Pussella is an experienced lecturer with nearly 30 years of experience in the field of Physics, having entered the field from the University of Colombo. Since it is possible to connect in any way, both online and physical, a child from any part of the country can easily participate in this course.', '1765342736_6938fe106295b.jpg', 1, '2025-12-08 03:23:28'),
-(8, 'TC2025008', '740853', 'Madushan Neranjan', '0704849142', 'Combined Maths', 'BSc (Hons) in T&LM Faculty of Engineering | University of Moratuwa', '1765341287_6938f8676626c.jpg', 1, '2025-12-10 04:34:47'),
-(10, 'TC2025009', '444475', 'Anuradha Perera', '0741785456', 'Physics', 'University of Moratuwa - Faculty of Engineering', '1765349676_6939192c316e0.jpg', 1, '2025-12-10 06:54:36'),
-(12, 'TC2025010', '150448', 'Kelum Senanayake', '0767287752', 'Chemistry', 'B.Sc (Hons) U.S.J, P.G Dip in Edu', '1765350270_69391b7ede088.jpg', 1, '2025-12-10 07:04:30'),
-(13, 'TC2025011', '179098', 'Amila Dasanayake', '0741785456', 'Chemistry', 'Faculty of Medicine, University of Colombo', '1765350516_69391c7463ba6.jpg', 1, '2025-12-10 07:08:36'),
-(14, 'TC2025012', '786434', 'Bhanuka Ekanayaka', ' 0711039004', 'ICT', 'B.Sc(ICT) Hons - University of Moratuwa ', '1765350998_69391e56e33fd.png', 1, '2025-12-10 07:16:38'),
-(15, 'TC2025013', '575395', 'Janaka Abeywardana', '0781452430', 'Combined Maths', 'B.Sc (Mathematics) Hons University of Moratuwa', '1765351375_69391fcfedeca.jpg', 1, '2025-12-10 07:22:55');
+INSERT INTO `teachers` (`teacher_id`, `teacher_number`, `password`, `full_name`, `phone`, `subject`, `description`, `qualifications`, `image`, `status`, `created_at`) VALUES
+(2, 'TC2025002', '295001', 'Dinesh Muthugala', '', 'Biology', 'In addition to his academic qualifications, Muthugala is a well-known Biology lecturer in Sri Lanka and is the founder of DM Education Private Limited. He is also an entrepreneur and film producer. ', NULL, '1765341990_6938fb26a3253.jpg', 1, '2025-12-04 08:43:07'),
+(3, 'TC2025003', '770370', 'Ravindu bandaranayake', '0713510441', 'ICT', 'He holds a B.Sc. (Hons) in Cybersecurity and Forensics from the University of Gloucestershire, United Kingdom. He previously studied Software Engineering at the Sri Lanka Institute of Information Technology (SLIIT) and Electronics at Wayamba University of Sri Lanka (WUSL).', NULL, '1765342852_6938fe84f3f0c.jpg', 1, '2025-12-04 09:05:45'),
+(4, 'TC2025004', '243687', 'Darshana Ukuwela', '0713510441', 'Physics', 'BSc (Hons) Physics | University Of Peradeniya', NULL, '1765345145_6939077937bbd.jpg', 1, '2025-12-04 09:48:23'),
+(5, 'TC2025005', '880619', 'Tissa Jananayake', '0773099341', 'Biology', 'B.Sc. Hon\'s (Microbiology) Sp. (Kelaniya) P.G. Dip. in Psychological Counseling (Colombo), PhD(USSR)', NULL, '1765341762_6938fa42caec4.jpg', 1, '2025-12-05 14:11:06'),
+(6, 'TC2025006', '101937', 'Akila Vimanga Senevirathna', '0716548262', 'Arts', 'Thinking\r\nSearching\r\nAkila Vimanga Senevirathna is a\r\ntutor and teacher known for offering classes in the Sinhala language, and a search result indicates he holds a B.A. degree. His specific area of focus is teaching Sinhala language for GCE Ordinary Level (O/L) and Advanced Level (A/L) students in Sri Lanka.', NULL, '1765085853_6935129d42433.jpg', 1, '2025-12-07 05:37:33'),
+(7, 'TC2025007', '878802', 'Amith Pussella', '0773093941', 'Physics', 'Mr. Amit Pussella is an experienced lecturer with nearly 30 years of experience in the field of Physics, having entered the field from the University of Colombo. Since it is possible to connect in any way, both online and physical, a child from any part of the country can easily participate in this course.', NULL, '1765342736_6938fe106295b.jpg', 1, '2025-12-08 03:23:28'),
+(8, 'TC2025008', '740853', 'Madushan Neranjan', '0704849142', 'Combined Maths', 'BSc (Hons) in T&LM Faculty of Engineering | University of Moratuwa', NULL, '1765341287_6938f8676626c.jpg', 1, '2025-12-10 04:34:47'),
+(10, 'TC2025009', '444475', 'Anuradha Perera', '0741785456', 'Physics', 'University of Moratuwa - Faculty of Engineering', NULL, '1765349676_6939192c316e0.jpg', 1, '2025-12-10 06:54:36'),
+(12, 'TC2025010', '150448', 'Kelum Senanayake', '0767287752', 'Chemistry', 'B.Sc (Hons) U.S.J, P.G Dip in Edu', NULL, '1765350270_69391b7ede088.jpg', 1, '2025-12-10 07:04:30'),
+(13, 'TC2025011', '179098', 'Amila Dasanayake', '0741785456', 'Chemistry', 'Faculty of Medicine, University of Colombo', NULL, '1765350516_69391c7463ba6.jpg', 1, '2025-12-10 07:08:36'),
+(14, 'TC2025012', '786434', 'Bhanuka Ekanayaka', ' 0711039004', 'ICT', 'B.Sc(ICT) Hons - University of Moratuwa ', NULL, '1765350998_69391e56e33fd.png', 1, '2025-12-10 07:16:38'),
+(15, 'TC2025013', '575395', 'Janaka Abeywardana', '0781452430', 'Combined Maths', 'B.Sc (Mathematics) Hons University of Moratuwa', NULL, '1765351375_69391fcfedeca.jpg', 1, '2025-12-10 07:22:55');
 
 -- --------------------------------------------------------
 
@@ -384,6 +442,19 @@ ALTER TABLE `exam_marks`
   ADD KEY `student_id` (`student_id`);
 
 --
+-- Indexes for table `exam_questions`
+--
+ALTER TABLE `exam_questions`
+  ADD PRIMARY KEY (`question_id`),
+  ADD KEY `exam_id` (`exam_id`);
+
+--
+-- Indexes for table `exam_results`
+--
+ALTER TABLE `exam_results`
+  ADD PRIMARY KEY (`result_id`);
+
+--
 -- Indexes for table `expenses`
 --
 ALTER TABLE `expenses`
@@ -394,6 +465,12 @@ ALTER TABLE `expenses`
 --
 ALTER TABLE `newsletter_subs`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `online_exams`
+--
+ALTER TABLE `online_exams`
+  ADD PRIMARY KEY (`exam_id`);
 
 --
 -- Indexes for table `payments`
@@ -472,6 +549,18 @@ ALTER TABLE `exam_marks`
   MODIFY `mark_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `exam_questions`
+--
+ALTER TABLE `exam_questions`
+  MODIFY `question_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `exam_results`
+--
+ALTER TABLE `exam_results`
+  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
@@ -481,7 +570,13 @@ ALTER TABLE `expenses`
 -- AUTO_INCREMENT for table `newsletter_subs`
 --
 ALTER TABLE `newsletter_subs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `online_exams`
+--
+ALTER TABLE `online_exams`
+  MODIFY `exam_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `payments`
@@ -536,6 +631,12 @@ ALTER TABLE `enrollments`
 ALTER TABLE `exam_marks`
   ADD CONSTRAINT `exam_marks_ibfk_1` FOREIGN KEY (`exam_id`) REFERENCES `exams` (`exam_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `exam_marks_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `exam_questions`
+--
+ALTER TABLE `exam_questions`
+  ADD CONSTRAINT `exam_questions_ibfk_1` FOREIGN KEY (`exam_id`) REFERENCES `online_exams` (`exam_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `payments`

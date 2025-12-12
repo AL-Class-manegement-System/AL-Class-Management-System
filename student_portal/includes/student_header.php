@@ -1,4 +1,5 @@
 <?php
+// student_portal/includes/student_header.php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -47,6 +48,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
 // Active Link එකට අදාළ CSS Class
 function getActiveClass($page_name, $current_page)
 {
+    // do_exam.php හෝ submit_exam.php වැනි පිටු වල සිටින විටත් Exam Center එක Active කිරීමට
+    if ($page_name === 'exam_center.php' && ($current_page === 'do_exam.php' || $current_page === 'submit_exam.php')) {
+        return 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30';
+    }
+    
     if ($page_name === $current_page) {
         return 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30';
     } else {
@@ -88,6 +94,20 @@ function getActiveClass($page_name, $current_page)
         body {
             font-family: 'Inter', sans-serif;
         }
+        /* Custom Scrollbar for Sidebar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b; 
+        }
     </style>
 </head>
 
@@ -102,23 +122,12 @@ function getActiveClass($page_name, $current_page)
         <aside id="sidebar"
             class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 text-white flex flex-col shadow-2xl transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:static md:inset-auto md:transform-none border-r border-slate-800">
 
-
             <div class="flex items-center justify-center h-20 border-b border-gray-800">
                 <div class="text-2xl font-bold text-white flex items-center gap-2">
                     <i class="fas fa-university text-indigo-500"></i>
                     <span>Future Minds</span>
                 </div>
             </div>
-            <!-- <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800 bg-slate-950">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">F</div>
-                    <span class="text-lg font-bold tracking-wide text-gray-100">Future Minds</span>
-                </div>
-                <button onclick="toggleSidebar()"
-                    class="md:hidden text-slate-400 hover:text-white focus:outline-none transition-colors p-1 rounded-lg hover:bg-slate-800">
-                    <i class="fas fa-times text-lg"></i>
-                </button>
-            </div> -->
 
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
 
@@ -143,6 +152,12 @@ function getActiveClass($page_name, $current_page)
                 </a>
 
                 <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6">Academics</p>
+                
+                <a href="exam_center.php"
+                    class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('exam_center.php', $current_page); ?>">
+                    <i class="fas fa-file-alt w-6 text-center group-hover:scale-110 transition-transform"></i>
+                    <span class="ms-3 font-medium">Exam Center</span>
+                </a>
 
                 <a href="exam_results.php"
                     class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('exam_results.php', $current_page); ?>">
@@ -204,6 +219,8 @@ function getActiveClass($page_name, $current_page)
                             echo 'Student Profile';
                         elseif ($current_page == 'study_packs.php')
                             echo 'Study Materials';
+                        elseif ($current_page == 'exam_center.php' || $current_page == 'do_exam.php')
+                            echo 'Exam Center';
                         else
                             echo 'Student Portal';
                         ?>
