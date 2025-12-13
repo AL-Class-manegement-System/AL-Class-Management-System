@@ -1,17 +1,16 @@
 <?php
-// Your Gemini API Key - Use a secure method to load this in a real application
-$api_key = "AIzaSyCw7Z2x03zk-ubMIyI3LA3oLjdAwWlKy9E"; // <<< මෙහි ඔබේ API Key එක යොදන්න >>>
-$model_name = "gemini-2.5-flash"; // අපි වේගවත්ම model එක භාවිතා කරමු
+//API Key 
+$api_key = "AIzaSyCw7Z2x03zk-ubMIyI3LA3oLjdAwWlKy9E"; 
+$model_name = "gemini-2.5-flash"; 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
     header('Content-Type: application/json');
 
     $user_message = $_POST['message'];
 
-    // 1. Fetch Context Data from Database
-    include '../includes/connection.php'; // Adjust path if necessary
 
-    // Fetch active notices
+    include '../includes/connection.php'; 
+
     $notice_sql = "SELECT title, description FROM notices WHERE status = 1 ORDER BY created_at DESC LIMIT 5";
     $notice_res = $conn->query($notice_sql);
     $notices_text = "";
@@ -23,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
         $notices_text = "No active notices.";
     }
 
-    // Fetch active classes
     $class_sql = "SELECT class_name, subject, teacher_name, day, time, fee FROM classes WHERE status = 1";
     $class_res = $conn->query($class_sql);
     $classes_text = "";
@@ -35,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
         $classes_text = "No active classes found.";
     }
 
-    // Fetch upcoming exams
     $exam_sql = "SELECT exam_name, subject, date FROM exams ORDER BY date DESC LIMIT 5";
     $exam_res = $conn->query($exam_sql);
     $exams_text = "";
@@ -47,12 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
         $exams_text = "No upcoming exams found.";
     }
 
-    // Fetch student count
     $student_sql = "SELECT COUNT(*) as total FROM students WHERE status = 1";
     $student_res = $conn->query($student_sql);
     $student_count = $student_res ? $student_res->fetch_assoc()['total'] : 0;
 
-    // Fetch teacher count
+
     $teacher_sql = "SELECT COUNT(*) as total FROM teachers WHERE status = 1";
     $teacher_res = $conn->query($teacher_sql);
     $teacher_count = $teacher_res ? $teacher_res->fetch_assoc()['total'] : 0;
@@ -99,10 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
         ]
     ]);
 
-    // Initialize cURL (PHP standard for making API requests)
     $ch = curl_init($url);
 
-    // Set cURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
     curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
@@ -111,7 +105,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
         'Content-Length: ' . strlen($payload)
     ]);
 
-    // Execute cURL and get response
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
@@ -124,13 +117,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
         exit;
     }
 
-    // Extract the AI's response text
+
     $ai_response = $data['candidates'][0]['content']['parts'][0]['text'] ?? 'Sorry, I could not generate a response.';
 
     echo json_encode(['response' => $ai_response]);
 
 } else {
-    // Handle invalid requests
     http_response_code(405);
     echo json_encode(['error' => 'Invalid request method.']);
 }
