@@ -1,7 +1,7 @@
 <?php
 //API Key 
-$api_key = "AIzaSyCw7Z2x03zk-ubMIyI3LA3oLjdAwWlKy9E"; 
-$model_name = "gemini-2.5-flash"; 
+$api_key = "AIzaSyB_nXNdo9jfi4ex453dvXYsydvx7r60e9w";
+$model_name = "gemini-2.5-flash";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
     header('Content-Type: application/json');
@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
     $user_message = $_POST['message'];
 
 
-    include '../includes/connection.php'; 
+    include '../includes/connection.php';
 
     $notice_sql = "SELECT title, description FROM notices WHERE status = 1 ORDER BY created_at DESC LIMIT 5";
     $notice_res = $conn->query($notice_sql);
