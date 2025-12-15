@@ -194,7 +194,7 @@ function getActiveClass($page_name, $current_page)
 
         </aside>
 
-        <div class="flex-1 flex flex-col h-screen overflow-y-auto w-full relative bg-gray-50">
+        <div class="flex-1 flex flex-col h-screen overflow-y-auto w-full relative bg-gray-50 static">
 
             <header
                 class="h-20 bg-white shadow-sm border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-20">
@@ -205,7 +205,7 @@ function getActiveClass($page_name, $current_page)
                         <i class="fas fa-bars text-xl"></i>
                     </button>
 
-                    <h2 class="text-xl font-bold text-slate-800 hidden sm:block">
+                    <h2 class="text-xl font-bold text-purple-800 hidden sm:block">
                         <?php
                         if ($current_page == 'index.php')
                             echo 'Dashboard';

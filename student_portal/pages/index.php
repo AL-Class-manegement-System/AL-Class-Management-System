@@ -27,49 +27,49 @@ $sql_today_classes = "
     WHERE e.student_id = ? AND c.day = ?
     ORDER BY c.time ASC
 ";
-$stmt_today = $conn->prepare($sql_today_classes);
+// $stmt_today = $conn->prepare($sql_today_classes);
 
-// Fatal error fix: prepare සාර්ථක දැයි පරීක්ෂා කිරීම
-if ($stmt_today) { 
-    $stmt_today->bind_param("is", $db_student_id, $current_day);
-    if ($stmt_today->execute()) { 
-        $today_result = $stmt_today->get_result();
+// // Fatal error fix: prepare සාර්ථක දැයි පරීක්ෂා කිරීම
+// if ($stmt_today) { 
+//     $stmt_today->bind_param("is", $db_student_id, $current_day);
+//     if ($stmt_today->execute()) { 
+//         $today_result = $stmt_today->get_result();
 
-        while ($row = $today_result->fetch_assoc()) {
-            $start_timestamp = strtotime($row['time']);
-            $end_timestamp = $start_timestamp + (90 * 60); // පන්ති කාලය මිනිත්තු 90ක් ලෙස උපකල්පනය කරයි.
+//         while ($row = $today_result->fetch_assoc()) {
+//             $start_timestamp = strtotime($row['time']);
+//             $end_timestamp = $start_timestamp + (90 * 60); // පන්ති කාලය මිනිත්තු 90ක් ලෙස උපකල්පනය කරයි.
         
-            $status = 'Upcoming';
-            if (time() >= $start_timestamp && time() < $end_timestamp) {
-                $status = 'Active';
-            } elseif (time() >= $end_timestamp) {
-                $status = 'Finished';
-            } elseif ($start_timestamp - time() <= (30 * 60)) {
-                $status = 'Starting Soon';
-            }
+//             $status = 'Upcoming';
+//             if (time() >= $start_timestamp && time() < $end_timestamp) {
+//                 $status = 'Active';
+//             } elseif (time() >= $end_timestamp) {
+//                 $status = 'Finished';
+//             } elseif ($start_timestamp - time() <= (30 * 60)) {
+//                 $status = 'Starting Soon';
+//             }
             
-            $row['status'] = $status;
-            $row['time_display'] = date('h:i', $start_timestamp);
-            $row['ampm'] = date('A', $start_timestamp);
-            $today_classes[] = $row;
+//             $row['status'] = $status;
+//             $row['time_display'] = date('h:i', $start_timestamp);
+//             $row['ampm'] = date('A', $start_timestamp);
+//             $today_classes[] = $row;
             
-            // Next Class සොයා ගැනීම
-            if (!$next_class && $status !== 'Finished') {
-                $next_class = $row;
-                $diff_seconds = $start_timestamp - time();
-                if ($diff_seconds > 0) {
-                    $minutes_left = ceil($diff_seconds / 60);
-                    $next_class['time_left_msg'] = "Starts in " . $minutes_left . " mins";
-                } elseif ($status == 'Active') {
-                    $next_class['time_left_msg'] = "Ongoing Now";
-                } else {
-                    $next_class['time_left_msg'] = "Starting Soon";
-                }
-            }
-        }
-    }
-    $stmt_today->close();
-}
+//             // Next Class සොයා ගැනීම
+//             if (!$next_class && $status !== 'Finished') {
+//                 $next_class = $row;
+//                 $diff_seconds = $start_timestamp - time();
+//                 if ($diff_seconds > 0) {
+//                     $minutes_left = ceil($diff_seconds / 60);
+//                     $next_class['time_left_msg'] = "Starts in " . $minutes_left . " mins";
+//                 } elseif ($status == 'Active') {
+//                     $next_class['time_left_msg'] = "Ongoing Now";
+//                 } else {
+//                     $next_class['time_left_msg'] = "Starting Soon";
+//                 }
+//             }
+//         }
+//     }
+//     $stmt_today->close();
+// }
 
 // b) Attendance Data (Prepared Statement)
 $attendance_percentage = 'N/A';
