@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Dec 12, 2025 at 04:59 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- දායකයා: 127.0.0.1
+-- උත්පාදන වේලාව: දෙසැම්බර් 15, 2025 දින 11:13 AM ට
+-- සේවාදායකයේ අනුවාදය: 10.4.32-MariaDB
+-- PHP අනුවාදය: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `al_class_db`
+-- දත්තගබඩාව: `al_class_db`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `attendance`
+-- වගුවක් සඳහා වගු සැකිල්ල `attendance`
 --
 
 CREATE TABLE `attendance` (
@@ -36,7 +36,7 @@ CREATE TABLE `attendance` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `attendance`
+-- වගු සඳහා නික්ෂේප දත්ත `attendance`
 --
 
 INSERT INTO `attendance` (`attendance_id`, `student_id`, `date`, `status`, `time`) VALUES
@@ -51,7 +51,7 @@ INSERT INTO `attendance` (`attendance_id`, `student_id`, `date`, `status`, `time
 -- --------------------------------------------------------
 
 --
--- Table structure for table `classes`
+-- වගුවක් සඳහා වගු සැකිල්ල `classes`
 --
 
 CREATE TABLE `classes` (
@@ -67,7 +67,7 @@ CREATE TABLE `classes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `classes`
+-- වගු සඳහා නික්ෂේප දත්ත `classes`
 --
 
 INSERT INTO `classes` (`class_id`, `class_name`, `stream`, `subject`, `teacher_name`, `fee`, `day`, `time`, `status`) VALUES
@@ -82,32 +82,35 @@ INSERT INTO `classes` (`class_id`, `class_name`, `stream`, `subject`, `teacher_n
 -- --------------------------------------------------------
 
 --
--- Table structure for table `enrollments`
+-- වගුවක් සඳහා වගු සැකිල්ල `enrollments`
 --
 
 CREATE TABLE `enrollments` (
   `enrollment_id` int(11) NOT NULL,
   `student_id` int(11) NOT NULL,
   `class_id` int(11) NOT NULL,
-  `joined_date` datetime DEFAULT current_timestamp()
+  `joined_date` datetime DEFAULT current_timestamp(),
+  `status` int(1) DEFAULT 1 COMMENT '0=Pending, 1=Active',
+  `slip_image` varchar(255) DEFAULT NULL,
+  `payment_method` varchar(50) DEFAULT 'Cash',
+  `enrolled_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `enrollments`
+-- වගු සඳහා නික්ෂේප දත්ත `enrollments`
 --
 
-INSERT INTO `enrollments` (`enrollment_id`, `student_id`, `class_id`, `joined_date`) VALUES
-(1, 7, 4, '2025-12-07 10:44:50'),
-(7, 7, 1, '2025-12-07 11:02:54'),
-(8, 1, 6, '2025-12-07 11:12:55'),
-(9, 10, 4, '2025-12-12 15:33:07'),
-(10, 10, 2, '2025-12-12 15:33:08'),
-(11, 10, 7, '2025-12-12 15:33:08');
+INSERT INTO `enrollments` (`enrollment_id`, `student_id`, `class_id`, `joined_date`, `status`, `slip_image`, `payment_method`, `enrolled_at`) VALUES
+(1, 7, 4, '2025-12-07 10:44:50', 1, NULL, 'Cash', '2025-12-15 15:42:53'),
+(7, 7, 1, '2025-12-07 11:02:54', 1, NULL, 'Cash', '2025-12-15 15:42:53'),
+(9, 10, 4, '2025-12-12 15:33:07', 1, NULL, 'Cash', '2025-12-15 15:42:53'),
+(10, 10, 2, '2025-12-12 15:33:08', 1, NULL, 'Cash', '2025-12-15 15:42:53'),
+(11, 10, 7, '2025-12-12 15:33:08', 1, NULL, 'Cash', '2025-12-15 15:42:53');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `exams`
+-- වගුවක් සඳහා වගු සැකිල්ල `exams`
 --
 
 CREATE TABLE `exams` (
@@ -119,7 +122,7 @@ CREATE TABLE `exams` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `exams`
+-- වගු සඳහා නික්ෂේප දත්ත `exams`
 --
 
 INSERT INTO `exams` (`exam_id`, `exam_name`, `subject`, `date`, `total_marks`) VALUES
@@ -130,7 +133,7 @@ INSERT INTO `exams` (`exam_id`, `exam_name`, `subject`, `date`, `total_marks`) V
 -- --------------------------------------------------------
 
 --
--- Table structure for table `exam_marks`
+-- වගුවක් සඳහා වගු සැකිල්ල `exam_marks`
 --
 
 CREATE TABLE `exam_marks` (
@@ -143,7 +146,7 @@ CREATE TABLE `exam_marks` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `exam_questions`
+-- වගුවක් සඳහා වගු සැකිල්ල `exam_questions`
 --
 
 CREATE TABLE `exam_questions` (
@@ -160,7 +163,7 @@ CREATE TABLE `exam_questions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `exam_questions`
+-- වගු සඳහා නික්ෂේප දත්ත `exam_questions`
 --
 
 INSERT INTO `exam_questions` (`question_id`, `exam_id`, `question_text`, `option_1`, `option_2`, `option_3`, `option_4`, `option_5`, `correct_option`, `image_path`) VALUES
@@ -426,7 +429,7 @@ INSERT INTO `exam_questions` (`question_id`, `exam_id`, `question_text`, `option
 -- --------------------------------------------------------
 
 --
--- Table structure for table `exam_results`
+-- වගුවක් සඳහා වගු සැකිල්ල `exam_results`
 --
 
 CREATE TABLE `exam_results` (
@@ -439,7 +442,7 @@ CREATE TABLE `exam_results` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `exam_results`
+-- වගු සඳහා නික්ෂේප දත්ත `exam_results`
 --
 
 INSERT INTO `exam_results` (`result_id`, `exam_id`, `student_id`, `score`, `total_questions`, `attempted_at`) VALUES
@@ -451,12 +454,14 @@ INSERT INTO `exam_results` (`result_id`, `exam_id`, `student_id`, `score`, `tota
 (6, 20, 0, 6, 20, '2025-12-12 21:01:53'),
 (7, 20, 0, 4, 20, '2025-12-12 21:02:51'),
 (8, 1, 0, 0, 0, '2025-12-12 21:03:01'),
-(9, 21, 0, 18, 50, '2025-12-12 21:20:23');
+(9, 21, 0, 18, 50, '2025-12-12 21:20:23'),
+(10, 1, 1, 0, 0, '2025-12-15 10:16:16'),
+(11, 21, 1, 0, 50, '2025-12-15 10:49:43');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `expenses`
+-- වගුවක් සඳහා වගු සැකිල්ල `expenses`
 --
 
 CREATE TABLE `expenses` (
@@ -467,7 +472,7 @@ CREATE TABLE `expenses` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `expenses`
+-- වගු සඳහා නික්ෂේප දත්ත `expenses`
 --
 
 INSERT INTO `expenses` (`exp_id`, `description`, `amount`, `date`) VALUES
@@ -476,7 +481,7 @@ INSERT INTO `expenses` (`exp_id`, `description`, `amount`, `date`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `newsletter_subs`
+-- වගුවක් සඳහා වගු සැකිල්ල `newsletter_subs`
 --
 
 CREATE TABLE `newsletter_subs` (
@@ -486,17 +491,19 @@ CREATE TABLE `newsletter_subs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `newsletter_subs`
+-- වගු සඳහා නික්ෂේප දත්ත `newsletter_subs`
 --
 
 INSERT INTO `newsletter_subs` (`id`, `email`, `subscribed_at`) VALUES
 (1, 'sahashrajanith@gmail.com', '2025-12-12 04:22:35'),
-(2, 'janith@gmail.com', '2025-12-12 04:26:04');
+(2, 'janith@gmail.com', '2025-12-12 04:26:04'),
+(3, 'janithjanithdamsara@gmail.com', '2025-12-15 04:53:04'),
+(4, 'supun@gmail.com', '2025-12-15 07:53:27');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `online_exams`
+-- වගුවක් සඳහා වගු සැකිල්ල `online_exams`
 --
 
 CREATE TABLE `online_exams` (
@@ -511,7 +518,7 @@ CREATE TABLE `online_exams` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `online_exams`
+-- වගු සඳහා නික්ෂේප දත්ත `online_exams`
 --
 
 INSERT INTO `online_exams` (`exam_id`, `teacher_id`, `title`, `stream`, `subject`, `duration`, `approval_status`, `created_at`) VALUES
@@ -521,12 +528,13 @@ INSERT INTO `online_exams` (`exam_id`, `teacher_id`, `title`, `stream`, `subject
 (12, 5, 'ad', 'Bio Science', 'wDD', 33, 'Rejected', '2025-12-12 11:48:46'),
 (13, 5, 'ghj', 'Bio Science', 'wdwdw', 22, 'Approved', '2025-12-12 12:01:59'),
 (14, 5, 'sgvrgh', 'Bio Science', 'sefe', 44, 'Approved', '2025-12-12 12:21:56'),
-(21, 6, 'wdwdwd', 'Arts', 'Sinhala ', 22, 'Approved', '2025-12-12 15:41:37');
+(21, 6, 'wdwdwd', 'Arts', 'Sinhala ', 22, 'Approved', '2025-12-12 15:41:37'),
+(22, 2, 'cxhfgcdwshfcgew', 'Bio Science', 'wgverwg', 22, 'Pending', '2025-12-15 04:54:26');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `payments`
+-- වගුවක් සඳහා වගු සැකිල්ල `payments`
 --
 
 CREATE TABLE `payments` (
@@ -544,7 +552,7 @@ CREATE TABLE `payments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `payments`
+-- වගු සඳහා නික්ෂේප දත්ත `payments`
 --
 
 INSERT INTO `payments` (`payment_id`, `student_id`, `class_id`, `month`, `year`, `amount`, `payment_status`, `transaction_id`, `method`, `payment_type`, `paid_date`) VALUES
@@ -570,7 +578,7 @@ INSERT INTO `payments` (`payment_id`, `student_id`, `class_id`, `month`, `year`,
 -- --------------------------------------------------------
 
 --
--- Table structure for table `salaries`
+-- වගුවක් සඳහා වගු සැකිල්ල `salaries`
 --
 
 CREATE TABLE `salaries` (
@@ -585,7 +593,7 @@ CREATE TABLE `salaries` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `students`
+-- වගුවක් සඳහා වගු සැකිල්ල `students`
 --
 
 CREATE TABLE `students` (
@@ -608,7 +616,7 @@ CREATE TABLE `students` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `students`
+-- වගු සඳහා නික්ෂේප දත්ත `students`
 --
 
 INSERT INTO `students` (`student_id`, `reg_number`, `full_name`, `nic`, `dob`, `gender`, `school`, `address`, `student_phone`, `parent_phone`, `email`, `stream`, `batch`, `photo`, `registered_date`, `status`) VALUES
@@ -623,7 +631,7 @@ INSERT INTO `students` (`student_id`, `reg_number`, `full_name`, `nic`, `dob`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `system_settings`
+-- වගුවක් සඳහා වගු සැකිල්ල `system_settings`
 --
 
 CREATE TABLE `system_settings` (
@@ -633,7 +641,7 @@ CREATE TABLE `system_settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `system_settings`
+-- වගු සඳහා නික්ෂේප දත්ත `system_settings`
 --
 
 INSERT INTO `system_settings` (`setting_key`, `setting_value`, `description`) VALUES
@@ -644,7 +652,7 @@ INSERT INTO `system_settings` (`setting_key`, `setting_value`, `description`) VA
 -- --------------------------------------------------------
 
 --
--- Table structure for table `teachers`
+-- වගුවක් සඳහා වගු සැකිල්ල `teachers`
 --
 
 CREATE TABLE `teachers` (
@@ -662,7 +670,7 @@ CREATE TABLE `teachers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `teachers`
+-- වගු සඳහා නික්ෂේප දත්ත `teachers`
 --
 
 INSERT INTO `teachers` (`teacher_id`, `teacher_number`, `password`, `full_name`, `phone`, `subject`, `description`, `qualifications`, `image`, `status`, `created_at`) VALUES
@@ -682,7 +690,7 @@ INSERT INTO `teachers` (`teacher_id`, `teacher_number`, `password`, `full_name`,
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- වගුවක් සඳහා වගු සැකිල්ල `users`
 --
 
 CREATE TABLE `users` (
@@ -694,7 +702,7 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `users`
+-- වගු සඳහා නික්ෂේප දත්ත `users`
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `role`, `created_at`) VALUES
@@ -856,7 +864,7 @@ ALTER TABLE `exam_questions`
 -- AUTO_INCREMENT for table `exam_results`
 --
 ALTER TABLE `exam_results`
-  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `expenses`
@@ -868,13 +876,13 @@ ALTER TABLE `expenses`
 -- AUTO_INCREMENT for table `newsletter_subs`
 --
 ALTER TABLE `newsletter_subs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `online_exams`
 --
 ALTER TABLE `online_exams`
-  MODIFY `exam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `exam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `payments`
@@ -907,44 +915,44 @@ ALTER TABLE `users`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- Constraints for dumped tables
+-- නික්ෂේපනය කරන ලද වගු සඳහා සීමා බාධක
 --
 
 --
--- Constraints for table `attendance`
+-- වගුව සඳහා සීමා බාධක `attendance`
 --
 ALTER TABLE `attendance`
   ADD CONSTRAINT `attendance_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `enrollments`
+-- වගුව සඳහා සීමා බාධක `enrollments`
 --
 ALTER TABLE `enrollments`
   ADD CONSTRAINT `enrollments_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `enrollments_ibfk_2` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `exam_marks`
+-- වගුව සඳහා සීමා බාධක `exam_marks`
 --
 ALTER TABLE `exam_marks`
   ADD CONSTRAINT `exam_marks_ibfk_1` FOREIGN KEY (`exam_id`) REFERENCES `exams` (`exam_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `exam_marks_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `exam_questions`
+-- වගුව සඳහා සීමා බාධක `exam_questions`
 --
 ALTER TABLE `exam_questions`
   ADD CONSTRAINT `exam_questions_ibfk_1` FOREIGN KEY (`exam_id`) REFERENCES `online_exams` (`exam_id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `payments`
+-- වගුව සඳහා සීමා බාධක `payments`
 --
 ALTER TABLE `payments`
   ADD CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `payments_ibfk_2` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `salaries`
+-- වගුව සඳහා සීමා බාධක `salaries`
 --
 ALTER TABLE `salaries`
   ADD CONSTRAINT `salaries_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`teacher_id`) ON DELETE CASCADE;

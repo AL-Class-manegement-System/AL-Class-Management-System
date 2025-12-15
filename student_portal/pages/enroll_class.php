@@ -1,167 +1,188 @@
 <?php
 // student_portal/pages/enroll_class.php
 include('../includes/student_header.php');
-require_once '../../includes/connection.php';
 
-// 1. Get Class Details
 if (!isset($_GET['class_id'])) {
-    echo "<script>alert('Invalid Class!'); window.location.href='my_classes.php';</script>";
+    echo "<script>window.location.href='my_classes.php';</script>";
     exit();
 }
 
 $class_id = intval($_GET['class_id']);
-$student_id = $student['student_id'];
+$student_id = $_SESSION['student_id'];
 
-// Check if already enrolled
-$check_sql = "SELECT * FROM enrollments WHERE student_id = ? AND class_id = ?";
-$stmt = $conn->prepare($check_sql);
-$stmt->bind_param("ii", $student_id, $class_id);
-$stmt->execute();
-if ($stmt->get_result()->num_rows > 0) {
-    echo "<script>alert('You are already enrolled!'); window.location.href='my_classes.php';</script>";
-    exit();
-}
-
-// Fetch Class Fee & Name
-$class_sql = "SELECT class_name, subject, fee, teacher_name FROM classes WHERE class_id = ?";
-$stmt = $conn->prepare($class_sql);
+// Fetch Class Details
+$sql = "SELECT * FROM classes WHERE class_id = ?";
+$stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $class_id);
 $stmt->execute();
-$class = $stmt->get_result()->fetch_assoc();
+$result = $stmt->get_result();
+$class = $result->fetch_assoc();
 
-// 2. Handle Payment Submission
-if (isset($_POST['submit_payment'])) {
-    $entered_reg_no = $_POST['reg_number'];
-    $payment_method = $_POST['payment_method'];
-    $amount = $class['fee'];
-    $month = date('F'); // Current Month
-    $year = date('Y');
-
-    if ($payment_method == 'Bank Slip') {
-        // --- Bank Slip Upload Logic ---
-        if (isset($_FILES['slip_image']) && $_FILES['slip_image']['error'] == 0) {
-            $allowed = ['jpg', 'jpeg', 'png', 'pdf'];
-            $ext = strtolower(pathinfo($_FILES['slip_image']['name'], PATHINFO_EXTENSION));
-            
-            if (in_array($ext, $allowed)) {
-                $new_name = "slip_" . $student_id . "_" . time() . "." . $ext;
-                $upload_dir = "../../uploads/slips/";
-                
-                if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-                
-                if (move_uploaded_file($_FILES['slip_image']['tmp_name'], $upload_dir . $new_name)) {
-                    // Insert into payments table (Pending Status)
-                    $sql = "INSERT INTO payments (student_id, class_id, month, year, amount, payment_status, method, payment_type, slip_image) 
-                            VALUES (?, ?, ?, ?, ?, 'pending', 'Bank Slip', 'Registration', ?)";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("iisids", $student_id, $class_id, $month, $year, $amount, $new_name);
-                    
-                    if ($stmt->execute()) {
-                        echo "<script>alert('Payment Slip Uploaded! Please wait for Admin approval.'); window.location.href='my_classes.php';</script>";
-                    } else {
-                        echo "<script>alert('Database Error: " . $conn->error . "');</script>";
-                    }
-                } else {
-                    echo "<script>alert('Failed to upload image.');</script>";
-                }
-            } else {
-                echo "<script>alert('Invalid file type! Only JPG, PNG, PDF allowed.');</script>";
-            }
-        } else {
-            echo "<script>alert('Please upload the payment slip.');</script>";
-        }
-    }
+if (!$class) {
+    echo "<div class='p-10 text-center'>Class not found.</div>";
+    include('../includes/footer.php');
+    exit();
 }
 ?>
 
 <div class="flex-1 flex flex-col h-screen overflow-y-auto bg-gray-50">
-    <main class="p-8 max-w-3xl mx-auto w-full">
-        
-        <h1 class="text-3xl font-bold text-slate-800 mb-6">Enrollment & Payment</h1>
-
-        <div class="bg-white p-8 rounded-2xl shadow-lg border border-indigo-100">
-            
-            <div class="mb-6 p-4 bg-indigo-50 rounded-xl border border-indigo-200">
-                <h2 class="text-xl font-bold text-indigo-700"><?php echo htmlspecialchars($class['class_name']); ?></h2>
-                <p class="text-gray-600"><?php echo htmlspecialchars($class['subject']); ?> | <?php echo htmlspecialchars($class['teacher_name']); ?></p>
-                <div class="mt-2 text-2xl font-bold text-slate-800">LKR <?php echo number_format($class['fee'], 2); ?></div>
+    <main class="p-6 md:p-12">
+        <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden">
+            <div class="bg-indigo-600 p-8 text-white text-center">
+                <h1 class="text-3xl font-bold mb-2">Enroll in Class</h1>
+                <p class="opacity-90">Confirm your details and proceed to payment</p>
             </div>
 
-            <form method="POST" enctype="multipart/form-data" class="space-y-6">
-                
+            <div class="p-8 md:p-12">
+                <div
+                    class="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800"><?php echo htmlspecialchars($class['subject']); ?>
+                        </h2>
+                        <p class="text-slate-600"><?php echo htmlspecialchars($class['class_name']); ?> |
+                            <?php echo htmlspecialchars($class['teacher_name']); ?>
+                        </p>
+                        <div
+                            class="mt-2 inline-flex items-center px-3 py-1 rounded-full bg-white text-indigo-600 text-sm font-bold shadow-sm">
+                            <?php echo htmlspecialchars($class['day']); ?> @
+                            <?php echo htmlspecialchars($class['time']); ?>
+                        </div>
+                    </div>
+                    <div class="text-center md:text-right">
+                        <div class="text-sm text-slate-500 uppercase tracking-wider font-semibold">Class Fee</div>
+                        <div class="text-3xl font-bold text-indigo-600">LKR
+                            <?php echo number_format($class['fee'], 2); ?>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-bold text-slate-800 mb-6">Select Payment Method</h3>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Student Name</label>
-                        <input type="text" value="<?php echo htmlspecialchars($student['full_name']); ?>" readonly 
-                            class="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-500 cursor-not-allowed">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Student ID</label>
-                        <input type="text" name="reg_number" value="<?php echo htmlspecialchars($student['reg_number']); ?>" required 
-                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white" placeholder="Confirm your ID">
-                    </div>
-                </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">Select Payment Method</label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="payment_method" value="Bank Slip" class="peer sr-only" checked onchange="togglePayment('slip')">
-                            <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 hover:bg-gray-50 transition text-center">
-                                <i class="fas fa-file-invoice-dollar text-2xl mb-2 text-indigo-600"></i>
-                                <div class="font-bold text-gray-700">Bank Deposit</div>
+                    <div
+                        class="border-2 border-indigo-100 rounded-2xl p-6 hover:border-indigo-500 transition-all cursor-pointer relative group bg-white h-full flex flex-col justify-between">
+                        <div>
+                            <div class="absolute top-4 right-4 text-indigo-500"><i
+                                    class="fas fa-credit-card text-2xl"></i></div>
+                            <h4 class="font-bold text-lg text-slate-800 mb-2">Pay Online</h4>
+                            <p class="text-sm text-slate-500 mb-6">Pay securely using Visa, MasterCard, or Genie.
+                                Activation is instant.</p>
+                        </div>
+                        <button onclick="payOnline(<?php echo $class_id; ?>)"
+                            class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">
+                            Pay Now & Enroll
+                        </button>
+                    </div>
+
+                    <div class="border-2 border-gray-100 rounded-2xl p-6 hover:border-green-500 transition-all cursor-pointer relative group bg-white h-full flex flex-col justify-between"
+                        id="slipCard">
+                        <div>
+                            <div class="absolute top-4 right-4 text-green-500"><i
+                                    class="fas fa-file-invoice text-2xl"></i></div>
+                            <h4 class="font-bold text-lg text-slate-800 mb-2">Upload Bank Slip</h4>
+                            <p class="text-sm text-slate-500 mb-4">Transfer to the account below and upload the receipt.
+                                (Manual Approval)</p>
+
+                            <div class="bg-gray-50 p-3 rounded-lg text-sm text-slate-600 mb-4 border border-gray-200">
+                                <p><strong>Bank:</strong> Commercial Bank</p>
+                                <p><strong>Acc No:</strong> 1234567890</p>
+                                <p><strong>Name:</strong> Future Minds</p>
+                                <p><strong>Branch:</strong> Nugegoda</p>
                             </div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="payment_method" value="Online" class="peer sr-only" onchange="togglePayment('online')">
-                            <div class="p-4 rounded-xl border-2 border-gray-200 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 hover:bg-gray-50 transition text-center">
-                                <i class="fas fa-credit-card text-2xl mb-2 text-green-600"></i>
-                                <div class="font-bold text-gray-700">Pay Online</div>
-                            </div>
-                        </label>
+                        </div>
+
+                        <button onclick="toggleSlipForm()"
+                            class="w-full py-3 bg-white border-2 border-green-500 text-green-600 rounded-xl font-bold hover:bg-green-50 transition"
+                            id="btnToggleSlip">
+                            Upload Slip
+                        </button>
+
+                        <form action="upload_slip_process.php" method="POST" enctype="multipart/form-data"
+                            class="hidden mt-4" id="slipForm">
+                            <input type="hidden" name="class_id" value="<?php echo $class_id; ?>">
+
+                            <label class="block mb-2 text-sm font-medium text-slate-600">Select Image/PDF</label>
+                            <input type="file" name="slip_file" required accept=".jpg,.jpeg,.png,.pdf"
+                                class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 mb-4 cursor-pointer">
+
+                            <button type="submit"
+                                class="w-full py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition shadow-lg shadow-green-200">
+                                Submit Slip
+                            </button>
+                            <button type="button" onclick="toggleSlipForm()"
+                                class="w-full mt-2 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
+                        </form>
                     </div>
-                </div>
 
-                <div id="slip-section" class="border-t pt-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Upload Payment Slip / Screenshot</label>
-                    <input type="file" name="slip_image" accept=".jpg,.jpeg,.png,.pdf" 
-                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                    <p class="text-xs text-gray-500 mt-1">Bank: BOC | Acc: 12345678 | Branch: Colombo</p>
-                    
-                    <button type="submit" name="submit_payment" class="mt-6 w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition">
-                        Submit Enrollment
-                    </button>
                 </div>
-
-                <div id="online-section" class="hidden border-t pt-4 text-center">
-                    <p class="text-gray-600 mb-4">You will be redirected to PayHere secure gateway.</p>
-                    <button type="button" onclick="payWithPayHere()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition">
-                        Pay LKR <?php echo $class['fee']; ?> Now
-                    </button>
-                </div>
-
-            </form>
+            </div>
         </div>
     </main>
 </div>
 
-<script>
-function togglePayment(method) {
-    if (method === 'slip') {
-        document.getElementById('slip-section').classList.remove('hidden');
-        document.getElementById('online-section').classList.add('hidden');
-    } else {
-        document.getElementById('slip-section').classList.add('hidden');
-        document.getElementById('online-section').classList.remove('hidden');
-    }
-}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="https://www.payhere.lk/lib/payhere.js"></script>
 
-// PayHere Integration Logic (Basic)
-function payWithPayHere() {
-    // You can integrate the PayHere JS SDK or form submission here
-    alert("PayHere Integration will be triggered here.\nOrder ID: Enr_<?php echo $student_id . '_' . $class_id; ?>\nAmount: <?php echo $class['fee']; ?>");
-    // Redirect or submit PayHere form
-}
+<script>
+    // 1. Toggle Slip Form Logic
+    function toggleSlipForm() {
+        const form = document.getElementById('slipForm');
+        const btn = document.getElementById('btnToggleSlip');
+
+        if (form.classList.contains('hidden')) {
+            form.classList.remove('hidden');
+            btn.classList.add('hidden');
+        } else {
+            form.classList.add('hidden');
+            btn.classList.remove('hidden');
+        }
+    }
+
+    // 2. PayHere Logic (Existing)
+    function payOnline(classId) {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        btn.disabled = true;
+
+        $.ajax({
+            url: 'get_payhere_hash.php',
+            type: 'POST',
+            data: { class_id: classId },
+            dataType: 'json',
+            success: function (data) {
+                if (data.error) {
+                    alert(data.error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+
+                payhere.onCompleted = function onCompleted(orderId) {
+                    window.location.href = "payment_success.php?order_id=" + orderId;
+                };
+
+                payhere.onDismissed = function onDismissed() {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                };
+
+                payhere.onError = function onError(error) {
+                    alert("Payment Error: " + error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                };
+
+                payhere.startPayment(data);
+            },
+            error: function () {
+                alert("System Error: Could not initiate payment.");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    }
 </script>
 
 <?php include('../includes/footer.php'); ?>
