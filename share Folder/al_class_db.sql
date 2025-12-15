@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- දායකයා: 127.0.0.1
--- උත්පාදන වේලාව: දෙසැම්බර් 15, 2025 දින 11:13 AM ට
+-- උත්පාදන වේලාව: දෙසැම්බර් 15, 2025 දින 11:31 AM ට
 -- සේවාදායකයේ අනුවාදය: 10.4.32-MariaDB
 -- PHP අනුවාදය: 8.2.12
 
@@ -547,6 +547,7 @@ CREATE TABLE `payments` (
   `payment_status` enum('paid','pending','failed') NOT NULL DEFAULT 'paid',
   `transaction_id` varchar(100) DEFAULT NULL,
   `method` varchar(20) NOT NULL DEFAULT 'Cash',
+  `slip_image` varchar(255) DEFAULT NULL,
   `payment_type` varchar(20) NOT NULL DEFAULT 'Full',
   `paid_date` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -555,25 +556,25 @@ CREATE TABLE `payments` (
 -- වගු සඳහා නික්ෂේප දත්ත `payments`
 --
 
-INSERT INTO `payments` (`payment_id`, `student_id`, `class_id`, `month`, `year`, `amount`, `payment_status`, `transaction_id`, `method`, `payment_type`, `paid_date`) VALUES
-(2, 1, 1, 'November', 2025, 2500.00, 'paid', NULL, 'Card', 'Full', '2025-11-30 12:28:35'),
-(3, 1, 1, 'May', 2025, 2500.00, 'paid', NULL, 'Card', 'Half', '2025-11-30 12:39:16'),
-(6, 1, 1, 'November', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full', '2025-11-30 13:36:13'),
-(7, 1, 1, 'December', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full', '2025-12-01 17:32:52'),
-(8, 6, 1, 'December', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full', '2025-12-02 12:16:38'),
-(11, 1, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full', '2025-12-02 14:29:26'),
-(12, 1, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 14:43:59'),
-(13, 1, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 14:59:18'),
-(14, 1, 1, 'April', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 15:09:39'),
-(15, 1, 1, 'February', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 15:09:49'),
-(16, 7, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 15:15:59'),
-(17, 7, 1, 'November', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 15:29:37'),
-(18, 5, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-02 15:54:19'),
-(19, 1, 1, 'August', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-08 09:46:17'),
-(20, 5, 1, 'September', 2025, 1250.00, 'paid', NULL, 'Cash', 'Half Payment', '2025-12-08 09:48:34'),
-(21, 5, 1, 'February', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-08 10:44:37'),
-(22, 9, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', 'Full Payment', '2025-12-08 10:51:58'),
-(23, 1, 1, 'March', 2025, 1250.00, 'paid', NULL, 'Cash', 'Half Payment', '2025-12-09 12:29:37');
+INSERT INTO `payments` (`payment_id`, `student_id`, `class_id`, `month`, `year`, `amount`, `payment_status`, `transaction_id`, `method`, `slip_image`, `payment_type`, `paid_date`) VALUES
+(2, 1, 1, 'November', 2025, 2500.00, 'paid', NULL, 'Card', NULL, 'Full', '2025-11-30 12:28:35'),
+(3, 1, 1, 'May', 2025, 2500.00, 'paid', NULL, 'Card', NULL, 'Half', '2025-11-30 12:39:16'),
+(6, 1, 1, 'November', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full', '2025-11-30 13:36:13'),
+(7, 1, 1, 'December', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full', '2025-12-01 17:32:52'),
+(8, 6, 1, 'December', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full', '2025-12-02 12:16:38'),
+(11, 1, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full', '2025-12-02 14:29:26'),
+(12, 1, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full Payment', '2025-12-02 14:43:59'),
+(13, 1, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full Payment', '2025-12-02 14:59:18'),
+(14, 1, 1, 'April', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full Payment', '2025-12-02 15:09:39'),
+(15, 1, 1, 'February', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full Payment', '2025-12-02 15:09:49'),
+(16, 7, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full Payment', '2025-12-02 15:15:59'),
+(17, 7, 1, 'November', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full Payment', '2025-12-02 15:29:37'),
+(18, 5, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full Payment', '2025-12-02 15:54:19'),
+(19, 1, 1, 'August', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full Payment', '2025-12-08 09:46:17'),
+(20, 5, 1, 'September', 2025, 1250.00, 'paid', NULL, 'Cash', NULL, 'Half Payment', '2025-12-08 09:48:34'),
+(21, 5, 1, 'February', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full Payment', '2025-12-08 10:44:37'),
+(22, 9, 1, 'January', 2025, 2500.00, 'paid', NULL, 'Cash', NULL, 'Full Payment', '2025-12-08 10:51:58'),
+(23, 1, 1, 'March', 2025, 1250.00, 'paid', NULL, 'Cash', NULL, 'Half Payment', '2025-12-09 12:29:37');
 
 -- --------------------------------------------------------
 
@@ -840,7 +841,7 @@ ALTER TABLE `classes`
 -- AUTO_INCREMENT for table `enrollments`
 --
 ALTER TABLE `enrollments`
-  MODIFY `enrollment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `enrollment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `exams`
@@ -888,7 +889,7 @@ ALTER TABLE `online_exams`
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `salaries`
