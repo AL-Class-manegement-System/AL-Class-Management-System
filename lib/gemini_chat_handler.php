@@ -1,6 +1,6 @@
 <?php
 //API Key 
-$api_key = "AIzaSyB_nXNdo9jfi4ex453dvXYsydvx7r60e9w";
+$api_key = "AIzaSyAnsGDxJbW0Q1FnMyHbNp208WCmmkwS-AY";
 $model_name = "gemini-2.5-flash";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
