@@ -52,7 +52,7 @@ function getActiveClass($page_name, $current_page)
     if ($page_name === 'exam_center.php' && ($current_page === 'do_exam.php' || $current_page === 'submit_exam.php')) {
         return 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30';
     }
-    
+
     if ($page_name === $current_page) {
         return 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30';
     } else {
@@ -94,19 +94,23 @@ function getActiveClass($page_name, $current_page)
         body {
             font-family: 'Inter', sans-serif;
         }
+
         /* Custom Scrollbar for Sidebar */
         .custom-scrollbar::-webkit-scrollbar {
             width: 5px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: #1e293b; 
+            background: #1e293b;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #475569; 
+            background: #475569;
             border-radius: 5px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #64748b; 
+            background: #64748b;
         }
     </style>
 </head>
@@ -152,7 +156,7 @@ function getActiveClass($page_name, $current_page)
                 </a>
 
                 <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6">Academics</p>
-                
+
                 <a href="exam_center.php"
                     class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('exam_center.php', $current_page); ?>">
                     <i class="fas fa-file-alt w-6 text-center group-hover:scale-110 transition-transform"></i>
@@ -181,6 +185,11 @@ function getActiveClass($page_name, $current_page)
                     class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('study_packs.php', $current_page); ?>">
                     <i class="fas fa-box-open w-6 text-center group-hover:scale-110 transition-transform"></i>
                     <span class="ms-3 font-medium">Study Packs</span>
+                </a>
+                <a href="payment_history.php"
+                    class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('study_packs.php', $current_page); ?>">
+                    <i class="fas fa-box-open w-6 text-center group-hover:scale-110 transition-transform"></i>
+                    <span class="ms-3 font-medium">payment history</span>
                 </a>
             </nav>
 
