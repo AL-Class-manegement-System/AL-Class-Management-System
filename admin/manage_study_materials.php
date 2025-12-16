@@ -1,7 +1,7 @@
 <?php
 // admin/manage_study_materials.php
 session_start();
-include('includes/auth.php'); 
+include('includes/auth.php');
 include('db_con.php');
 
 $message = null;
@@ -10,7 +10,7 @@ $message = null;
 if (isset($_GET['action']) && isset($_GET['id'])) {
     $id = intval($_GET['id']);
     $action = $_GET['action'];
-    
+
     if ($action == 'approve') {
         $conn->query("UPDATE study_materials SET status = 1 WHERE material_id = $id");
         $message = "Material Approved Successfully!";
@@ -37,8 +37,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_material'])) {
 
     if (isset($_FILES['material_file']) && $_FILES['material_file']['error'] == 0) {
         $upload_dir = '../uploads/study_materials/';
-        if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-        
+        if (!is_dir($upload_dir))
+            mkdir($upload_dir, 0777, true);
+
         $filename = "admin_" . time() . "_" . $_FILES['material_file']['name'];
         if (move_uploaded_file($_FILES['material_file']['tmp_name'], $upload_dir . $filename)) {
             $db_path = "uploads/study_materials/" . $filename;
@@ -69,12 +70,14 @@ $classes = $conn->query("SELECT * FROM classes WHERE status=1");
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Manage Study Materials</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body class="bg-gray-100 font-sans">
     <?php include('includes/sidebar.php'); ?>
 
@@ -82,48 +85,71 @@ $classes = $conn->query("SELECT * FROM classes WHERE status=1");
         <h2 class="text-3xl font-bold text-gray-800 mb-6">Study Material Management</h2>
 
         <?php if ($message): ?>
-            <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded">
+            <div id="status-alert"
+                class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded transition-opacity duration-500">
                 <?php echo $message; ?>
             </div>
+            <script>
+                setTimeout(function () {
+                    const alert = document.getElementById('status-alert');
+                    if (alert) {
+                        alert.style.opacity = '0';
+                        setTimeout(() => alert.style.display = 'none', 500);
+                    }
+                }, 3000);
+            </script>
         <?php endif; ?>
 
-        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-8 shadow-sm">
+        <div id="pending-section"
+            class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-8 shadow-sm transition-opacity duration-500">
             <h3 class="text-xl font-bold text-yellow-800 mb-4 flex items-center gap-2">
                 <i class="fas fa-clock"></i> Pending Teacher Approvals
             </h3>
-            
+
             <?php if ($pending_res->num_rows > 0): ?>
-            <div class="overflow-x-auto bg-white rounded-lg shadow">
-                <table class="w-full text-sm text-left text-gray-500">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3">Material</th>
-                            <th class="px-6 py-3">Class</th>
-                            <th class="px-6 py-3">Teacher</th>
-                            <th class="px-6 py-3">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while($row = $pending_res->fetch_assoc()): ?>
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 font-bold">
-                                <?php echo $row['title']; ?>
-                                <br>
-                                <a href="../<?php echo $row['file_path']; ?>" target="_blank" class="text-blue-500 text-xs underline">View File</a>
-                            </td>
-                            <td class="px-6 py-4"><?php echo $row['class_name']; ?></td>
-                            <td class="px-6 py-4"><?php echo $row['teacher_name'] ?? 'Admin/Unknown'; ?></td>
-                            <td class="px-6 py-4 flex gap-2">
-                                <a href="?action=approve&id=<?php echo $row['material_id']; ?>" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">Approve</a>
-                                <a href="?action=reject&id=<?php echo $row['material_id']; ?>" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Reject</a>
-                            </td>
-                        </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-            </div>
+                <div class="overflow-x-auto bg-white rounded-lg shadow">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3">Material</th>
+                                <th class="px-6 py-3">Class</th>
+                                <th class="px-6 py-3">Teacher</th>
+                                <th class="px-6 py-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while ($row = $pending_res->fetch_assoc()): ?>
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td class="px-6 py-4 font-bold">
+                                        <?php echo $row['title']; ?>
+                                        <br>
+                                        <a href="../<?php echo $row['file_path']; ?>" target="_blank"
+                                            class="text-blue-500 text-xs underline">View File</a>
+                                    </td>
+                                    <td class="px-6 py-4"><?php echo $row['class_name']; ?></td>
+                                    <td class="px-6 py-4"><?php echo $row['teacher_name'] ?? 'Admin/Unknown'; ?></td>
+                                    <td class="px-6 py-4 flex gap-2">
+                                        <a href="?action=approve&id=<?php echo $row['material_id']; ?>"
+                                            class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">Approve</a>
+                                        <a href="?action=reject&id=<?php echo $row['material_id']; ?>"
+                                            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Reject</a>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
             <?php else: ?>
                 <p class="text-gray-500 italic">No pending materials for approval.</p>
+                <script>
+                    setTimeout(function () {
+                        const section = document.getElementById('pending-section');
+                        if (section) {
+                            section.style.opacity = '0';
+                            setTimeout(() => section.style.display = 'none', 500);
+                        }
+                    }, 3000);
+                </script>
             <?php endif; ?>
         </div>
 
@@ -137,14 +163,17 @@ $classes = $conn->query("SELECT * FROM classes WHERE status=1");
                 <div class="w-full">
                     <label class="text-sm font-bold text-gray-600">Class</label>
                     <select name="class_id" class="w-full border p-2 rounded" required>
-                        <?php while($c = $classes->fetch_assoc()) { echo "<option value='{$c['class_id']}'>{$c['class_name']} - {$c['subject']}</option>"; } ?>
+                        <?php while ($c = $classes->fetch_assoc()) {
+                            echo "<option value='{$c['class_id']}'>{$c['class_name']} - {$c['subject']}</option>";
+                        } ?>
                     </select>
                 </div>
                 <div class="w-full">
                     <label class="text-sm font-bold text-gray-600">File</label>
                     <input type="file" name="material_file" class="w-full border p-1 rounded" required>
                 </div>
-                <button type="submit" name="add_material" class="bg-indigo-600 text-white px-6 py-2.5 rounded font-bold hover:bg-indigo-700">Upload</button>
+                <button type="submit" name="add_material"
+                    class="bg-indigo-600 text-white px-6 py-2.5 rounded font-bold hover:bg-indigo-700">Upload</button>
             </form>
         </div>
 
@@ -162,18 +191,21 @@ $classes = $conn->query("SELECT * FROM classes WHERE status=1");
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while($row = $active_res->fetch_assoc()): ?>
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 font-medium text-gray-900">
-                            <?php echo $row['title']; ?>
-                            <a href="../<?php echo $row['file_path']; ?>" target="_blank" class="ml-2 text-blue-500 text-xs"><i class="fas fa-external-link-alt"></i></a>
-                        </td>
-                        <td class="px-6 py-4"><?php echo $row['class_name']; ?></td>
-                        <td class="px-6 py-4"><?php echo date('Y-m-d', strtotime($row['uploaded_on'])); ?></td>
-                        <td class="px-6 py-4">
-                            <a href="?action=delete&id=<?php echo $row['material_id']; ?>" onclick="return confirm('Delete this file?')" class="text-red-600 hover:underline">Delete</a>
-                        </td>
-                    </tr>
+                    <?php while ($row = $active_res->fetch_assoc()): ?>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-gray-900">
+                                <?php echo $row['title']; ?>
+                                <a href="../<?php echo $row['file_path']; ?>" target="_blank"
+                                    class="ml-2 text-blue-500 text-xs"><i class="fas fa-external-link-alt"></i></a>
+                            </td>
+                            <td class="px-6 py-4"><?php echo $row['class_name']; ?></td>
+                            <td class="px-6 py-4"><?php echo date('Y-m-d', strtotime($row['uploaded_on'])); ?></td>
+                            <td class="px-6 py-4">
+                                <a href="?action=delete&id=<?php echo $row['material_id']; ?>"
+                                    onclick="return confirm('Delete this file?')"
+                                    class="text-red-600 hover:underline">Delete</a>
+                            </td>
+                        </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
@@ -181,4 +213,5 @@ $classes = $conn->query("SELECT * FROM classes WHERE status=1");
 
     </div>
 </body>
+
 </html>
