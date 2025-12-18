@@ -1,258 +1,159 @@
 <?php
-// admin/add_manual_payment.php
+// admin/add_timetable.php
 session_start();
-include('includes/auth.php');
-include('db_con.php');
+include 'db_con.php';
 
-// --- AJAX HANDLER: ශිෂ්‍යයා තෝරාගත් විට අදාළ පන්ති ලබා ගැනීම ---
-if (isset($_POST['action']) && $_POST['action'] == 'fetch_student_data') {
-    // JSON ප්‍රතිචාරය සඳහා Header එක සකසයි
-    header('Content-Type: application/json');
+// Admin Login Check
+// if (!isset($_SESSION['admin_id'])) { header("Location: login.php"); exit(); }
 
-    $student_id = intval($_POST['student_id']);
+$message = "";
+$msg_type = "";
 
-    // 1. ශිෂ්‍යයාගේ Stream එක ලබා ගැනීම
-    $stu_query = $conn->query("SELECT stream FROM students WHERE student_id = $student_id");
+// Form Submission Handling
+if (isset($_POST['submit'])) {
+    $class_name = mysqli_real_escape_string($conn, $_POST['class_name']);
+    $subject = mysqli_real_escape_string($conn, $_POST['subject']);
+    $stream = mysqli_real_escape_string($conn, $_POST['stream']);
+    $teacher_name = mysqli_real_escape_string($conn, $_POST['teacher_name']);
+    $day = mysqli_real_escape_string($conn, $_POST['day']);
+    $time = mysqli_real_escape_string($conn, $_POST['time']);
+    $fee = floatval($_POST['fee']);
 
-    if ($stu_query->num_rows > 0) {
-        $student = $stu_query->fetch_assoc();
-        $stream = $student['stream']; // උදා: Maths, Bio, Tech
+    // Insert Query
+    $sql = "INSERT INTO classes (class_name, subject, stream, teacher_name, day, time, fee, status) 
+            VALUES ('$class_name', '$subject', '$stream', '$teacher_name', '$day', '$time', '$fee', 1)";
+
+    if ($conn->query($sql) === TRUE) {
+        // Success: Redirect back to timetable list
+        header("Location: timetable.php?msg=Class Added Successfully");
+        exit();
     } else {
-        $stream = '';
-    }
-
-    // 2. Stream එකට අදාළ පන්ති (Classes) ලබා ගැනීම (නම වෙනස් වුවත් ගැලපෙන ලෙස)
-    if (!empty($stream)) {
-
-        $conditions = [];
-
-        // කෙලින්ම සමාන වන අවස්ථා (Exact Match)
-        $conditions[] = "stream = '$stream'";
-
-        // නම් වෙනස් වන අවස්ථා (Mapping)
-        if ($stream == 'Maths') {
-            $conditions[] = "stream = 'Physical Science'";
-        } elseif ($stream == 'Bio') {
-            $conditions[] = "stream = 'Bio Science'";
-        } elseif ($stream == 'Tech') {
-            $conditions[] = "stream = 'Technology'";
-        } elseif ($stream == 'Art') {
-            $conditions[] = "stream = 'Arts'";
-        }
-
-        // SQL Query එක ගොඩනැගීම (OR භාවිතා කර)
-        $sql_condition = implode(' OR ', $conditions);
-        $class_sql = "SELECT class_id, class_name, subject, fee, teacher_name FROM classes WHERE $sql_condition";
-
-    } else {
-        // Stream එකක් නැත්නම් සියලුම පන්ති
-        $class_sql = "SELECT class_id, class_name, subject, fee, teacher_name FROM classes";
-    }
-
-    $class_res = $conn->query($class_sql);
-
-    $classes = [];
-    if ($class_res) {
-        while ($row = $class_res->fetch_assoc()) {
-            $classes[] = $row;
-        }
-    }
-
-    // JSON ලෙස Data යැවීම
-    echo json_encode(['stream' => $stream, 'classes' => $classes]);
-    exit; // AJAX Call එක මෙතැනින් අවසන් කරයි
-}
-
-// --- FORM SUBMIT: මුදල් ගෙවීම ඇතුළත් කිරීම ---
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['action'])) {
-    $student_id = $_POST['student_id'];
-    $class_id = $_POST['class_id'];
-    $amount = $_POST['amount'];
-    $month = date('F'); // වත්මන් මාසය
-    $year = date('Y');  // වත්මන් වර්ෂය
-
-    // 1. Payments Table එකට ඇතුළත් කිරීම (Status = paid)
-    $stmt = $conn->prepare("INSERT INTO payments (student_id, class_id, month, year, amount, payment_status, method, payment_type, paid_date) VALUES (?, ?, ?, ?, ?, 'paid', 'Cash', 'Full', NOW())");
-    $stmt->bind_param("iisds", $student_id, $class_id, $month, $year, $amount);
-
-    if ($stmt->execute()) {
-        // 2. Enroll කිරීම හෝ Active කිරීම
-        $check_enroll = $conn->query("SELECT * FROM enrollments WHERE student_id = $student_id AND class_id = $class_id");
-
-        if ($check_enroll->num_rows == 0) {
-            $enroll_sql = "INSERT INTO enrollments (student_id, class_id, status, joined_date, payment_method) VALUES (?, ?, 1, NOW(), 'Cash')";
-            $stmt2 = $conn->prepare($enroll_sql);
-            $stmt2->bind_param("ii", $student_id, $class_id);
-            $stmt2->execute();
-        } else {
-            $conn->query("UPDATE enrollments SET status = 1 WHERE student_id = $student_id AND class_id = $class_id");
-        }
-
-        echo "<script>alert('Payment Added & Student Enrolled Successfully!'); window.location.href='payments.php';</script>";
-    } else {
-        echo "<script>alert('Error adding payment.');</script>";
+        $message = "Error: " . $conn->error;
+        $msg_type = "red";
     }
 }
-
-// --- INITIAL LOAD: පිටුව පූරණය වන විට ---
-// සිසුන් ලැයිස්තුව ලබා ගැනීම (Dropdown එකට) - Search කිරීම සඳහා ID සහ Name දෙකම ගන්නවා
-$students = $conn->query("SELECT student_id, full_name, reg_number FROM students ORDER BY reg_number ASC");
-
-// සියලුම පන්ති ලැයිස්තුව ලබා ගැනීම (මුලින්ම පෙන්වීමට)
-$all_classes = $conn->query("SELECT class_id, class_name, subject, fee FROM classes");
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>Add Manual Payment</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Class - Future Minds</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    <style>
-        .select2-container .select2-selection--single {
-            height: 50px;
-            padding: 10px;
-            border-color: #e5e7eb;
-            border-radius: 0.5rem;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 50px;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Poppins', sans-serif; } </style>
 </head>
 
-<body class="bg-gray-100 font-sans">
-    <div class="flex">
-        <?php include('includes/sidebar.php'); ?>
-        <div class="ml-64 flex-1 p-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">💰 Add Manual Payment (Cash)</h1>
+<body class="bg-gray-100">
 
-            <div class="bg-white p-8 rounded-xl shadow-md max-w-2xl">
-                <form method="POST" action="">
+    <?php include('includes/sidebar.php'); ?>
 
-                    <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Select Student (Search by ID or
-                            Name)</label>
-                        <select name="student_id" id="student_id" class="w-full p-3 border rounded-lg" required>
-                            <option value="">Search Student...</option>
-                            <?php while ($st = $students->fetch_assoc()): ?>
-                                <option value="<?php echo $st['student_id']; ?>">
-                                    <?php echo $st['reg_number'] . " - " . $st['full_name']; ?>
-                                </option>
-                            <?php endwhile; ?>
-                        </select>
-                    </div>
+    <div class="ml-64 flex flex-col min-h-screen">
+        
+        <header class="bg-white shadow-sm py-4 px-8 flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-800">Add New Class</h2>
+            <a href="timetable.php" class="text-gray-600 hover:text-gray-900 font-medium flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </header>
 
-                    <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Student Stream</label>
-                        <input type="text" id="stream_display"
-                            class="w-full p-3 border rounded-lg bg-gray-100 text-gray-600 font-bold" readonly
-                            placeholder="Select a student to see stream">
-                    </div>
+        <main class="p-8">
+            
+            <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="p-8">
+                    
+                    <?php if ($message): ?>
+                        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+                            <p><?php echo $message; ?></p>
+                        </div>
+                    <?php endif; ?>
 
-                    <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Select Class</label>
-                        <select name="class_id" id="class_id" class="w-full p-3 border rounded-lg bg-white" required>
-                            <option value="">Select Class...</option>
-                            <?php
-                            // මුලින්ම සියලුම පන්ති Load කරයි
-                            while ($cl = $all_classes->fetch_assoc()):
-                                ?>
-                                <option value="<?php echo $cl['class_id']; ?>" data-fee="<?php echo $cl['fee']; ?>">
-                                    <?php echo $cl['subject'] . " - " . $cl['class_name'] . " (Rs. " . $cl['fee'] . ")"; ?>
-                                </option>
-                            <?php endwhile; ?>
-                        </select>
-                    </div>
+                    <form action="" method="POST">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                            <div class="col-span-2">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Class Name</label>
+                                <input type="text" name="class_name" placeholder="e.g. 2025 Revision - Group A" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
 
-                    <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Amount (LKR)</label>
-                        <input type="number" name="amount" id="amount" class="w-full p-3 border rounded-lg bg-gray-50"
-                            placeholder="Class Fee" required>
-                    </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Subject</label>
+                                <input type="text" name="subject" placeholder="e.g. Combined Maths" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
 
-                    <button type="submit"
-                        class="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition w-full shadow-lg">
-                        <i class="fas fa-check-circle"></i> Confirm Payment & Enroll
-                    </button>
-                </form>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Stream</label>
+                                <select name="stream" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                                    <option value="">-- Select Stream --</option>
+                                    <option value="Physical Science">Physical Science (Maths)</option>
+                                    <option value="Bio Science">Bio Science</option>
+                                    <option value="Commerce">Commerce</option>
+                                    <option value="Technology">Technology</option>
+                                    <option value="Arts">Arts</option>
+                                    <option value="ICT">ICT / General</option>
+                                </select>
+                            </div>
+
+                            <div class="col-span-2">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Teacher</label>
+                                <select name="teacher_name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                                    <option value="">-- Select Teacher --</option>
+                                    <?php
+                                    // Fetch teachers from database
+                                    $t_sql = "SELECT full_name FROM teachers ORDER BY full_name ASC";
+                                    $t_res = $conn->query($t_sql);
+                                    if ($t_res->num_rows > 0) {
+                                        while ($t_row = $t_res->fetch_assoc()) {
+                                            echo "<option value='" . htmlspecialchars($t_row['full_name']) . "'>" . htmlspecialchars($t_row['full_name']) . "</option>";
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <p class="text-xs text-gray-500 mt-1">Select the teacher conducting this class.</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Day</label>
+                                <select name="day" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                    <option value="Sunday">Sunday</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Time</label>
+                                <input type="text" name="time" placeholder="e.g. 08:00 AM - 10:00 AM" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+
+                            <div class="col-span-2">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Class Fee (LKR)</label>
+                                <input type="number" name="fee" step="0.01" placeholder="e.g. 2500.00" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+
+                        </div>
+
+                        <div class="mt-8 flex justify-end">
+                            <button type="submit" name="submit" 
+                                class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 transition duration-200 shadow-lg flex items-center gap-2">
+                                <i class="fas fa-save"></i> Save Class
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
+
+        </main>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            // Select2 Active කිරීම (Search පහසුකම සඳහා)
-            $('#student_id').select2({
-                placeholder: "Type Student ID (Ex: ST2025...) or Name",
-                allowClear: true,
-                width: '100%'
-            });
-
-            // Class එක වෙනස් කරන විට Fee එක Auto වැටීම
-            $('#class_id').on('change', function () {
-                var selectedFee = $(this).find(':selected').data('fee');
-                if (selectedFee) {
-                    $('#amount').val(selectedFee);
-                } else {
-                    $('#amount').val('');
-                }
-            });
-
-            // ශිෂ්‍යයෙක් තෝරාගත් විට ක්‍රියාත්මක වන කොටස (AJAX)
-            $('#student_id').on('change', function () {
-                var studentID = $(this).val();
-
-                if (studentID) {
-                    $.ajax({
-                        url: 'add_manual_payment.php', // මෙම ගොනුවටම request එක යවයි
-                        type: 'POST',
-                        data: { action: 'fetch_student_data', student_id: studentID },
-                        dataType: 'json',
-                        success: function (response) {
-
-                            // 1. Stream එක පෙන්වීම
-                            $('#stream_display').val(response.stream ? response.stream : 'No Stream Assigned');
-
-                            // 2. Classes Dropdown එක Update කිරීම (පෙර තිබූ පන්ති අයින් කර අලුත් ඒවා දමයි)
-                            var classDropdown = $('#class_id');
-                            classDropdown.empty();
-                            classDropdown.append('<option value="">Select Class...</option>');
-
-                            if (response.classes.length > 0) {
-                                $.each(response.classes, function (key, cls) {
-                                    // Class Name + Subject + Fee පෙන්වීම
-                                    var optionText = cls.subject + " - " + cls.class_name + " (Rs. " + cls.fee + ")";
-                                    classDropdown.append('<option value="' + cls.class_id + '" data-fee="' + cls.fee + '">' + optionText + '</option>');
-                                });
-                            } else {
-                                classDropdown.append('<option value="">No classes found for this stream</option>');
-                            }
-
-                            // Amount එක Clear කිරීම
-                            $('#amount').val('');
-                        },
-                        error: function (xhr, status, error) {
-                            console.error("AJAX Error:", error);
-                            // alert('Error fetching student data.'); // Error එකක් ආවොත් බලාගන්න මෙය Uncomment කරන්න
-                        }
-                    });
-                } else {
-                    // ශිෂ්‍යයෙක් නැත්නම්
-                    $('#stream_display').val('');
-                    $('#amount').val('');
-                }
-            });
-        });
-    </script>
 </body>
-
 </html>
