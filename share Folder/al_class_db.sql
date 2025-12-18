@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 18, 2025 at 12:27 PM
+-- Generation Time: Dec 18, 2025 at 04:32 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -77,8 +77,8 @@ INSERT INTO `classes` (`class_id`, `class_name`, `stream`, `subject`, `teacher_n
 (4, 'Bio Revision class', 'Bio Science', 'Bio Revision', 'Dinesh Muthugala', 2500.00, 'Friday', '08:00 am to 02:00 pm', 1),
 (5, 'ET for Srimal Wijesinghe', 'Technology', 'Engineering Technology ', 'Srimal Wijesinghe', 2500.00, 'Friday', '08:00 am to 02:00 pm', 1),
 (6, 'akila vimanga senevirathna  Sinhala class', 'Arts', 'Sinhala class', 'akila vimanga senevirathna', 2500.00, 'Wednesday', '08:00 to 12:00', 1),
-(7, 'ICT fron abc', 'ICT', 'ICT', 'Mr.Ravindu bandaranayake', 3000.00, 'Saturday', '12:00 pm to 04:00 pm', 1),
-(8, '2027 al class', 'Arts', 'sinhala', 'Akila Vimanga Senevirathna', 2500.00, 'Sunday', '08:00 am to 02:00 pm', 1);
+(8, '2027 al class', 'Arts', 'sinhala', 'Akila Vimanga Senevirathna', 2500.00, 'Sunday', '08:00 am to 02:00 pm', 1),
+(9, 'ICT fron abc', 'ICT', 'ICT', 'Ravindu bandaranayake', 3000.00, 'Monday', '08:00 am to 02:00 pm', 1);
 
 -- --------------------------------------------------------
 
@@ -104,8 +104,7 @@ INSERT INTO `enrollments` (`enrollment_id`, `student_id`, `class_id`, `joined_da
 (1, 7, 4, '2025-12-07 10:44:50', 1, 'Cash', NULL),
 (7, 7, 1, '2025-12-07 11:02:54', 1, 'Cash', NULL),
 (9, 10, 4, '2025-12-12 15:33:07', 1, 'Cash', NULL),
-(10, 10, 2, '2025-12-12 15:33:08', 1, 'Cash', NULL),
-(11, 10, 7, '2025-12-12 15:33:08', 1, 'Cash', NULL);
+(10, 10, 2, '2025-12-12 15:33:08', 1, 'Cash', NULL);
 
 -- --------------------------------------------------------
 
@@ -521,8 +520,10 @@ INSERT INTO `payments` (`payment_id`, `student_id`, `class_id`, `month`, `year`,
 (21, 5, 1, 'February', 2025, 2500.00, 'paid', NULL, NULL, 'Cash', 'Full Payment', '2025-12-08 10:44:37'),
 (22, 9, 1, 'January', 2025, 2500.00, 'paid', NULL, NULL, 'Cash', 'Full Payment', '2025-12-08 10:51:58'),
 (23, 1, 1, 'March', 2025, 1250.00, 'paid', NULL, NULL, 'Cash', 'Half Payment', '2025-12-09 12:29:37'),
-(24, 1, 7, 'December', 2025, 3000.00, 'paid', NULL, 'slip_1_1765557924.jpg', 'Bank Slip', 'Registration', '2025-12-12 22:20:29'),
-(25, 1, 8, 'December', 2025, 2500.00, 'paid', NULL, 'slip_1_1765558480.png', 'Bank Slip', 'Registration', '2025-12-12 22:24:51');
+(25, 1, 8, 'December', 2025, 2500.00, 'paid', NULL, 'slip_1_1765558480.png', 'Bank Slip', 'Registration', '2025-12-12 22:24:51'),
+(48, 1, 8, 'December', 2025, 2500.00, 'paid', NULL, 'slip_1_8_1766063449.jpg', 'Slip', 'Full', '2025-12-18 18:40:49'),
+(49, 1, 6, 'December', 2025, 2500.00, 'paid', NULL, 'slip_1_6_1766063683.jpg', 'Slip', 'Full', '2025-12-18 18:44:43'),
+(50, 1, 9, 'December', 2025, 3000.00, 'paid', NULL, 'slip_1_9_1766067229.jpg', 'Slip', 'Full', '2025-12-18 19:43:49');
 
 -- --------------------------------------------------------
 
@@ -592,6 +593,16 @@ CREATE TABLE `study_materials` (
   `uploaded_on` datetime NOT NULL DEFAULT current_timestamp(),
   `status` int(1) NOT NULL DEFAULT 0 COMMENT '0=Pending, 1=Approved, 2=Rejected'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `study_materials`
+--
+
+INSERT INTO `study_materials` (`material_id`, `title`, `class_id`, `file_path`, `uploaded_by`, `uploaded_on`, `status`) VALUES
+(1, '2024 AL Mcq', 9, 'uploads/study_materials/admin_1766070851_69441a438c225.pdf', 1, '2025-12-18 20:44:11', 1),
+(2, '2024 AL Mcq', 9, 'uploads/study_materials/admin_1766071386_69441c5ae8887.pdf', 1, '2025-12-18 20:53:06', 1),
+(3, 'bio 2025', 4, 'uploads/study_materials/mat_1766071552_69441d009d2b3.pdf', 2, '2025-12-18 20:55:52', 1),
+(4, 'bio 2025', 4, 'uploads/study_materials/mat_1766071885_69441e4d192e5.pdf', 2, '2025-12-18 21:01:25', 1);
 
 -- --------------------------------------------------------
 
@@ -806,7 +817,7 @@ ALTER TABLE `attendance`
 -- AUTO_INCREMENT for table `classes`
 --
 ALTER TABLE `classes`
-  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `enrollments`
@@ -860,7 +871,7 @@ ALTER TABLE `online_exams`
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `salaries`
@@ -878,7 +889,7 @@ ALTER TABLE `students`
 -- AUTO_INCREMENT for table `study_materials`
 --
 ALTER TABLE `study_materials`
-  MODIFY `material_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `material_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `teachers`
