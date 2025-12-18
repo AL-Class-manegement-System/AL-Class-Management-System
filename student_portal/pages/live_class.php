@@ -1,66 +1,82 @@
 <?php
+// student_portal/pages/live_class.php
+session_start();
 include('../includes/student_header.php');
+include('../../includes/connection.php');
 
-// ==========================================
-// DB වෙතින් සජීවී පන්තියක URL එක ලබා ගැනීම (Hardcode ඉවත් කිරීම)
-// ==========================================
-$db_student_id = $student['student_id'];
-$live_url = "#"; // Default fallback URL
-$class_details = null;
+if (!isset($_SESSION['student_id'])) {
+    header("Location: ../../log/login.php");
+    exit();
+}
 
-// ශිෂ්‍යයා enroll වී ඇති පන්ති අතුරින් active live class එකක් සොයා ගැනීම (Prepared Statement)
-$sql_live = "
-    SELECT c.subject, c.live_url, c.teacher_name
-    FROM enrollments e
-    JOIN classes c ON e.class_id = c.class_id
-    WHERE e.student_id = ? AND c.is_live = 1 
-    LIMIT 1 
-";
+$student_id = $_SESSION['student_id'];
 
-// Live Status/Title
-$class_title = $class_details ? htmlspecialchars($class_details['subject']) . ' by ' . htmlspecialchars($class_details['teacher_name']) : 'No Live Class Currently Available';
-$info_message = $class_details ? 'You are now watching the live session for ' . htmlspecialchars($class_details['subject']) . '.' : 'Please check the Time Table for your next scheduled class.';
-$from_color = $class_details ? 'from-green-600' : 'from-yellow-600';
-$to_color = $class_details ? 'to-teal-600' : 'to-orange-600';
+// 1. සිසුවා Active වී ඇති පන්ති වල IDs ලබා ගැනීම
+$enrolled_ids = [];
+$e_sql = "SELECT class_id FROM enrollments WHERE student_id = ? AND status = 1";
+$stmt = $conn->prepare($e_sql);
+$stmt->bind_param("i", $student_id);
+$stmt->execute();
+$res = $stmt->get_result();
+while($r = $res->fetch_assoc()){ $enrolled_ids[] = $r['class_id']; }
+
+$live_classes = [];
+
+if (!empty($enrolled_ids)) {
+    $ids_str = implode(',', $enrolled_ids);
+    
+    // 2. අදාළ පන්ති වල Approved Live Classes/Recordings ලබා ගැනීම
+    $sql = "SELECT l.*, c.class_name, c.subject 
+            FROM live_classes l 
+            JOIN classes c ON l.class_id = c.class_id 
+            WHERE l.class_id IN ($ids_str) AND l.status = 1 
+            ORDER BY l.start_time DESC";
+            
+    $live_classes = $conn->query($sql);
+}
 ?>
 
-<div class="flex-1 flex flex-col h-screen overflow-y-auto">
+<div class="flex-1 flex flex-col h-screen overflow-y-auto bg-gray-50">
+    <main class="p-4 md:p-8">
+        <h1 class="text-3xl font-bold text-slate-800 mb-2">Live Classes & Recordings 🔴</h1>
+        <p class="text-slate-500 mb-8">Join live sessions or watch past recordings.</p>
 
-    <main class="p-8 pt-2">
-
-        <div
-            class="bg-gradient-to-r <?php echo $from_color; ?> <?php echo $to_color; ?> rounded-2xl p-8 text-white mb-8 shadow-lg relative overflow-hidden opacity-80">
-            <div class="relative z-10">
-                <h1 class="text-3xl font-bold mb-2"><?php echo $class_title; ?> 🎥</h1>
-                <p class="opacity-90"><?php echo $info_message; ?></p>
-            </div>
-            <i class="fas fa-video absolute -bottom-4 -right-4 text-9xl text-white opacity-10 transform rotate-12"></i>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-lg p-6">
-            <h2 class="text-2xl font-bold mb-4">Current Live Class</h2>
-
-            <?php if ($class_details && $class_details['live_url']): ?>
-                <div class="aspect-w-16 aspect-h-9">
-                    <iframe src="<?php echo $live_url; ?>" title="<?php echo $class_title; ?>" frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen class="w-full h-full rounded-lg">
-                    </iframe>
-                </div>
-            <?php else: ?>
-                <div
-                    class="flex flex-col items-center justify-center py-20 text-center bg-gray-50 rounded-lg border border-dashed border-gray-200">
-                    <i class="fas fa-satellite-dish text-5xl text-gray-400 mb-4"></i>
-                    <h3 class="text-xl font-bold text-gray-500">No Live Stream</h3>
-                    <p class="text-sm text-gray-400 mt-1">There are no ongoing live sessions for your enrolled classes right
-                        now.</p>
-                    <a href="time_table.php"
-                        class="mt-4 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
-                        View Time Table
+        <?php if (!empty($live_classes) && $live_classes->num_rows > 0): ?>
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <?php while ($row = $live_classes->fetch_assoc()): 
+                    $is_live = ($row['type'] == 'Live');
+                    $card_color = $is_live ? 'border-red-200' : 'border-blue-200';
+                    $bg_badge = $is_live ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700';
+                    $icon = $is_live ? 'fa-video' : 'fa-play-circle';
+                ?>
+                <div class="bg-white rounded-xl shadow-sm border <?php echo $card_color; ?> p-6 hover:shadow-md transition">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="<?php echo $bg_badge; ?> px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                            <?php echo $is_live ? 'Live Session' : 'Recording'; ?>
+                        </span>
+                        <span class="text-xs text-slate-400 font-medium">
+                            <?php echo date('M d, h:i A', strtotime($row['start_time'])); ?>
+                        </span>
+                    </div>
+                    
+                    <h3 class="text-lg font-bold text-slate-800 mb-1"><?php echo htmlspecialchars($row['title']); ?></h3>
+                    <p class="text-sm text-slate-500 mb-4"><?php echo htmlspecialchars($row['subject']) . " - " . htmlspecialchars($row['class_name']); ?></p>
+                    
+                    <a href="<?php echo htmlspecialchars($row['class_link']); ?>" target="_blank" 
+                       class="block w-full text-center py-3 rounded-lg font-bold text-white transition 
+                       <?php echo $is_live ? 'bg-red-500 hover:bg-red-600 shadow-red-200' : 'bg-blue-500 hover:bg-blue-600 shadow-blue-200'; ?> shadow-lg">
+                        <i class="fas <?php echo $icon; ?> mr-2"></i> 
+                        <?php echo $is_live ? 'Join Now' : 'Watch Recording'; ?>
                     </a>
                 </div>
-            <?php endif; ?>
-
-        </div>
+                <?php endwhile; ?>
+            </div>
+        <?php else: ?>
+            <div class="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
+                <i class="fas fa-video-slash text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">No active live classes or recordings available for your enrolled subjects.</p>
+            </div>
+        <?php endif; ?>
     </main>
 </div>
+<?php include('../includes/footer.php'); ?>

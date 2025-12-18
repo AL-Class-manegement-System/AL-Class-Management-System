@@ -1,184 +1,184 @@
 <?php
+// admin/manage_live_class.php
 session_start();
-include('includes/auth.php'); 
+include('includes/auth.php');
 include('db_con.php');
 
-$message = null;
-$error = null;
+$message = "";
 
-// ==========================================
-// ACTION: Set Live Class (Secure Prepared Statement)
-// ==========================================
-if (isset($_POST['set_live'])) {
-    $class_id = intval($_POST['class_id']);
-    $live_url = trim($_POST['live_url']);
-    $subject = trim($_POST['subject']); // To get the subject name for success message
+// 1. Approve / Reject / Delete Actions
+if (isset($_GET['action']) && isset($_GET['id'])) {
+    $id = intval($_GET['id']);
+    $action = $_GET['action'];
 
-    if (!empty($class_id) && !empty($live_url)) {
-        
-        // 1. Deactivate all existing live classes (Set is_live = 0)
-        $deactivate_sql = "UPDATE classes SET is_live = 0 WHERE is_live = 1";
-        if (!$conn->query($deactivate_sql)) {
-            $error = "Error deactivating old class: " . $conn->error;
-        }
+    if ($action == 'approve') {
+        $conn->query("UPDATE live_classes SET status = 1 WHERE live_id = $id");
+        $message = "Class Approved Successfully!";
+    } elseif ($action == 'reject') {
+        $conn->query("UPDATE live_classes SET status = 2 WHERE live_id = $id");
+        $message = "Class Rejected!";
+    } elseif ($action == 'delete') {
+        $conn->query("DELETE FROM live_classes WHERE live_id = $id");
+        $message = "Class Deleted!";
+    }
+}
 
-        if (!$error) {
-            // 2. Activate the selected class and set its URL
-            $activate_sql = "UPDATE classes SET is_live = 1, live_url = ? WHERE class_id = ?";
-            $activate_stmt = $conn->prepare($activate_sql);
-            
-            if ($activate_stmt) {
-                // Live URL එකට අනවශ්‍ය පරාමිතීන් තිබේ නම් ඒවා ඉවත් කිරීම
-                $clean_live_url = preg_replace('/(\?.*)?$/', '', $live_url); 
-                
-                $activate_stmt->bind_param("si", $clean_live_url, $class_id);
-                
-                if ($activate_stmt->execute()) {
-                    $message = "Successfully set **" . htmlspecialchars($subject) . "** as the live class!";
-                } else {
-                    $error = "Error setting new live class: " . $activate_stmt->error;
-                }
-                $activate_stmt->close();
-            } else {
-                $error = "Database Prepare Error (Activate): " . $conn->error;
-            }
-        }
+// 2. Admin Direct Add (Auto Approved)
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['admin_add_class'])) {
+    $title = $_POST['title'];
+    $class_id = $_POST['class_id'];
+    $type = $_POST['type']; // Live or Recording
+    $link = $_POST['link'];
+    $start_time = $_POST['start_time'];
+
+    // Admin adds -> Status 1 (Approved)
+    $sql = "INSERT INTO live_classes (title, class_id, teacher_id, type, class_link, start_time, status) VALUES (?, ?, 0, ?, ?, ?, 1)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sisss", $title, $class_id, $type, $link, $start_time);
+    if($stmt->execute()){
+        $message = "Class Added & Approved!";
     } else {
-        $error = "Please select a class and provide a valid Live URL.";
+        $message = "Error adding class.";
     }
 }
 
-// ==========================================
-// ACTION: Stop Live Class (Secure Prepared Statement)
-// ==========================================
-if (isset($_POST['stop_live'])) {
-    $deactivate_sql = "UPDATE classes SET is_live = 0 WHERE is_live = 1";
-    if ($conn->query($deactivate_sql)) {
-        $message = "Live session successfully terminated.";
-    } else {
-        $error = "Error stopping live session: " . $conn->error;
-    }
-}
+// Get Pending Classes
+$pending = $conn->query("SELECT l.*, c.class_name, t.full_name FROM live_classes l 
+                         JOIN classes c ON l.class_id = c.class_id 
+                         LEFT JOIN teachers t ON l.teacher_id = t.teacher_id 
+                         WHERE l.status = 0 ORDER BY l.created_at DESC");
 
+// Get Approved Classes
+$approved = $conn->query("SELECT l.*, c.class_name, t.full_name FROM live_classes l 
+                          JOIN classes c ON l.class_id = c.class_id 
+                          LEFT JOIN teachers t ON l.teacher_id = t.teacher_id 
+                          WHERE l.status = 1 ORDER BY l.start_time DESC");
 
-// ==========================================
-// DATA FETCHING: Active Classes and Current Live Status
-// ==========================================
-
-// Fetch all active classes to populate the dropdown
-$classes = [];
-$class_sql = "SELECT class_id, class_name, subject, teacher_name, stream FROM classes WHERE status = 1 ORDER BY subject ASC";
-$class_res = $conn->query($class_sql);
-if ($class_res) {
-    while ($row = $class_res->fetch_assoc()) {
-        $classes[] = $row;
-    }
-}
-
-// Check for the currently live class
-$current_live_class = null;
-$live_sql = "SELECT class_id, class_name, subject, teacher_name, live_url FROM classes WHERE is_live = 1 LIMIT 1";
-$live_res = $conn->query($live_sql);
-if ($live_res && $live_res->num_rows > 0) {
-    $current_live_class = $live_res->fetch_assoc();
-}
-
+$classes = $conn->query("SELECT * FROM classes");
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Live Class Management | Admin</title>
+    <title>Manage Live Classes</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Poppins', sans-serif; } </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-gray-100 font-sans antialiased">
-    <div class="flex">
-        <?php include('includes/sidebar.php'); ?>
-        <div class="ml-64 flex-1">
-            <main class="p-8">
-                <h1 class="text-3xl font-bold text-gray-800 mb-6">🎥 Live Class Management</h1>
-                <hr class="mb-6">
+<body class="bg-gray-100 font-sans">
+    <?php include('includes/sidebar.php'); ?>
 
-                <?php if ($message): ?>
-                    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm">
-                        <?php echo $message; ?>
-                    </div>
-                <?php endif; ?>
-                <?php if ($error): ?>
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded shadow-sm">
-                        <p class="font-bold">Error</p>
-                        <p class="text-sm"><?php echo $error; ?></p>
-                    </div>
-                <?php endif; ?>
+    <div class="ml-64 p-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Manage Live Classes & Recordings</h2>
 
-                <?php if ($current_live_class): ?>
-                
-                <div class="bg-indigo-600 text-white rounded-xl shadow-lg p-6 mb-8 border border-indigo-700">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-video text-3xl animate-pulse"></i>
-                            <div>
-                                <h2 class="text-2xl font-bold">LIVE NOW: <?php echo htmlspecialchars($current_live_class['subject']); ?></h2>
-                                <p class="text-indigo-200">Teacher: <?php echo htmlspecialchars($current_live_class['teacher_name']); ?> (<?php echo htmlspecialchars($current_live_class['class_name']); ?>)</p>
-                            </div>
-                        </div>
-                        <form method="POST" onsubmit="return confirm('Are you sure you want to stop the live session?');">
-                            <button type="submit" name="stop_live" class="bg-red-500 text-white px-5 py-2 rounded-lg font-bold hover:bg-red-600 transition shadow-md">
-                                <i class="fas fa-stop-circle mr-2"></i> STOP LIVE
-                            </button>
-                        </form>
-                    </div>
-                    <p class="mt-4 text-sm bg-indigo-500 p-2 rounded">
-                        <i class="fas fa-link mr-2"></i> URL: <?php echo htmlspecialchars($current_live_class['live_url']); ?>
-                    </p>
+        <?php if($message): ?>
+            <div class="bg-green-100 text-green-700 p-4 rounded mb-4 font-bold border border-green-200"><?php echo $message; ?></div>
+        <?php endif; ?>
+
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-8 shadow-sm">
+            <h3 class="text-xl font-bold text-yellow-800 mb-4 flex items-center gap-2"><i class="fas fa-clock"></i> Pending Approvals</h3>
+            
+            <?php if($pending->num_rows > 0): ?>
+            <div class="overflow-x-auto bg-white rounded-lg shadow">
+                <table class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3">Title</th>
+                            <th class="px-6 py-3">Type</th>
+                            <th class="px-6 py-3">Teacher</th>
+                            <th class="px-6 py-3">Class</th>
+                            <th class="px-6 py-3">Time</th>
+                            <th class="px-6 py-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while($row = $pending->fetch_assoc()): ?>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 font-bold"><?php echo htmlspecialchars($row['title']); ?></td>
+                            <td class="px-6 py-4">
+                                <?php echo ($row['type'] == 'Live') ? '<span class="text-red-600 font-bold">Live</span>' : '<span class="text-blue-600 font-bold">Rec</span>'; ?>
+                            </td>
+                            <td class="px-6 py-4"><?php echo htmlspecialchars($row['full_name']); ?></td>
+                            <td class="px-6 py-4"><?php echo htmlspecialchars($row['class_name']); ?></td>
+                            <td class="px-6 py-4"><?php echo $row['start_time']; ?></td>
+                            <td class="px-6 py-4 flex gap-2">
+                                <a href="?action=approve&id=<?php echo $row['live_id']; ?>" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-xs">Approve</a>
+                                <a href="?action=reject&id=<?php echo $row['live_id']; ?>" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs" onclick="return confirm('Reject?')">Reject</a>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php else: ?>
+                <p class="text-gray-500 italic">No pending classes.</p>
+            <?php endif; ?>
+        </div>
+
+        <div class="bg-white rounded-xl shadow p-6 mb-8 border border-gray-200">
+            <h3 class="text-lg font-bold text-gray-700 mb-4">Direct Add (Admin)</h3>
+            <form method="POST" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                <div>
+                    <label class="text-xs font-bold text-gray-600">Title</label>
+                    <input type="text" name="title" class="w-full border p-2 rounded text-sm" required>
                 </div>
-
-                <?php else: ?>
-
-                <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
-                    <h2 class="text-xl font-bold text-gray-700 mb-4 flex items-center gap-2">
-                        <i class="fas fa-play-circle text-green-600"></i> Start New Live Session
-                    </h2>
-                    <form method="POST" action="">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            
-                            <div>
-                                <label for="class_id" class="block text-sm font-medium text-gray-700 mb-2">Select Class to Go Live</label>
-                                <select id="class_id" name="class_id" required 
-                                        class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                                        onchange="document.getElementById('subject_name_hidden').value=this.options[this.selectedIndex].text.split(' | ')[0]">
-                                    <option value="" disabled selected>-- Select an Active Class --</option>
-                                    <?php foreach ($classes as $class): ?>
-                                    <option value="<?php echo $class['class_id']; ?>">
-                                        <?php echo htmlspecialchars($class['subject']) . " | " . htmlspecialchars($class['class_name']); ?>
-                                    </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <input type="hidden" id="subject_name_hidden" name="subject" value="">
-                            </div>
-
-                            <div>
-                                <label for="live_url" class="block text-sm font-medium text-gray-700 mb-2">YouTube Embed URL</label>
-                                <input type="text" id="live_url" name="live_url" placeholder="Ex: https://www.youtube.com/embed/dQw4w9WgXcQ" required
-                                       class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
-                                <p class="text-xs text-gray-500 mt-1">Use a YouTube *Embed* URL (e.g. `https://www.youtube.com/embed/VIDEO_ID`) or similar.</p>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-end pt-4 border-t border-gray-100">
-                            <button type="submit" name="set_live" class="px-6 py-3 rounded-lg bg-indigo-600 text-white font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition transform hover:-translate-y-0.5">
-                                <i class="fas fa-broadcast-tower mr-2"></i> Go Live Now
-                            </button>
-                        </div>
-                    </form>
+                <div>
+                    <label class="text-xs font-bold text-gray-600">Class</label>
+                    <select name="class_id" class="w-full border p-2 rounded text-sm" required>
+                        <?php while($c = $classes->fetch_assoc()) { echo "<option value='{$c['class_id']}'>{$c['class_name']}</option>"; } ?>
+                    </select>
                 </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600">Type</label>
+                    <select name="type" class="w-full border p-2 rounded text-sm" required>
+                        <option value="Live">Live Class</option>
+                        <option value="Recording">Recording</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600">Time</label>
+                    <input type="datetime-local" name="start_time" class="w-full border p-2 rounded text-sm" required>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600">Link</label>
+                    <input type="text" name="link" class="w-full border p-2 rounded text-sm" placeholder="URL" required>
+                </div>
+                <button type="submit" name="admin_add_class" class="bg-indigo-600 text-white px-4 py-2 rounded font-bold hover:bg-indigo-700">Add</button>
+            </form>
+        </div>
 
-                <?php endif; ?>
-            </main>
+        <div class="bg-white rounded-xl shadow overflow-hidden">
+            <div class="px-6 py-4 border-b bg-gray-50">
+                <h3 class="font-bold text-gray-800">Approved Live Classes & Recordings</h3>
+            </div>
+            <table class="w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                    <tr>
+                        <th class="px-6 py-3">Title</th>
+                        <th class="px-6 py-3">Type</th>
+                        <th class="px-6 py-3">Class</th>
+                        <th class="px-6 py-3">Time</th>
+                        <th class="px-6 py-3">Link</th>
+                        <th class="px-6 py-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while($row = $approved->fetch_assoc()): ?>
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($row['title']); ?></td>
+                        <td class="px-6 py-4">
+                            <?php echo ($row['type'] == 'Live') ? '<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">Live</span>' : '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">Rec</span>'; ?>
+                        </td>
+                        <td class="px-6 py-4"><?php echo htmlspecialchars($row['class_name']); ?></td>
+                        <td class="px-6 py-4"><?php echo $row['start_time']; ?></td>
+                        <td class="px-6 py-4"><a href="<?php echo $row['class_link']; ?>" target="_blank" class="text-blue-500 underline">Join</a></td>
+                        <td class="px-6 py-4">
+                            <a href="?action=delete&id=<?php echo $row['live_id']; ?>" onclick="return confirm('Delete?')" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </body>

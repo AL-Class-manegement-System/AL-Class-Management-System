@@ -1,6 +1,5 @@
 <?php 
-// admin/student.php - Fixed to use prepared statements for secure filtering.
-
+// admin/student.php
 include 'db_con.php'; 
 ?>
 
@@ -86,8 +85,16 @@ include 'db_con.php';
                     </div>
 
                     <div class="flex gap-2">
-                        <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition shadow-lg shadow-indigo-500/30">
+                        <button type="submit" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition shadow-lg shadow-indigo-500/30">
                             <i class="fas fa-filter mr-1"></i> Filter
+                        </button>
+
+                        <button type="submit" formaction="export_students.php" name="action" value="csv" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition shadow-lg" title="Download CSV">
+                            <i class="fas fa-file-csv mr-1"></i> CSV
+                        </button>
+
+                        <button type="submit" formaction="export_students.php" name="action" value="pdf" formtarget="_blank" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition shadow-lg" title="Print PDF">
+                            <i class="fas fa-file-pdf mr-1"></i> PDF
                         </button>
                         
                         <?php if(isset($_GET['search']) || isset($_GET['stream']) || isset($_GET['batch'])): ?>
@@ -114,12 +121,10 @@ include 'db_con.php';
                         <tbody class="bg-white divide-y divide-gray-200">
                             
                             <?php
-                            // 1. Base Query
                             $sql = "SELECT * FROM students WHERE 1=1";
                             $params = [];
                             $types = '';
 
-                            // 2. Safely add search conditions (Prepared Statements)
                             if(isset($_GET['search']) && !empty($_GET['search'])){
                                 $search = "%" . $_GET['search'] . "%";
                                 $sql .= " AND (full_name LIKE ? OR reg_number LIKE ?)";
@@ -155,8 +160,7 @@ include 'db_con.php';
                                 $result = $stmt->get_result();
                                 $stmt->close();
                             } else {
-                                // If prepare fails, set an error message
-                                echo "<tr><td colspan='5' class='text-center py-8 text-red-500'>Database Query Error. Please check SQL syntax.</td></tr>";
+                                echo "<tr><td colspan='5' class='text-center py-8 text-red-500'>Database Query Error.</td></tr>";
                             }
 
 
@@ -169,11 +173,10 @@ include 'db_con.php';
                                     $status_color = $is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
                                     $status_text = $is_active ? 'Active' : 'Inactive';
                                     
-                                    // Image Path Logic
                                     $photo_name = $row['photo'];
                                     $photo_path = (!empty($photo_name) && file_exists("../assets/images/students/" . $photo_name)) 
                                         ? "../assets/images/students/" . $photo_name 
-                                        : "../assets/images/user2.jpg"; // Default image path
+                                        : "../assets/images/user2.jpg"; 
                             ?>
 
                             <tr class="hover:bg-gray-50 transition">
@@ -202,6 +205,12 @@ include 'db_con.php';
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
                                     
+                                    <a href="student_enrollments.php?student_id=<?php echo $row['student_id']; ?>" 
+                                       class="p-2 rounded-lg text-blue-600 bg-blue-50 hover:bg-blue-100 transition border border-blue-200" 
+                                       title="View Enrollment History">
+                                        <i class="fas fa-history"></i>
+                                    </a>
+
                                     <a href="print_id_card.php?id=<?php echo $row['student_id']; ?>" target="_blank" class="p-2 rounded-lg text-purple-600 bg-purple-50 hover:bg-purple-100 transition" title="Print ID Card">
                                         <i class="fas fa-id-card"></i>
                                     </a>

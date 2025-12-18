@@ -1,210 +1,218 @@
 <?php
-// 1. Session Start 
+// teacher_portal/pages/upload_materials.php
+// Updated: Fixed Page Refresh Issue (Form Resubmission) using Redirect
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// ==========================================
-// TEACHER DATA SETUP & SECURITY CHECK
-// ==========================================
-// DB ID එක ලබා ගැනීම: loginbackend.php මගින් සකසන ලද numeric ID එක
-$teacher_db_id = $_SESSION['teacher_db_id'] ?? null; 
-$teacher_name = $_SESSION['full_name'] ?? 'Teacher';
-$teacher_subject = $_SESSION['subject'] ?? 'General'; // මෙම විෂය Session එකේ set කර ඇත්දැයි පරීක්ෂා කරන්න
+include('../../includes/connection.php');
 
-// back to login if no teacher DB ID or ID is invalid
-if (!isset($teacher_db_id) || !is_numeric($teacher_db_id) || $teacher_db_id <= 0) {
+// ගුරුවරයාගේ දත්ත ලබා ගැනීම
+$teacher_db_id = $_SESSION['teacher_db_id'] ?? null;
+
+if (!$teacher_db_id) {
     header("Location: ../../log/login.php");
     exit();
 }
 
-// 3. Path variable setup
-$path = "../../"; 
-$page_title = "Upload Study Materials"; 
+// ගුරුවරයාගේ නම ලබා ගැනීම
+$t_sql = "SELECT full_name, subject FROM teachers WHERE teacher_id = ?";
+$t_stmt = $conn->prepare($t_sql);
+$t_stmt->bind_param("i", $teacher_db_id);
+$t_stmt->execute();
+$t_res = $t_stmt->get_result();
+$teacher_data = $t_res->fetch_assoc();
+$teacher_name = $teacher_data['full_name'];
+$teacher_subject = $teacher_data['subject'];
 
-// 4. Include Head and Connection
-include("../include/head.php"); 
-require_once $path . 'includes/connection.php'; // Database connection ($conn)
+// ගුරුවරයාට අදාළ පන්ති ලැයිස්තුව ලබා ගැනීම
+$class_sql = "SELECT class_id, class_name FROM classes WHERE teacher_name = ?";
+$class_stmt = $conn->prepare($class_sql);
+$class_stmt->bind_param("s", $teacher_name);
+$class_stmt->execute();
+$classes_result = $class_stmt->get_result();
 
-// ==========================================
-// FILE UPLOAD AND DB INSERT LOGIC
-// ==========================================
 $message = "";
 $msg_type = "";
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['upload_material'])) {
-    
-    $material_title = trim($_POST['material_title']);
-    $material_type = $_POST['material_type'];
-    $subject_name = $teacher_subject;
-
-    if (empty($material_title) || strlen($material_title) > 255) {
-        $message = "Error: Material title is required and must be under 255 characters.";
+// ---------------------------------------------------------
+// 1. Success Message එක URL එකෙන් ලබා ගැනීම (Redirect වූ පසු)
+// ---------------------------------------------------------
+if (isset($_GET['msg'])) {
+    if ($_GET['msg'] == 'success') {
+        $message = "Material uploaded successfully! Sent for Admin Approval.";
+        $msg_type = "green";
+    } elseif ($_GET['msg'] == 'error_db') {
+        $message = "Database Error occurred.";
         $msg_type = "red";
-        goto end_upload_logic;
-    }
-
-    if (isset($_FILES['material_file']) && $_FILES['material_file']['error'] == 0) {
-        
-        $subject_folder = str_replace([' ', '/', '&'], '_', strtolower($subject_name));
-        $target_dir = $path . "assets/study_materials/" . $subject_folder . "/"; 
-        
-        if (!is_dir($target_dir)) {
-            if (!mkdir($target_dir, 0777, true)) {
-                $message = "Error: Could not create upload directory. Check server permissions.";
-                $msg_type = "red";
-                goto end_upload_logic;
-            }
-        }
-
-        $file_name = basename($_FILES["material_file"]["name"]);
-        $file_extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-        $new_file_name = uniqid('material_') . '.' . $file_extension;
-        $target_file = $target_dir . $new_file_name;
-        
-        $uploadOk = 1;
-
-        if ($_FILES["material_file"]["size"] > 50000000) {
-            $message = "Sorry, your file is too large (max 50MB).";
-            $msg_type = "red";
-            $uploadOk = 0;
-        } 
-        if (!in_array($file_extension, ['pdf', 'doc', 'docx', 'zip', 'rar'])) {
-            $message = "Sorry, only PDF, DOC/DOCX, ZIP & RAR files are allowed.";
-            $msg_type = "red";
-            $uploadOk = 0;
-        }
-        
-        if ($uploadOk == 1) {
-            if (move_uploaded_file($_FILES["material_file"]["tmp_name"], $target_file)) {
-                
-                $relative_path = "assets/study_materials/" . $subject_folder . "/" . $new_file_name;
-
-                // 🌟 DB INSERT: teacher_id ලෙස $teacher_db_id භාවිතා කරයි.
-                $sql = "INSERT INTO study_materials (teacher_id, subject_name, material_title, material_type, file_path, upload_date, status) VALUES (?, ?, ?, ?, ?, CURDATE(), 1)";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("issss", $teacher_db_id, $subject_name, $material_title, $material_type, $relative_path); // 'i' is used for DB ID
-
-                if ($stmt->execute()) {
-                    $message = "Study material '" . htmlspecialchars($material_title) . "' uploaded successfully!";
-                    $msg_type = "green";
-                } else {
-                    $message = "File uploaded, but database error: " . $conn->error;
-                    $msg_type = "red";
-                    unlink($target_file);
-                }
-                $stmt->close();
-            } else {
-                $error_code = $_FILES["material_file"]["error"];
-                $message = "Sorry, there was an error uploading your file (Code: {$error_code}). Check server permissions.";
-                $msg_type = "red";
-            }
-        }
-    } else {
-        $message = "Please select a file to upload.";
+    } elseif ($_GET['msg'] == 'error_upload') {
+        $message = "File upload failed.";
+        $msg_type = "red";
+    } elseif ($_GET['msg'] == 'error_type') {
+        $message = "Invalid file type.";
+        $msg_type = "red";
+    } elseif ($_GET['msg'] == 'error_file') {
+        $message = "Please select a file.";
         $msg_type = "red";
     }
 }
-end_upload_logic:
+
+// ---------------------------------------------------------
+// 2. Form Submission Handling (POST)
+// ---------------------------------------------------------
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['upload_material'])) {
+
+    $title = trim($_POST['material_title']);
+    $class_id = intval($_POST['class_id']);
+
+    // File Validation
+    if (isset($_FILES['material_file']) && $_FILES['material_file']['error'] == 0) {
+        $allowed = ['pdf', 'doc', 'docx', 'zip', 'rar', 'jpg', 'png'];
+        $filename = $_FILES['material_file']['name'];
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+        if (in_array($ext, $allowed)) {
+            // Upload Path
+            $upload_dir = "../../uploads/study_materials/";
+
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+
+            $new_filename = "mat_" . time() . "_" . uniqid() . "." . $ext;
+            $target_file = $upload_dir . $new_filename;
+            $db_path = "uploads/study_materials/" . $new_filename;
+
+            if (move_uploaded_file($_FILES['material_file']['tmp_name'], $target_file)) {
+                
+                // Status = 0 (Pending Approval)
+                $sql = "INSERT INTO study_materials (title, class_id, file_path, uploaded_by, uploaded_on, status) VALUES (?, ?, ?, ?, NOW(), 0)";
+                
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("sisi", $title, $class_id, $db_path, $teacher_db_id);
+
+                if ($stmt->execute()) {
+                    // === SOLUTION ===
+                    // සාර්ථක වූ පසු Redirect කරන්න. එවිට Refresh කළාට ප්‍රශ්නයක් නැත.
+                    header("Location: upload_materials.php?msg=success");
+                    exit(); 
+                } else {
+                    header("Location: upload_materials.php?msg=error_db");
+                    exit();
+                }
+            } else {
+                header("Location: upload_materials.php?msg=error_upload");
+                exit();
+            }
+        } else {
+            header("Location: upload_materials.php?msg=error_type");
+            exit();
+        }
+    } else {
+        header("Location: upload_materials.php?msg=error_file");
+        exit();
+    }
+}
+
+include("../include/head.php");
+include("../include/sidebar.php");
 ?>
 
-<?php include("../include/sidebar.php"); ?>
-
 <div class="p-4 sm:ml-64 pb-20">
-    <div class="flex items-center justify-between p-4 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm">
-        <h2 class="text-xl font-bold text-gray-800"><?php echo $page_title; ?></h2>
-        <div class="text-sm font-semibold text-gray-600">
-            Your Subject: <span class="text-blue-600 font-bold"><?php echo htmlspecialchars($teacher_subject); ?></span>
-        </div>
-    </div>
-
-    <?php if ($message): 
-        $colorClass = ($msg_type == 'green') ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-100 text-red-700 border-red-200';
-    ?>
-    <div id="msg" class="<?php echo $colorClass; ?> px-4 py-3 rounded-lg text-sm font-medium mb-6 shadow-sm border flex items-center gap-2">
-        <i class="ph ph-info text-lg"></i> <?php echo $message; ?>
-    </div>
-    <?php endif; ?>
-
     <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6">
-        <h5 class="text-lg font-bold leading-none text-gray-900 mb-6">Upload New Material</h5>
-        
-        <form method="POST" action="" enctype="multipart/form-data">
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <div>
-                    <label for="material_title" class="block mb-2 text-sm font-medium text-gray-900">Material Title</label>
-                    <input type="text" id="material_title" name="material_title" maxlength="255" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required placeholder="e.g., Integration Past Paper 2023">
-                </div>
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Upload Study Materials</h2>
 
+        <?php if ($message): ?>
+            <div class="p-4 mb-4 text-sm rounded-lg flex items-center gap-2 <?php echo $msg_type == 'green' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' : 'bg-red-100 text-red-700 border border-red-200'; ?>">
+                <i class="fas <?php echo $msg_type == 'green' ? 'fa-clock' : 'fa-exclamation-circle'; ?>"></i>
+                <?php echo $message; ?>
+            </div>
+        <?php endif; ?>
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="material_type" class="block mb-2 text-sm font-medium text-gray-900">Material Type</label>
-                    <select id="material_type" name="material_type" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
-                        <option value="">Select Type</option>
-                        <option value="Notes">Lesson Notes</option>
-                        <option value="Past Paper">Past Paper</option>
-                        <option value="Model Paper">Model Paper</option>
-                        <option value="Assignment">Assignment / Worksheet</option>
-                        <option value="Reading">Extra Reading Material</option>
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Material Title</label>
+                    <input type="text" name="material_title"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" required
+                        placeholder="Ex: Combined Maths Unit 1 Tute">
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Select Class</label>
+                    <select name="class_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" required>
+                        <option value="">-- Choose Class --</option>
+                        <?php while ($row = $classes_result->fetch_assoc()): ?>
+                            <option value="<?php echo $row['class_id']; ?>">
+                                <?php echo htmlspecialchars($row['class_name']); ?>
+                            </option>
+                        <?php endwhile; ?>
                     </select>
                 </div>
-
                 <div class="md:col-span-2">
-                    <label for="material_file" class="block mb-2 text-sm font-medium text-gray-900">Upload File (PDF, DOCX, ZIP/RAR max 50MB)</label>
-                    <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none p-2" 
-                           id="material_file" name="material_file" type="file" required accept=".pdf,.doc,.docx,.zip,.rar">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Upload File (PDF, DOC, ZIP, IMG)</label>
+                    <input type="file" name="material_file"
+                        class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
+                        required>
+                    <p class="mt-1 text-xs text-gray-500">Allowed formats: PDF, Word, Zip, JPG, PNG.</p>
                 </div>
             </div>
-
-            <button type="submit" name="upload_material" class="mt-6 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors">
-                <i class="ph ph-upload simple-bold mr-2"></i> Upload Material
+            <button type="submit" name="upload_material"
+                class="mt-6 text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 transition flex items-center gap-2">
+                <i class="fas fa-cloud-upload-alt"></i> Upload & Request Approval
             </button>
         </form>
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-        <h5 class="text-lg font-bold leading-none text-gray-900 mb-6">Your Recently Uploaded Materials</h5>
-        
-        <?php
-        // 🌟 LIST SELECT: teacher_id මත පදනම්ව filter කිරීම
-        $list_sql = "SELECT material_title, material_type, upload_date, file_path FROM study_materials WHERE teacher_id = ? AND status = 1 ORDER BY upload_date DESC LIMIT 10";
-        $list_stmt = $conn->prepare($list_sql);
-        $list_stmt->bind_param("i", $teacher_db_id); // $teacher_db_id is used for filtering
-        $list_stmt->execute();
-        $list_result = $list_stmt->get_result();
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-lg font-bold text-gray-800">My Upload Status</h3>
+        </div>
+        <div class="p-6">
+            <?php
+            $his_sql = "SELECT sm.*, c.class_name FROM study_materials sm 
+                        JOIN classes c ON sm.class_id = c.class_id 
+                        WHERE sm.uploaded_by = ? ORDER BY sm.uploaded_on DESC LIMIT 10";
+            $his_stmt = $conn->prepare($his_sql);
+            $his_stmt->bind_param("i", $teacher_db_id);
+            $his_stmt->execute();
+            $res = $his_stmt->get_result();
+            ?>
 
-        if ($list_result->num_rows > 0) {
-            echo '<ul class="divide-y divide-gray-200">';
-            while ($item = $list_result->fetch_assoc()) {
-                // File path: teacher_portal/pages/ සිට project root වෙත යාමට '../../'
-                $download_path = '../../' . htmlspecialchars($item['file_path']);
-                
-                echo '<li class="py-3 sm:py-4">';
-                echo '<div class="flex items-center justify-between space-x-4 rtl:space-x-reverse">';
-                
-                echo '<div class="flex-1 min-w-0 flex items-center gap-3">';
-                echo '<div class="flex-shrink-0 text-blue-500"><i class="ph ph-file-text text-xl"></i></div>';
-                echo '<div>';
-                echo '<p class="text-sm font-medium text-gray-900 truncate">' . htmlspecialchars($item['material_title']) . '</p>';
-                echo '<p class="text-xs text-gray-500 truncate">' . htmlspecialchars($item['material_type']) . ' | Uploaded: ' . date('M d, Y', strtotime($item['upload_date'])) . '</p>';
-                echo '</div>';
-                echo '</div>';
-                
-                echo '<a href="' . $download_path . '" target="_blank" class="inline-flex items-center text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 px-3 py-1.5 rounded-lg transition">';
-                echo '<i class="ph ph-download-simple text-sm mr-1"></i> View';
-                echo '</a>';
-                
-                echo '</div>';
-                echo '</li>';
-            }
-            echo '</ul>';
-        } else {
-            echo '<p class="text-sm text-gray-500">No materials uploaded for '.htmlspecialchars($teacher_subject).' yet.</p>';
-        }
-        $list_stmt->close();
-        ?>
+            <?php if ($res->num_rows > 0): ?>
+                <ul class="divide-y divide-gray-100">
+                    <?php while ($row = $res->fetch_assoc()): 
+                        $status_label = "";
+                        // Status Logic
+                        if ($row['status'] == 1) {
+                            $status_label = '<span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded border border-green-200"><i class="fas fa-check-circle"></i> Approved</span>';
+                        } elseif ($row['status'] == 2) {
+                            $status_label = '<span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded border border-red-200"><i class="fas fa-times-circle"></i> Rejected</span>';
+                        } else {
+                            $status_label = '<span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded border border-yellow-200"><i class="fas fa-clock"></i> Pending</span>';
+                        }
+                    ?>
+                        <li class="py-4 flex justify-between items-center hover:bg-gray-50 transition px-2 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900"><?php echo htmlspecialchars($row['title']); ?></p>
+                                    <p class="text-xs text-gray-500"><?php echo htmlspecialchars($row['class_name']); ?></p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <?php echo $status_label; ?>
+                                <p class="text-[10px] text-gray-400 mt-1"><?php echo date('Y-m-d H:i', strtotime($row['uploaded_on'])); ?></p>
+                            </div>
+                        </li>
+                    <?php endwhile; ?>
+                </ul>
+            <?php else: ?>
+                <p class="text-gray-500 text-center py-4">No uploads found.</p>
+            <?php endif; ?>
+        </div>
     </div>
-
-    <?php include("../include/footer.php"); ?>
 </div>
+<?php include("../include/footer.php"); ?>

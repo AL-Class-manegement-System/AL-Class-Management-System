@@ -1,117 +1,142 @@
 <?php
 // student_portal/pages/upload_slip_process.php
 session_start();
+include('../../includes/connection.php');
 
-// 1. Connection ෆයිල් එක නිවැරදිව සම්බන්ධ කරගැනීම
-// (ඔබේ ෆෝල්ඩර ව්‍යුහය අනුව මෙය වෙනස් විය හැක, නමුත් සාමාන්‍යයෙන් පියවර 2ක් ආපස්සට යාම හරි)
-if (file_exists('../../includes/connection.php')) {
-    include('../../includes/connection.php');
-} elseif (file_exists('../includes/connection.php')) {
-    include('../includes/connection.php');
-} else {
-    die("Error: Connection file not found. Check the path.");
-}
-
-// 2. Login වී නැත්නම් එලියට දැමීම
+// 1. Session & Login Check (ශිෂ්‍යයා ලොග් වී ඇත්දැයි බැලීම)
 if (!isset($_SESSION['student_id'])) {
-    die("<div style='color:red; text-align:center; margin-top:50px;'>
-            <h2>Access Denied!</h2>
-            <p>You are not logged in.</p>
-            <a href='../../log/login.php'>Go to Login</a>
-         </div>");
+    header("Location: ../../log/login.php");
+    exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-    $student_id = $_SESSION['student_id'];
-    $class_id = intval($_POST['class_id']); // Class ID එක පිරිසිදු කිරීම
-
-    // --- DEBUGGING: දෝෂය සොයා ගැනීමට ---
-    // echo "Student ID: " . $student_id . "<br>";
-    // echo "Class ID: " . $class_id . "<br>";
-    // ------------------------------------
-
-    // 3. ශිෂ්‍යයා සැබවින්ම Database එකේ සිටීදැයි පරීක්ෂා කිරීම (Validation)
-    $check_st = $conn->query("SELECT student_id FROM students WHERE student_id = $student_id");
-    if ($check_st->num_rows == 0) {
-        session_destroy(); // වැරදි Session එක මකා දැමීම
-        die("<div style='color:red; text-align:center; margin-top:50px; font-family:sans-serif;'>
-                <h1>Account Error!</h1>
-                <p>Your Student ID <b>($student_id)</b> does not exist in the database.</p>
-                <p>Please log out and register/login again.</p>
-                <a href='../../log/login.php' style='background:red; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;'>Login Again</a>
-             </div>");
-    }
-
-    // 4. පන්තියේ විස්තර ලබා ගැනීම
-    $class_res = $conn->query("SELECT fee FROM classes WHERE class_id = $class_id");
-    if ($class_res->num_rows == 0) {
-        die("Error: Invalid Class ID ($class_id). The class does not exist.");
-    }
-    $class_data = $class_res->fetch_assoc();
-    $amount = $class_data['fee'];
-    $month = date('F');
-    $year = date('Y');
-
-    // 5. ෆයිල් එක Upload කිරීම
-    if (isset($_FILES['slip_file']) && $_FILES['slip_file']['error'] == 0) {
-
-        $allowed = ['jpg', 'jpeg', 'png', 'pdf'];
-        $filename = $_FILES['slip_file']['name'];
-        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-
-        if (!in_array($ext, $allowed)) {
-            die("Error: Invalid file type. Only JPG, PNG, PDF allowed.");
-        }
-
-        $new_filename = "slip_" . $student_id . "_" . $class_id . "_" . time() . "." . $ext;
-        $upload_dir = "../../uploads/slips/";
-
-        if (!is_dir($upload_dir))
-            mkdir($upload_dir, 0777, true);
-
-        if (move_uploaded_file($_FILES['slip_file']['tmp_name'], $upload_dir . $new_filename)) {
-
-            // 6. Database එකට දත්ත ඇතුලත් කිරීම (Try-Catch සහිතව)
-            try {
-                $stmt = $conn->prepare("INSERT INTO payments (student_id, class_id, month, year, amount, payment_status, method, slip_image, payment_type, paid_date) 
-                                        VALUES (?, ?, ?, ?, ?, 'pending', 'Bank Slip', ?, 'Full', NOW())");
-
-                if ($stmt === false) {
-                    throw new Exception("Prepare failed: " . $conn->error);
-                }
-
-                $stmt->bind_param("iissdss", $student_id, $class_id, $month, $year, $amount, $new_filename);
-
-                if ($stmt->execute()) {
-                    // සාර්ථකයි!
-                    echo "<script>
-                            alert('Slip Uploaded Successfully! Please wait for Admin Approval.'); 
-                            window.location.href='my_classes.php';
-                          </script>";
-                } else {
-                    throw new Exception("Execute failed: " . $stmt->error);
-                }
-
-            } catch (mysqli_sql_exception $e) {
-                // මෙතනදී තමයි අර Error එක අල්ලන්නේ
-                die("<div style='color:red; padding:20px; font-family:monospace;'>
-                        <h3>Database Error Occurred:</h3>
-                        <p>" . $e->getMessage() . "</p>
-                        <p><b>Solution:</b> Ensure your Student ID exists. Try logging out and back in.</p>
-                     </div>");
-            } catch (Exception $e) {
-                die("Error: " . $e->getMessage());
-            }
-
-        } else {
-            die("Error: Failed to move uploaded file. Check folder permissions.");
-        }
-    } else {
-        die("Error: No file uploaded. Error Code: " . $_FILES['slip_file']['error']);
-    }
-} else {
+// 2. Request Method Check (POST හරහා පැමිණි ඉල්ලීමක් දැයි බැලීම)
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: my_classes.php");
     exit();
+}
+
+// =======================================================================
+// වැදගත්: Session එකෙන් එන Reg Number එකෙන් Database ID එක සොයා ගැනීම
+// =======================================================================
+// Session එකේ ඇත්තේ STxxxx වැනි අංකයකි (String), නමුත් Payments table එකට ඕනේ ID එක (Integer)
+$student_reg_no = $_SESSION['student_id']; 
+
+$st_sql = "SELECT student_id FROM students WHERE reg_number = ?";
+$st_stmt = $conn->prepare($st_sql);
+$st_stmt->bind_param("s", $student_reg_no);
+$st_stmt->execute();
+$st_res = $st_stmt->get_result();
+
+if ($st_res->num_rows > 0) {
+    $row = $st_res->fetch_assoc();
+    $student_db_id = $row['student_id']; // මෙය තමයි Integer ID එක
+} else {
+    echo "<script>alert('Error: Student profile not found.'); window.history.back();</script>";
+    exit();
+}
+$st_stmt->close();
+
+// 3. Class ID Check
+$class_id = isset($_POST['class_id']) ? intval($_POST['class_id']) : 0;
+if ($class_id == 0) {
+    echo "<script>alert('Invalid Class ID.'); window.location.href='my_classes.php';</script>";
+    exit();
+}
+
+// 4. Class Fee Check (ගාස්තුව ලබා ගැනීම)
+$class_sql = "SELECT fee FROM classes WHERE class_id = ?";
+$stmt = $conn->prepare($class_sql);
+$stmt->bind_param("i", $class_id);
+$stmt->execute();
+$class_res = $stmt->get_result();
+
+if ($class_res->num_rows == 0) {
+    echo "<script>alert('Class not found.'); window.location.href='my_classes.php';</script>";
+    exit();
+}
+
+$class_data = $class_res->fetch_assoc();
+$amount = $class_data['fee'];
+$month = date('F'); // වත්මන් මාසය
+$year = date('Y');
+
+// 5. File Upload Logic
+if (isset($_FILES['slip_file']) && $_FILES['slip_file']['error'] === UPLOAD_ERR_OK) {
+    
+    $file_tmp = $_FILES['slip_file']['tmp_name'];
+    $file_name = $_FILES['slip_file']['name'];
+    $file_size = $_FILES['slip_file']['size'];
+    $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+
+    // Allowed Extensions
+    $allowed = ['jpg', 'jpeg', 'png', 'pdf'];
+
+    // ගොනු වර්ගය පරීක්ෂා කිරීම
+    if (!in_array($file_ext, $allowed)) {
+        echo "<script>alert('Error: Only JPG, PNG, or PDF files are allowed.'); window.history.back();</script>";
+        exit();
+    }
+
+    // ගොනු ප්‍රමාණය පරීක්ෂා කිරීම (Max 5MB)
+    if ($file_size > 5 * 1024 * 1024) {
+        echo "<script>alert('Error: File size must be less than 5MB.'); window.history.back();</script>";
+        exit();
+    }
+
+    // Unique Filename එකක් සෑදීම
+    $new_filename = "slip_" . $student_db_id . "_" . $class_id . "_" . time() . "." . $file_ext;
+    
+    // Upload Path (අපි කලින් කතා කරගත් පරිදි uploads/slips/ ෆෝල්ඩරයට)
+    $upload_dir = "../../uploads/slips/";
+
+    // ෆෝල්ඩරය නොමැති නම් සෑදීම
+    if (!is_dir($upload_dir)) {
+        if (!mkdir($upload_dir, 0777, true)) {
+            die("Failed to create upload directory. Please check permissions.");
+        }
+    }
+
+    // ගොනුව Upload කිරීම
+    if (move_uploaded_file($file_tmp, $upload_dir . $new_filename)) {
+        
+        // 6. Database Insert
+        $status = 'pending';
+        $method = 'Slip';
+        $payment_type = 'Full';
+        
+        $ins_sql = "INSERT INTO payments (student_id, class_id, month, year, amount, payment_status, method, slip_image, payment_type, paid_date) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+        
+        $stmt_ins = $conn->prepare($ins_sql);
+        
+        if ($stmt_ins) {
+            // $student_db_id (Integer) භාවිතා කරයි
+            $stmt_ins->bind_param("iissdssss", $student_db_id, $class_id, $month, $year, $amount, $status, $method, $new_filename, $payment_type);
+            
+            if ($stmt_ins->execute()) {
+                // සාර්ථකයි! අලුත් Success Page එකට යොමු කිරීම
+                header("Location: slip_success.php");
+                exit();
+            } else {
+                // Database දෝෂයක් නම්
+                echo "<script>alert('Database Error: " . addslashes($stmt_ins->error) . "'); window.history.back();</script>";
+            }
+            $stmt_ins->close();
+        } else {
+            echo "<script>alert('Database Prepare Error.'); window.history.back();</script>";
+        }
+
+    } else {
+        echo "<script>alert('Failed to upload file to server.'); window.history.back();</script>";
+    }
+
+} else {
+    // ගොනුව තෝරා නොමැති විට හෝ Upload දෝෂයක් ඇති විට
+    $error_code = $_FILES['slip_file']['error'];
+    if ($error_code == UPLOAD_ERR_NO_FILE) {
+         echo "<script>alert('Please select a slip file to upload.'); window.history.back();</script>";
+    } else {
+         echo "<script>alert('Upload Error Code: $error_code'); window.history.back();</script>";
+    }
 }
 ?>
