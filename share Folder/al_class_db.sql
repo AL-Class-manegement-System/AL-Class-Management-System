@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 18, 2025 at 04:32 PM
+-- Generation Time: Dec 18, 2025 at 05:17 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -430,6 +430,31 @@ INSERT INTO `expenses` (`exp_id`, `description`, `amount`, `date`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `live_classes`
+--
+
+CREATE TABLE `live_classes` (
+  `live_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `type` varchar(20) NOT NULL DEFAULT 'Live',
+  `class_link` text NOT NULL,
+  `start_time` datetime NOT NULL,
+  `status` int(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `live_classes`
+--
+
+INSERT INTO `live_classes` (`live_id`, `title`, `class_id`, `teacher_id`, `type`, `class_link`, `start_time`, `status`, `created_at`) VALUES
+(1, 'day 1 recording', 4, 2, 'Recording', 'https://youtu.be/WtK9aQppcDg?si=RiOXNzOn-r2b4sQb', '2025-12-13 21:44:00', 1, '2025-12-18 16:14:34');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `newsletter_subs`
 --
 
@@ -523,7 +548,8 @@ INSERT INTO `payments` (`payment_id`, `student_id`, `class_id`, `month`, `year`,
 (25, 1, 8, 'December', 2025, 2500.00, 'paid', NULL, 'slip_1_1765558480.png', 'Bank Slip', 'Registration', '2025-12-12 22:24:51'),
 (48, 1, 8, 'December', 2025, 2500.00, 'paid', NULL, 'slip_1_8_1766063449.jpg', 'Slip', 'Full', '2025-12-18 18:40:49'),
 (49, 1, 6, 'December', 2025, 2500.00, 'paid', NULL, 'slip_1_6_1766063683.jpg', 'Slip', 'Full', '2025-12-18 18:44:43'),
-(50, 1, 9, 'December', 2025, 3000.00, 'paid', NULL, 'slip_1_9_1766067229.jpg', 'Slip', 'Full', '2025-12-18 19:43:49');
+(50, 1, 9, 'December', 2025, 3000.00, 'paid', NULL, 'slip_1_9_1766067229.jpg', 'Slip', 'Full', '2025-12-18 19:43:49'),
+(51, 10, 9, 'December', 2025, 3000.00, 'paid', 'ORD_10_9_1766071993', NULL, 'Online', 'Full', '2025-12-18 21:03:13');
 
 -- --------------------------------------------------------
 
@@ -602,7 +628,9 @@ INSERT INTO `study_materials` (`material_id`, `title`, `class_id`, `file_path`, 
 (1, '2024 AL Mcq', 9, 'uploads/study_materials/admin_1766070851_69441a438c225.pdf', 1, '2025-12-18 20:44:11', 1),
 (2, '2024 AL Mcq', 9, 'uploads/study_materials/admin_1766071386_69441c5ae8887.pdf', 1, '2025-12-18 20:53:06', 1),
 (3, 'bio 2025', 4, 'uploads/study_materials/mat_1766071552_69441d009d2b3.pdf', 2, '2025-12-18 20:55:52', 1),
-(4, 'bio 2025', 4, 'uploads/study_materials/mat_1766071885_69441e4d192e5.pdf', 2, '2025-12-18 21:01:25', 1);
+(4, 'bio 2025', 4, 'uploads/study_materials/mat_1766071885_69441e4d192e5.pdf', 2, '2025-12-18 21:01:25', 1),
+(5, 'bio 2025', 4, 'uploads/study_materials/mat_1766072403_69442053ad005.pdf', 2, '2025-12-18 21:10:03', 2),
+(6, 'bio 2025', 4, 'uploads/study_materials/mat_1766072420_694420649f0c5.pdf', 2, '2025-12-18 21:10:20', 2);
 
 -- --------------------------------------------------------
 
@@ -743,6 +771,12 @@ ALTER TABLE `expenses`
   ADD PRIMARY KEY (`exp_id`);
 
 --
+-- Indexes for table `live_classes`
+--
+ALTER TABLE `live_classes`
+  ADD PRIMARY KEY (`live_id`);
+
+--
 -- Indexes for table `newsletter_subs`
 --
 ALTER TABLE `newsletter_subs`
@@ -856,6 +890,12 @@ ALTER TABLE `expenses`
   MODIFY `exp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `live_classes`
+--
+ALTER TABLE `live_classes`
+  MODIFY `live_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `newsletter_subs`
 --
 ALTER TABLE `newsletter_subs`
@@ -871,7 +911,7 @@ ALTER TABLE `online_exams`
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `salaries`
@@ -889,7 +929,7 @@ ALTER TABLE `students`
 -- AUTO_INCREMENT for table `study_materials`
 --
 ALTER TABLE `study_materials`
-  MODIFY `material_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `material_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `teachers`
