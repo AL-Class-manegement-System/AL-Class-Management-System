@@ -1,6 +1,6 @@
 <?php
 // teacher_portal/pages/my_students.php
-// Updated: Smart Name Matching (Fixes "Mr." prefix and Case Sensitivity issues)
+// Updated: Status display logic to show Active, Unenrolled, and Pending statuses
 
 include('../include/head.php');
 require_once '../../includes/connection.php';
@@ -19,7 +19,7 @@ $teacher_db_id = $_SESSION['teacher_db_id']; // Teacher ID from DB
 $teacher_full_name = "";
 $debug_msg = "";
 
-// 2. ගුරුවරයාගේ නම Database එකෙන් ලබා ගැනීම (වඩා නිවැරදියි)
+// 2. ගුරුවරයාගේ නම Database එකෙන් ලබා ගැනීම
 $sql_t = "SELECT full_name FROM teachers WHERE teacher_id = ?";
 $stmt_t = $conn->prepare($sql_t);
 $stmt_t->bind_param("i", $teacher_db_id);
@@ -38,12 +38,10 @@ $students = [];
 $classes_list = [];
 $class_details = null;
 
-// 3. Smart Class Searching (මෙන්න විසඳුම)
-// ගුරුවරයාගේ නම පන්තියේ නමේ කොටසක් වුවත්, පන්තියේ නම ගුරුවරයාගේ නමේ කොටසක් වුවත් සොයාගනී.
-// LOWER() භාවිතා කිරීමෙන් Simple/Capital ප්‍රශ්න විසඳේ.
+// 3. Smart Class Searching
 if (!empty($teacher_full_name)) {
     
-    $search_name = strtolower($teacher_full_name); // නම Simple letters වලට හරවයි
+    $search_name = strtolower($teacher_full_name); 
 
     $sql_classes = "
         SELECT class_id, class_name, stream, teacher_name 
@@ -56,7 +54,6 @@ if (!empty($teacher_full_name)) {
     ";
     
     if ($stmt_cls = $conn->prepare($sql_classes)) {
-        // පරාමිතික දෙකම එකම නමයි (දෙපැත්තටම පරීක්ෂා කිරීමට)
         $stmt_cls->bind_param("ss", $search_name, $search_name);
         
         if ($stmt_cls->execute()) {
@@ -69,11 +66,9 @@ if (!empty($teacher_full_name)) {
     }
 }
 
-// Debugging: පන්ති හමු නොවුණහොත් පණිවිඩයක්
+// Debugging
 if (empty($classes_list) && !empty($teacher_full_name)) {
     $debug_msg .= "⚠️ No classes found for teacher: '<strong>$teacher_full_name</strong>'.<br>";
-    $debug_msg .= "System tried to match names like 'Mr. $teacher_full_name' or '$teacher_full_name'.<br>";
-    $debug_msg .= "Please check 'Classes' table > 'teacher_name' column.";
 }
 
 // 4. සිසුන් ලබා ගැනීම (Selected Class)
@@ -91,8 +86,7 @@ if ($selected_class_id > 0) {
         $stmt_c_info->close();
     }
 
-    // B. Get Enrolled Students
-    // Status 1 (Active) අය පමණක් ගනී. අවශ්‍ය නම් 'AND e.status = 1' ඉවත් කරන්න.
+    // B. Get Enrolled Students (All statuses including Active, Pending, Unenrolled)
     $sql_students = "
         SELECT 
             s.student_id,
@@ -210,9 +204,17 @@ if ($selected_class_id > 0) {
                                     </td>
                                     <td class="px-6 py-4">
                                         <?php if($std['status'] == 1): ?>
-                                            <span class="text-green-600 font-bold text-xs bg-green-100 px-2 py-1 rounded">Active</span>
+                                            <span class="text-green-600 font-bold text-xs bg-green-100 px-2 py-1 rounded border border-green-200">
+                                                Active
+                                            </span>
+                                        <?php elseif($std['status'] == 2): ?>
+                                            <span class="text-red-600 font-bold text-xs bg-red-100 px-2 py-1 rounded border border-red-200">
+                                                Unenrolled
+                                            </span>
                                         <?php else: ?>
-                                            <span class="text-red-600 font-bold text-xs bg-red-100 px-2 py-1 rounded">Inactive</span>
+                                            <span class="text-yellow-600 font-bold text-xs bg-yellow-100 px-2 py-1 rounded border border-yellow-200">
+                                                Pending
+                                            </span>
                                         <?php endif; ?>
                                     </td>
                                 </tr>

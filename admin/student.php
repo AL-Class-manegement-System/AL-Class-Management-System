@@ -121,12 +121,10 @@ include 'db_con.php';
                         <tbody class="bg-white divide-y divide-gray-200">
                             
                             <?php
-                            // 1. Base Query
                             $sql = "SELECT * FROM students WHERE 1=1";
                             $params = [];
                             $types = '';
 
-                            // 2. Safely add search conditions (Prepared Statements)
                             if(isset($_GET['search']) && !empty($_GET['search'])){
                                 $search = "%" . $_GET['search'] . "%";
                                 $sql .= " AND (full_name LIKE ? OR reg_number LIKE ?)";
@@ -207,6 +205,12 @@ include 'db_con.php';
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
                                     
+                                    <a href="student_enrollments.php?student_id=<?php echo $row['student_id']; ?>" 
+                                       class="p-2 rounded-lg text-blue-600 bg-blue-50 hover:bg-blue-100 transition border border-blue-200" 
+                                       title="View Enrollment History">
+                                        <i class="fas fa-history"></i>
+                                    </a>
+
                                     <a href="print_id_card.php?id=<?php echo $row['student_id']; ?>" target="_blank" class="p-2 rounded-lg text-purple-600 bg-purple-50 hover:bg-purple-100 transition" title="Print ID Card">
                                         <i class="fas fa-id-card"></i>
                                     </a>
