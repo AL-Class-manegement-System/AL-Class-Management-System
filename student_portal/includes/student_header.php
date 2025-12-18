@@ -186,10 +186,11 @@ function getActiveClass($page_name, $current_page)
                     <i class="fas fa-box-open w-6 text-center group-hover:scale-110 transition-transform"></i>
                     <span class="ms-3 font-medium">Study Packs</span>
                 </a>
+                
                 <a href="payment_history.php"
-                    class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('study_packs.php', $current_page); ?>">
-                    <i class="fas fa-box-open w-6 text-center group-hover:scale-110 transition-transform"></i>
-                    <span class="ms-3 font-medium">payment history</span>
+                    class="flex items-center px-4 py-3 rounded-xl transition-all group <?php echo getActiveClass('payment_history.php', $current_page); ?>">
+                    <i class="fas fa-file-invoice-dollar w-6 text-center group-hover:scale-110 transition-transform"></i>
+                    <span class="ms-3 font-medium">Payment History</span>
                 </a>
             </nav>
 
@@ -228,6 +229,8 @@ function getActiveClass($page_name, $current_page)
                             echo 'Student Profile';
                         elseif ($current_page == 'study_packs.php')
                             echo 'Study Materials';
+                        elseif ($current_page == 'payment_history.php')
+                            echo 'Payment History';
                         elseif ($current_page == 'exam_center.php' || $current_page == 'do_exam.php')
                             echo 'Exam Center';
                         else

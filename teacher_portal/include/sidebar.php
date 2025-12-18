@@ -17,11 +17,11 @@
                <span class="ms-3">My Classes</span>
             </a>
          </li>
-         
+
          <li>
-            <a href="../pages/my_students.php" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
-               <i class="ph ph-users-three text-xl text-gray-400 group-hover:text-white"></i>
-               <span class="ms-3">My Students</span> 
+            <a href="../pages/manage_live_class.php" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
+               <i class="ph ph-video-camera text-xl text-gray-400 group-hover:text-white"></i>
+               <span class="ms-3">Live Classes</span>
             </a>
          </li>
 
@@ -31,7 +31,12 @@
                <span class="ms-3">Assignments</span>
             </a>
          </li>
-
+         <li>
+            <a href="../pages/add_questions.php" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
+               <i class="ph ph-question text-xl text-gray-400 group-hover:text-white"></i>
+               <span class="ms-3">Add Questions</span>
+            </a>
+         </li>
          <li>
             <a href="../pages/create_exam.php" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
                <i class="ph ph-exam text-xl text-gray-400 group-hover:text-white"></i>
@@ -53,9 +58,9 @@
       </ul>
       <ul class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-700">
          <li>
-            <a href="../../lib/logout.php" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
-               <i class="ph ph-sign-out text-xl text-red-500 group-hover:text-red-400"></i>
-               <span class="ms-3">Log Out</span>
+            <a href="../../lib/logout.php" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-red-900/20 hover:text-red-500 group transition-colors">
+               <i class="ph ph-sign-out text-xl text-gray-400 group-hover:text-red-500"></i>
+               <span class="ms-3">Sign Out</span>
             </a>
          </li>
       </ul>
