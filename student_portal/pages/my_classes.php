@@ -1,15 +1,14 @@
 <?php
 // student_portal/pages/my_classes.php
-// Updated: Redirects to enroll_class.php for payment/slip upload
+// Updated: Shows 'Enrolled' status if Payment is Approved by Admin
 
 include('../includes/student_header.php');
-// connection.php is already included via student_header.php
 
 // ==========================================
-// 1. Get Student Data
+// 1. Get Student Data & Stream
 // ==========================================
 $db_student_id = $student['student_id'];
-$my_stream_code = $student['stream']; // e.g., Maths, Bio, Tech
+$my_stream_code = $student['stream']; 
 
 // Stream Mapping
 $stream_map = [
@@ -20,11 +19,10 @@ $stream_map = [
     'Commerce' => 'Commerce'
 ];
 
-// Select relevant stream
 $filter_stream = isset($stream_map[$my_stream_code]) ? $stream_map[$my_stream_code] : $my_stream_code;
 
 // ==========================================
-// 2. Handle Actions (Only Unenroll is handled here now)
+// 2. Handle Actions (Unenroll)
 // ==========================================
 $message = "";
 $msg_type = "";
@@ -34,10 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['class_id'])) {
     $class_id = intval($_POST['class_id']);
     $action = $_POST['action'];
 
-    // Note: 'enroll' action is removed from here because we now redirect to enroll_class.php
-    
     if ($action == 'unenroll') {
-        // Unenroll Logic
+        // Enrollments table එකෙන් ඉවත් කිරීම
         $del_sql = "DELETE FROM enrollments WHERE student_id = ? AND class_id = ?";
         $del_stmt = $conn->prepare($del_sql);
         $del_stmt->bind_param("ii", $db_student_id, $class_id);
@@ -54,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['class_id'])) {
 }
 
 // ==========================================
-// 3. Get IDs of Currently Enrolled Classes
+// 3. Get IDs of Currently Enrolled Classes (From enrollments table)
 // ==========================================
 $enrolled_classes = [];
 $enr_sql = "SELECT class_id FROM enrollments WHERE student_id = ?";
@@ -62,11 +58,39 @@ $enr_stmt = $conn->prepare($enr_sql);
 $enr_stmt->bind_param("i", $db_student_id);
 $enr_stmt->execute();
 $enr_res = $enr_stmt->get_result();
-
 while ($row = $enr_res->fetch_assoc()) {
     $enrolled_classes[] = $row['class_id'];
 }
 $enr_stmt->close();
+
+// ==========================================
+// 4. Get IDs of Paid/Approved Classes (From payments table)
+// ==========================================
+// Admin විසින් Approve කරන ලද (Paid) පන්ති ද Enrolled ලෙස සැලකීමට මෙය භාවිතා කරයි.
+$paid_classes = [];
+$paid_sql = "SELECT class_id FROM payments WHERE student_id = ? AND (payment_status = 'paid' OR payment_status = 'approved')";
+$paid_stmt = $conn->prepare($paid_sql);
+$paid_stmt->bind_param("i", $db_student_id);
+$paid_stmt->execute();
+$paid_res = $paid_stmt->get_result();
+while ($row = $paid_res->fetch_assoc()) {
+    $paid_classes[] = $row['class_id'];
+}
+$paid_stmt->close();
+
+// ==========================================
+// 5. Get IDs of Pending Approvals
+// ==========================================
+$pending_classes = [];
+$pen_sql = "SELECT class_id FROM payments WHERE student_id = ? AND payment_status = 'pending'";
+$pen_stmt = $conn->prepare($pen_sql);
+$pen_stmt->bind_param("i", $db_student_id);
+$pen_stmt->execute();
+$pen_res = $pen_stmt->get_result();
+while ($row = $pen_res->fetch_assoc()) {
+    $pending_classes[] = $row['class_id'];
+}
+$pen_stmt->close();
 ?>
 
 <div class="flex-1 flex flex-col h-screen overflow-y-auto bg-gray-50">
@@ -94,7 +118,7 @@ $enr_stmt->close();
                 setTimeout(() => {
                     const msg = document.getElementById('msg');
                     if(msg) { msg.style.transition = "opacity 0.5s"; msg.style.opacity = "0"; setTimeout(() => msg.remove(), 500); }
-                }, 4000);
+                }, 3000);
             </script>
             <?php endif; ?>
         </div>
@@ -102,9 +126,7 @@ $enr_stmt->close();
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
 
             <?php
-            // ==========================================
-            // FILTERED QUERY: Active classes for the stream + ICT
-            // ==========================================
+            // Filter Classes
             $sql = "SELECT * FROM classes WHERE status = 1 AND (stream = ? OR stream = 'ICT') ORDER BY day ASC";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("s", $filter_stream);
@@ -114,35 +136,37 @@ $enr_stmt->close();
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     $class_id = $row['class_id'];
-                    $is_enrolled = in_array($class_id, $enrolled_classes);
                     
-                    // Card Styling based on Stream
-                    $border_color = 'border-indigo-100';
-                    $badge_color = 'bg-indigo-100 text-indigo-600';
+                    // Status Checking Logic
+                    // 1. Enrollment table එකේ හෝ Payment 'paid' නම් Enrolled ලෙස සලකන්න.
+                    $is_enrolled_officially = in_array($class_id, $enrolled_classes);
+                    $is_payment_approved = in_array($class_id, $paid_classes);
+                    
+                    $show_enrolled = $is_enrolled_officially || $is_payment_approved;
+                    
+                    // 2. Pending Check
+                    $is_pending = in_array($class_id, $pending_classes);
+
+                    // Colors
+                    $badge_color = 'bg-indigo-100 text-indigo-600'; 
                     $btn_color = 'bg-indigo-600 hover:bg-indigo-700';
-                    
-                    if($row['stream'] == 'Bio Science') { 
-                        $badge_color = 'bg-green-100 text-green-600'; $border_color = 'border-green-100'; $btn_color = 'bg-green-600 hover:bg-green-700';
-                    }
-                    if($row['stream'] == 'Commerce') { 
-                        $badge_color = 'bg-blue-100 text-blue-600'; $border_color = 'border-blue-100'; $btn_color = 'bg-blue-600 hover:bg-blue-700';
-                    }
-                    if($row['stream'] == 'Technology') { 
-                        $badge_color = 'bg-purple-100 text-purple-600'; $border_color = 'border-purple-100'; $btn_color = 'bg-purple-600 hover:bg-purple-700';
-                    }
-                    if($row['stream'] == 'Arts') { 
-                        $badge_color = 'bg-pink-100 text-pink-600'; $border_color = 'border-pink-100'; $btn_color = 'bg-pink-600 hover:bg-pink-700';
-                    }
-                    if($row['stream'] == 'ICT') { 
-                        $badge_color = 'bg-gray-100 text-gray-600'; $border_color = 'border-gray-200'; $btn_color = 'bg-gray-700 hover:bg-gray-800';
-                    }
+
+                    if($row['stream'] == 'Bio Science') { $badge_color = 'bg-green-100 text-green-600'; $btn_color = 'bg-green-600 hover:bg-green-700'; }
+                    if($row['stream'] == 'Commerce') { $badge_color = 'bg-blue-100 text-blue-600'; $btn_color = 'bg-blue-600 hover:bg-blue-700'; }
+                    if($row['stream'] == 'Technology') { $badge_color = 'bg-purple-100 text-purple-600'; $btn_color = 'bg-purple-600 hover:bg-purple-700'; }
+                    if($row['stream'] == 'Arts') { $badge_color = 'bg-pink-100 text-pink-600'; $btn_color = 'bg-pink-600 hover:bg-pink-700'; }
+                    if($row['stream'] == 'ICT') { $badge_color = 'bg-gray-100 text-gray-600'; $btn_color = 'bg-gray-700 hover:bg-gray-800'; }
             ?>
 
-            <div class="bg-white rounded-2xl p-6 shadow-sm border <?php echo $border_color; ?> hover:shadow-xl transition-all duration-300 flex flex-col h-full relative overflow-hidden group">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 flex flex-col h-full relative overflow-hidden group">
                 
-                <?php if($is_enrolled): ?>
+                <?php if($show_enrolled): ?>
                     <div class="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-10 uppercase tracking-wide">
                         <i class="fas fa-check-circle mr-1"></i> Enrolled
+                    </div>
+                <?php elseif($is_pending): ?>
+                    <div class="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-10 uppercase tracking-wide animate-pulse">
+                        <i class="fas fa-clock mr-1"></i> Pending
                     </div>
                 <?php endif; ?>
 
@@ -150,7 +174,7 @@ $enr_stmt->close();
                     <span class="<?php echo $badge_color; ?> text-[10px] font-bold px-2.5 py-1 rounded-lg mb-2 inline-block uppercase tracking-wider">
                         <?php echo htmlspecialchars($row['stream']); ?>
                     </span>
-                    <h3 class="text-lg font-bold text-slate-800 group-hover:text-indigo-600 transition-colors line-clamp-1" title="<?php echo htmlspecialchars($row['subject']); ?>">
+                    <h3 class="text-lg font-bold text-slate-800 line-clamp-1" title="<?php echo htmlspecialchars($row['subject']); ?>">
                         <?php echo htmlspecialchars($row['subject']); ?>
                     </h3>
                     <p class="text-xs text-slate-500 font-medium truncate mt-1"><?php echo htmlspecialchars($row['class_name']); ?></p>
@@ -177,7 +201,7 @@ $enr_stmt->close();
 
                 <div class="mt-auto">
                     
-                    <?php if($is_enrolled): ?>
+                    <?php if($show_enrolled): ?>
                         <form method="POST" action="">
                             <input type="hidden" name="class_id" value="<?php echo $class_id; ?>">
                             <input type="hidden" name="action" value="unenroll">
@@ -186,6 +210,12 @@ $enr_stmt->close();
                                 <i class="fas fa-sign-out-alt"></i> Unenroll
                             </button>
                         </form>
+
+                    <?php elseif($is_pending): ?>
+                        <button disabled class="w-full py-2.5 rounded-xl bg-yellow-100 text-yellow-700 text-sm font-bold cursor-not-allowed flex items-center justify-center gap-2 border border-yellow-200">
+                            <i class="fas fa-hourglass-half"></i> Approval Pending
+                        </button>
+
                     <?php else: ?>
                         <a href="enroll_class.php?class_id=<?php echo $class_id; ?>" 
                             class="w-full py-2.5 rounded-xl <?php echo $btn_color; ?> text-white text-sm font-bold shadow-lg shadow-indigo-500/20 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 text-center decoration-0">
@@ -200,13 +230,7 @@ $enr_stmt->close();
             <?php 
                 } 
             } else {
-                echo '<div class="col-span-full flex flex-col items-center justify-center py-20 text-center bg-white rounded-3xl border border-dashed border-gray-200">
-                        <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 text-gray-300 text-3xl">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-400">No Classes Found</h3>
-                        <p class="text-sm text-gray-400 mt-1">There are no active classes for <b>'.htmlspecialchars($filter_stream).'</b> stream yet.</p>
-                      </div>';
+                echo '<div class="col-span-full py-20 text-center text-gray-400">No classes found.</div>';
             }
             $stmt->close();
             ?>
