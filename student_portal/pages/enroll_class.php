@@ -2,6 +2,7 @@
 // student_portal/pages/enroll_class.php
 include('../includes/student_header.php');
 
+// Class ID එක URL එකේ තිබේදැයි පරීක්ෂා කිරීම
 if (!isset($_GET['class_id'])) {
     echo "<script>window.location.href='my_classes.php';</script>";
     exit();
@@ -10,7 +11,7 @@ if (!isset($_GET['class_id'])) {
 $class_id = intval($_GET['class_id']);
 $student_id = $_SESSION['student_id'];
 
-// Get Class Details
+// පන්තියේ විස්තර Database එකෙන් ලබා ගැනීම
 $sql = "SELECT * FROM classes WHERE class_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $class_id);
@@ -18,7 +19,7 @@ $stmt->execute();
 $class = $stmt->get_result()->fetch_assoc();
 
 if (!$class) {
-    echo "<div class='p-10 text-center'>Class not found.</div>";
+    echo "<div class='p-10 text-center text-red-500 font-bold'>Class not found.</div>";
     include('../includes/footer.php');
     exit();
 }
@@ -38,13 +39,16 @@ if (!$class) {
                     <div>
                         <h2 class="text-2xl font-bold text-slate-800"><?php echo htmlspecialchars($class['subject']); ?>
                         </h2>
-                        <p class="text-slate-600"><?php echo htmlspecialchars($class['class_name']); ?> |
-                            <?php echo htmlspecialchars($class['teacher_name']); ?></p>
+                        <p class="text-slate-600">
+                            <?php echo htmlspecialchars($class['class_name']); ?> |
+                            <?php echo htmlspecialchars($class['teacher_name']); ?>
+                        </p>
                     </div>
                     <div class="text-center md:text-right">
                         <div class="text-sm text-slate-500 uppercase tracking-wider font-semibold">Fee</div>
                         <div class="text-3xl font-bold text-indigo-600">LKR
-                            <?php echo number_format($class['fee'], 2); ?></div>
+                            <?php echo number_format($class['fee'], 2); ?>
+                        </div>
                     </div>
                 </div>
 
@@ -58,8 +62,9 @@ if (!$class) {
                         </div>
                         <h4 class="font-bold text-lg text-slate-800 mb-2">Pay Online</h4>
                         <p class="text-sm text-slate-500 mb-6">Visa, MasterCard, Genie. (Auto-approved)</p>
+
                         <button onclick="payOnline(<?php echo $class_id; ?>)"
-                            class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition">
+                            class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition transform active:scale-95">
                             Pay Now
                         </button>
                     </div>
@@ -90,7 +95,7 @@ if (!$class) {
                             <button type="submit"
                                 class="w-full py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition">Submit</button>
                             <button type="button" onclick="toggleSlipForm()"
-                                class="w-full mt-2 text-sm text-gray-500">Cancel</button>
+                                class="w-full mt-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
                         </form>
                     </div>
 
@@ -102,29 +107,45 @@ if (!$class) {
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="https://www.payhere.lk/lib/payhere.js"></script>
-<script>
-    function toggleSlipForm() {
-        $('#slipForm').toggleClass('hidden');
-        $('#btnToggleSlip').toggleClass('hidden');
-    }
 
+<script>
     function payOnline(classId) {
+        console.log("Starting payment for class: " + classId);
+
         $.ajax({
             url: 'get_payhere_hash.php',
             type: 'POST',
             data: { class_id: classId },
             dataType: 'json',
             success: function (data) {
-                if (data.error) { alert(data.error); return; }
+                // Backend එකෙන් Error එකක් ආවොත් පෙන්වන්න
+                if (data.error) {
+                    alert("Error: " + data.error);
+                    return;
+                }
 
+                // PayHere Popup එක පූරණය කිරීම
                 payhere.onCompleted = function (orderId) {
+                    console.log("Payment completed. OrderID:" + orderId);
                     window.location.href = "payment_success.php?order_id=" + orderId;
                 };
-                payhere.onError = function (error) { alert("Error: " + error); };
+
+                payhere.onDismissed = function onDismissed() {
+                    console.log("Payment dismissed");
+                };
+
+                payhere.onError = function onError(error) {
+                    console.log("Error:" + error);
+                    alert("Payment Failed: " + error);
+                };
+
                 payhere.startPayment(data);
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", error);
+                alert("System Error: Could not connect to PayHere.");
             }
         });
     }
 </script>
-
 <?php include('../includes/footer.php'); ?>

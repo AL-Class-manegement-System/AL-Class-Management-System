@@ -15,20 +15,21 @@ date_default_timezone_set('Asia/Colombo');
  * @param string $class_time පන්තිය ආරම්භ වන වේලාව (e.g., '08:00 AM')
  * @return array 
  */
-function getClassStatus($class_day, $class_time) {
+function getClassStatus($class_day, $class_time)
+{
     // පන්තියේ සාමාන්‍ය කාලය (මිනිත්තු)
-    $duration_minutes = 90; 
-    
+    $duration_minutes = 90;
+
     $current_day = date('l');
     $current_timestamp = time();
 
     // පන්තිය අද දිනදැයි පරීක්ෂා කිරීම
     if ($class_day === $current_day) {
-        
+
         // පන්තියේ ආරම්භක සහ අවසන් වන වේලාවන්හි timestamp
         // strtotime() මගින් අද දිනට අදාළ timestamp එක ගණනය කරයි.
         $start_timestamp = strtotime($class_time);
-        $end_timestamp = $start_timestamp + ($duration_minutes * 60); 
+        $end_timestamp = $start_timestamp + ($duration_minutes * 60);
 
         if ($current_timestamp >= $start_timestamp && $current_timestamp < $end_timestamp) {
             // දැනට පන්තිය පැවැත්වේ
@@ -53,7 +54,8 @@ function getClassStatus($class_day, $class_time) {
 /**
  * වත්මන් දිනයට අදාළව Container එක Highlight කිරීම සඳහා CSS Class ලබා දෙයි.
  */
-function getDayHighlightClass($class_day) {
+function getDayHighlightClass($class_day)
+{
     $current_day = date('l');
     if ($class_day === $current_day) {
         // වත්මන් දිනය
@@ -95,12 +97,12 @@ $stmt = $conn->prepare($sql_timetable);
 // ==========================================
 // ERROR FIX: Check if prepare was successful
 // ==========================================
-if ($stmt) { 
+if ($stmt) {
     $stmt->bind_param("i", $db_student_id); // Prepared Statement භාවිතය
-    
+
     if ($stmt->execute()) { // Check if execution was successful
         $result = $stmt->get_result();
-        
+
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 // දත්ත සතියේ දින අනුව කාණ්ඩ කිරීම
@@ -120,13 +122,14 @@ if ($stmt) {
 
 <div class="flex-1 flex flex-col h-screen overflow-y-auto bg-gray-50">
     <main class="p-4 md:p-8">
-        
+
         <h1 class="text-3xl font-bold text-slate-800 mb-8 flex items-center gap-3">
             Your Weekly Time Table 🗓️
         </h1>
 
         <?php if (empty($time_table_data)): ?>
-            <div class="flex flex-col items-center justify-center py-20 text-center bg-white rounded-3xl border border-dashed border-gray-200">
+            <div
+                class="flex flex-col items-center justify-center py-20 text-center bg-white rounded-3xl border border-dashed border-gray-200">
                 <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4 text-red-600 text-3xl">
                     <i class="fas fa-exclamation-circle"></i>
                 </div>
@@ -134,85 +137,87 @@ if ($stmt) {
                 <p class="text-sm text-gray-400 mt-1">Please visit the 'My Classes' page to enroll in a class first.</p>
             </div>
         <?php else: ?>
-        
+
             <div class="space-y-6">
-            
-                <?php 
+
+                <?php
                 // දින නිවැරදි පිළිවෙලට (Sunday සිට Saturday දක්වා) Loop කිරීම
-                foreach ($day_order_list as $day): 
+                foreach ($day_order_list as $day):
                     if (isset($time_table_data[$day])):
-                        
+
                         // Current Day Highlighting Class එක ලබා ගැනීම
                         $highlight_class = getDayHighlightClass($day);
-                ?>
-                
-                <div class="rounded-2xl overflow-hidden <?php echo $highlight_class; ?> transition-all duration-300">
-                    <div class="p-4 md:p-6 bg-indigo-600/10 border-l-4 border-indigo-600 flex items-center justify-between">
-                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-3">
-                            <i class="fas fa-calendar-day text-indigo-600"></i> <?php echo htmlspecialchars($day); ?>
-                            <span class="text-sm font-medium bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">
-                                <?php echo count($time_table_data[$day]); ?> Classes
-                            </span>
-                        </h2>
-                    </div>
-                    
-                    <div class="divide-y divide-slate-100">
-                        <?php foreach ($time_table_data[$day] as $class): 
-                            $status_info = getClassStatus($class['day'], $class['time']);
                         ?>
-                            
-                            <div class="p-4 md:p-6 flex items-center hover:bg-slate-50 transition-colors">
-                                
-                                <div class="w-20 md:w-28 flex-shrink-0 text-center relative">
-                                    <p class="text-2xl font-extrabold text-slate-800 leading-none">
-                                        <?php echo htmlspecialchars($class['time']); ?>
-                                    </p>
-                                    <span class="text-xs font-bold mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 <?php echo $status_info['color']; ?> <?php echo $status_info['text']; ?>">
-                                        <i class="<?php echo $status_info['icon']; ?> text-[8px]"></i>
-                                        <?php echo $status_info['status']; ?>
+
+                        <div class="rounded-2xl overflow-hidden <?php echo $highlight_class; ?> transition-all duration-300">
+                            <div class="p-4 md:p-6 bg-indigo-600/10 border-l-4 border-indigo-600 flex items-center justify-between">
+                                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-3">
+                                    <i class="fas fa-calendar-day text-indigo-600"></i> <?php echo htmlspecialchars($day); ?>
+                                    <span class="text-sm font-medium bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">
+                                        <?php echo count($time_table_data[$day]); ?> Classes
                                     </span>
-                                </div>
-                                
-                                <div class="flex-1 ml-6 border-l pl-6 border-slate-200">
-                                    <h3 class="font-bold text-lg text-slate-800 line-clamp-1">
-                                        <?php echo htmlspecialchars($class['subject']); ?>
-                                        <span class="text-xs font-normal text-slate-500 ml-2">(<?php echo htmlspecialchars($class['class_name']); ?>)</span>
-                                    </h3>
-                                    
-                                    <div class="flex flex-wrap items-center text-sm text-slate-500 mt-1 gap-x-4 gap-y-1">
-                                        <p class="flex items-center gap-1 font-medium">
-                                            <i class="fas fa-chalkboard-teacher text-indigo-400"></i>
-                                            <?php echo htmlspecialchars($class['teacher_name']); ?>
-                                        </p>
-                                        <p class="flex items-center gap-1">
-                                            <i class="fas fa-map-marker-alt text-indigo-400"></i>
-                                            <?php echo htmlspecialchars($class['hall_number'] ?? 'Online'); ?>
-                                        </p>
-                                    </div>
-                                </div>
-                                
-                                <?php if ($status_info['status'] === 'Ongoing' || $status_info['status'] === 'Starting Soon'): ?>
-                                    <a href="live_class.php" 
-                                        class="ml-4 flex-shrink-0 px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors shadow-md shadow-green-500/30">
-                                        <i class="fas fa-video mr-1"></i> Join Now
-                                    </a>
-                                <?php else: ?>
-                                    <button disabled
-                                        class="ml-4 flex-shrink-0 px-4 py-2 bg-gray-200 text-gray-500 text-sm font-semibold rounded-lg cursor-not-allowed">
-                                        Inactive
-                                    </button>
-                                <?php endif; ?>
+                                </h2>
                             </div>
-                            
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-                
-                <?php 
-                    endif; 
-                endforeach; 
+
+                            <div class="divide-y divide-slate-100">
+                                <?php foreach ($time_table_data[$day] as $class):
+                                    $status_info = getClassStatus($class['day'], $class['time']);
+                                    ?>
+
+                                    <div class="p-4 md:p-6 flex items-center hover:bg-slate-50 transition-colors">
+
+                                        <div class="w-20 md:w-28 flex-shrink-0 text-center relative">
+                                            <p class="text-2xl font-extrabold text-slate-800 leading-none">
+                                                <?php echo htmlspecialchars($class['time']); ?>
+                                            </p>
+                                            <span
+                                                class="text-xs font-bold mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 <?php echo $status_info['color']; ?> <?php echo $status_info['text']; ?>">
+                                                <i class="<?php echo $status_info['icon']; ?> text-[8px]"></i>
+                                                <?php echo $status_info['status']; ?>
+                                            </span>
+                                        </div>
+
+                                        <div class="flex-1 ml-6 border-l pl-6 border-slate-200">
+                                            <h3 class="font-bold text-lg text-slate-800 line-clamp-1">
+                                                <?php echo htmlspecialchars($class['subject']); ?>
+                                                <span
+                                                    class="text-xs font-normal text-slate-500 ml-2">(<?php echo htmlspecialchars($class['class_name']); ?>)</span>
+                                            </h3>
+
+                                            <div class="flex flex-wrap items-center text-sm text-slate-500 mt-1 gap-x-4 gap-y-1">
+                                                <p class="flex items-center gap-1 font-medium">
+                                                    <i class="fas fa-chalkboard-teacher text-indigo-400"></i>
+                                                    <?php echo htmlspecialchars($class['teacher_name']); ?>
+                                                </p>
+                                                <p class="flex items-center gap-1">
+                                                    <i class="fas fa-map-marker-alt text-indigo-400"></i>
+                                                    <?php echo htmlspecialchars($class['hall_number'] ?? 'Online'); ?>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <?php if ($status_info['status'] === 'Ongoing' || $status_info['status'] === 'Starting Soon'): ?>
+                                            <a href="live_class.php"
+                                                class="ml-4 flex-shrink-0 px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors shadow-md shadow-green-500/30">
+                                                <i class="fas fa-video mr-1"></i> Join Now
+                                            </a>
+                                        <?php else: ?>
+                                            <button disabled
+                                                class="ml-4 flex-shrink-0 px-4 py-2 bg-gray-200 text-gray-500 text-sm font-semibold rounded-lg cursor-not-allowed">
+                                                Inactive
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+
+                    <?php
+                    endif;
+                endforeach;
                 ?>
-                
+
             </div>
         <?php endif; ?>
 

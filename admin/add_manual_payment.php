@@ -4,9 +4,8 @@ session_start();
 include('includes/auth.php');
 include('db_con.php');
 
-// --- AJAX HANDLER: ශිෂ්‍යයා තෝරාගත් විට අදාළ පන්ති ලබා ගැනීම ---
+// --- AJAX HANDLER: ශිෂ්‍යයා තෝරාගත් විට විස්තර ලබා ගැනීම ---
 if (isset($_POST['action']) && $_POST['action'] == 'fetch_student_data') {
-    // JSON ප්‍රතිචාරය සඳහා Header එක සකසයි
     header('Content-Type: application/json');
 
     $student_id = intval($_POST['student_id']);
@@ -14,39 +13,37 @@ if (isset($_POST['action']) && $_POST['action'] == 'fetch_student_data') {
     // 1. ශිෂ්‍යයාගේ Stream එක ලබා ගැනීම
     $stu_query = $conn->query("SELECT stream FROM students WHERE student_id = $student_id");
 
+    $stream = '';
     if ($stu_query->num_rows > 0) {
         $student = $stu_query->fetch_assoc();
-        $stream = $student['stream']; // උදා: Maths, Bio, Tech
-    } else {
-        $stream = '';
+        $stream = trim($student['stream']); // උදා: Maths, Bio
     }
 
-    // 2. Stream එකට අදාළ පන්ති (Classes) ලබා ගැනීම (නම වෙනස් වුවත් ගැලපෙන ලෙස)
+    // 2. Stream එකට අදාළ පන්ති (Classes) ලබා ගැනීම
+    // Stream names ගැටළුව විසඳීම (Mapping)
     if (!empty($stream)) {
 
-        $conditions = [];
+        // Stream Mapping Array (Student Stream => Class Stream)
+        $stream_map = [
+            'Maths' => 'Physical Science',
+            'Bio' => 'Bio Science',
+            'Tech' => 'Technology',
+            'Art' => 'Arts',
+            'Commerce' => 'Commerce'
+        ];
 
-        // කෙලින්ම සමාන වන අවස්ථා (Exact Match)
-        $conditions[] = "stream = '$stream'";
+        // Short Name හෝ Long Name දෙකෙන් ඕනෑම එකකට ගැලපෙන පන්ති සෙවීම
+        $mapped_stream = isset($stream_map[$stream]) ? $stream_map[$stream] : $stream;
 
-        // නම් වෙනස් වන අවස්ථා (Mapping)
-        if ($stream == 'Maths') {
-            $conditions[] = "stream = 'Physical Science'";
-        } elseif ($stream == 'Bio') {
-            $conditions[] = "stream = 'Bio Science'";
-        } elseif ($stream == 'Tech') {
-            $conditions[] = "stream = 'Technology'";
-        } elseif ($stream == 'Art') {
-            $conditions[] = "stream = 'Arts'";
-        }
-
-        // SQL Query එක ගොඩනැගීම (OR භාවිතා කර)
-        $sql_condition = implode(' OR ', $conditions);
-        $class_sql = "SELECT class_id, class_name, subject, fee, teacher_name FROM classes WHERE $sql_condition";
+        // SQL: Stream එක කෙලින්ම ගැලපෙන හෝ Map වූ නමට ගැලපෙන පන්ති
+        $class_sql = "SELECT class_id, class_name, subject, fee, teacher_name 
+                      FROM classes 
+                      WHERE status = 1 
+                      AND (stream = '$stream' OR stream = '$mapped_stream')";
 
     } else {
-        // Stream එකක් නැත්නම් සියලුම පන්ති
-        $class_sql = "SELECT class_id, class_name, subject, fee, teacher_name FROM classes";
+        // Stream එකක් සොයාගත නොහැකි නම් සියලු පන්ති
+        $class_sql = "SELECT class_id, class_name, subject, fee, teacher_name FROM classes WHERE status = 1";
     }
 
     $class_res = $conn->query($class_sql);
@@ -60,7 +57,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'fetch_student_data') {
 
     // JSON ලෙස Data යැවීම
     echo json_encode(['stream' => $stream, 'classes' => $classes]);
-    exit; // AJAX Call එක මෙතැනින් අවසන් කරයි
+    exit;
 }
 
 // --- FORM SUBMIT: මුදල් ගෙවීම ඇතුළත් කිරීම ---
@@ -71,35 +68,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['action'])) {
     $month = date('F'); // වත්මන් මාසය
     $year = date('Y');  // වත්මන් වර්ෂය
 
-    // 1. Payments Table එකට ඇතුළත් කිරීම (Status = paid)
-    $stmt = $conn->prepare("INSERT INTO payments (student_id, class_id, month, year, amount, payment_status, method, payment_type, paid_date) VALUES (?, ?, ?, ?, ?, 'paid', 'Cash', 'Full', NOW())");
-    $stmt->bind_param("iisds", $student_id, $class_id, $month, $year, $amount);
+    if (!empty($student_id) && !empty($class_id)) {
+        // 1. Payments Table එකට ඇතුළත් කිරීම
+        $stmt = $conn->prepare("INSERT INTO payments (student_id, class_id, month, year, amount, payment_status, method, payment_type, paid_date) VALUES (?, ?, ?, ?, ?, 'paid', 'Cash', 'Full', NOW())");
+        $stmt->bind_param("iisds", $student_id, $class_id, $month, $year, $amount);
 
-    if ($stmt->execute()) {
-        // 2. Enroll කිරීම හෝ Active කිරීම
-        $check_enroll = $conn->query("SELECT * FROM enrollments WHERE student_id = $student_id AND class_id = $class_id");
+        if ($stmt->execute()) {
+            // 2. Enroll Table එක Update කිරීම
+            $check_enroll = $conn->query("SELECT * FROM enrollments WHERE student_id = $student_id AND class_id = $class_id");
 
-        if ($check_enroll->num_rows == 0) {
-            $enroll_sql = "INSERT INTO enrollments (student_id, class_id, status, joined_date, payment_method) VALUES (?, ?, 1, NOW(), 'Cash')";
-            $stmt2 = $conn->prepare($enroll_sql);
-            $stmt2->bind_param("ii", $student_id, $class_id);
-            $stmt2->execute();
+            if ($check_enroll->num_rows == 0) {
+                // අලුත් Enrollment එකක්
+                $enroll_sql = "INSERT INTO enrollments (student_id, class_id, status, joined_date, payment_method) VALUES (?, ?, 1, NOW(), 'Cash')";
+                $stmt2 = $conn->prepare($enroll_sql);
+                $stmt2->bind_param("ii", $student_id, $class_id);
+                $stmt2->execute();
+            } else {
+                // දැනටමත් ඉන්නවා නම් Active කිරීම
+                $conn->query("UPDATE enrollments SET status = 1 WHERE student_id = $student_id AND class_id = $class_id");
+            }
+
+            echo "<script>alert('Payment Added & Student Enrolled Successfully!'); window.location.href='payments.php';</script>";
         } else {
-            $conn->query("UPDATE enrollments SET status = 1 WHERE student_id = $student_id AND class_id = $class_id");
+            echo "<script>alert('Error adding payment: " . $stmt->error . "');</script>";
         }
-
-        echo "<script>alert('Payment Added & Student Enrolled Successfully!'); window.location.href='payments.php';</script>";
     } else {
-        echo "<script>alert('Error adding payment.');</script>";
+        echo "<script>alert('Please select Student and Class!');</script>";
     }
 }
 
-// --- INITIAL LOAD: පිටුව පූරණය වන විට ---
-// සිසුන් ලැයිස්තුව ලබා ගැනීම (Dropdown එකට) - Search කිරීම සඳහා ID සහ Name දෙකම ගන්නවා
-$students = $conn->query("SELECT student_id, full_name, reg_number FROM students ORDER BY reg_number ASC");
-
-// සියලුම පන්ති ලැයිස්තුව ලබා ගැනීම (මුලින්ම පෙන්වීමට)
-$all_classes = $conn->query("SELECT class_id, class_name, subject, fee FROM classes");
+// සිසුන් සහ පන්ති ලැයිස්තුව ලබා ගැනීම (Initial Load)
+$students = $conn->query("SELECT student_id, full_name, reg_number FROM students ORDER BY reg_number DESC");
+$all_classes = $conn->query("SELECT class_id, class_name, subject, fee, stream FROM classes WHERE status = 1");
 ?>
 
 <!DOCTYPE html>
@@ -136,8 +136,7 @@ $all_classes = $conn->query("SELECT class_id, class_name, subject, fee FROM clas
                 <form method="POST" action="">
 
                     <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Select Student (Search by ID or
-                            Name)</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Select Student</label>
                         <select name="student_id" id="student_id" class="w-full p-3 border rounded-lg" required>
                             <option value="">Search Student...</option>
                             <?php while ($st = $students->fetch_assoc()): ?>
@@ -152,19 +151,16 @@ $all_classes = $conn->query("SELECT class_id, class_name, subject, fee FROM clas
                         <label class="block text-gray-700 text-sm font-bold mb-2">Student Stream</label>
                         <input type="text" id="stream_display"
                             class="w-full p-3 border rounded-lg bg-gray-100 text-gray-600 font-bold" readonly
-                            placeholder="Select a student to see stream">
+                            placeholder="Select a student first">
                     </div>
 
                     <div class="mb-6">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Select Class</label>
                         <select name="class_id" id="class_id" class="w-full p-3 border rounded-lg bg-white" required>
                             <option value="">Select Class...</option>
-                            <?php
-                            // මුලින්ම සියලුම පන්ති Load කරයි
-                            while ($cl = $all_classes->fetch_assoc()):
-                                ?>
+                            <?php while ($cl = $all_classes->fetch_assoc()): ?>
                                 <option value="<?php echo $cl['class_id']; ?>" data-fee="<?php echo $cl['fee']; ?>">
-                                    <?php echo $cl['subject'] . " - " . $cl['class_name'] . " (Rs. " . $cl['fee'] . ")"; ?>
+                                    <?php echo $cl['subject'] . " - " . $cl['class_name'] . " (" . $cl['stream'] . ")"; ?>
                                 </option>
                             <?php endwhile; ?>
                         </select>
@@ -190,14 +186,14 @@ $all_classes = $conn->query("SELECT class_id, class_name, subject, fee FROM clas
 
     <script>
         $(document).ready(function () {
-            // Select2 Active කිරීම (Search පහසුකම සඳහා)
+            // Select2 Active කිරීම
             $('#student_id').select2({
-                placeholder: "Type Student ID (Ex: ST2025...) or Name",
+                placeholder: "Type Student ID or Name",
                 allowClear: true,
                 width: '100%'
             });
 
-            // Class එක වෙනස් කරන විට Fee එක Auto වැටීම
+            // Fee Auto Fill
             $('#class_id').on('change', function () {
                 var selectedFee = $(this).find(':selected').data('fee');
                 if (selectedFee) {
@@ -207,29 +203,28 @@ $all_classes = $conn->query("SELECT class_id, class_name, subject, fee FROM clas
                 }
             });
 
-            // ශිෂ්‍යයෙක් තෝරාගත් විට ක්‍රියාත්මක වන කොටස (AJAX)
+            // AJAX: Student තේරූ විට Stream සහ Classes Filter කිරීම
             $('#student_id').on('change', function () {
                 var studentID = $(this).val();
 
                 if (studentID) {
                     $.ajax({
-                        url: 'add_manual_payment.php', // මෙම ගොනුවටම request එක යවයි
+                        url: 'add_manual_payment.php',
                         type: 'POST',
                         data: { action: 'fetch_student_data', student_id: studentID },
                         dataType: 'json',
                         success: function (response) {
 
-                            // 1. Stream එක පෙන්වීම
-                            $('#stream_display').val(response.stream ? response.stream : 'No Stream Assigned');
+                            // Stream පෙන්වීම
+                            $('#stream_display').val(response.stream ? response.stream : 'No Stream');
 
-                            // 2. Classes Dropdown එක Update කිරීම (පෙර තිබූ පන්ති අයින් කර අලුත් ඒවා දමයි)
+                            // Classes Dropdown Update
                             var classDropdown = $('#class_id');
                             classDropdown.empty();
                             classDropdown.append('<option value="">Select Class...</option>');
 
                             if (response.classes.length > 0) {
                                 $.each(response.classes, function (key, cls) {
-                                    // Class Name + Subject + Fee පෙන්වීම
                                     var optionText = cls.subject + " - " + cls.class_name + " (Rs. " + cls.fee + ")";
                                     classDropdown.append('<option value="' + cls.class_id + '" data-fee="' + cls.fee + '">' + optionText + '</option>');
                                 });
@@ -237,16 +232,13 @@ $all_classes = $conn->query("SELECT class_id, class_name, subject, fee FROM clas
                                 classDropdown.append('<option value="">No classes found for this stream</option>');
                             }
 
-                            // Amount එක Clear කිරීම
                             $('#amount').val('');
                         },
                         error: function (xhr, status, error) {
                             console.error("AJAX Error:", error);
-                            // alert('Error fetching student data.'); // Error එකක් ආවොත් බලාගන්න මෙය Uncomment කරන්න
                         }
                     });
                 } else {
-                    // ශිෂ්‍යයෙක් නැත්නම්
                     $('#stream_display').val('');
                     $('#amount').val('');
                 }
