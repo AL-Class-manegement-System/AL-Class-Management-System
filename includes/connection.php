@@ -10,11 +10,12 @@
 //         die("Error " . mysqli_connect_error());
 //     }
 // ?>
+
 <?php
 $servername = "futuremindssite.site";
 $username = "futuremi"; 
 $password = "IQ4-ij.Sim33J2"; 
-$dbname = "nfuturemi_al_class_db"; 
+$dbname = "futuremi_al_class_db"; 
 
 $con = new mysqli($servername, $username, $password, $dbname);
 
