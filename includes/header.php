@@ -57,8 +57,8 @@
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Results</a>
                 <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium py-2">Teachers</a>
                 <hr class="border-gray-200">
-                <a href="#" class="text-indigo-600 font-medium py-2">LMS Login</a>
-                <a href="student_register.html" class="bg-indigo-600 text-white px-5 py-3 rounded-full font-medium shadow-md hover:bg-indigo-700 mx-auto w-full max-w-xs">Join 2026 Batch</a>
+                <a href="../log/login.php" class="text-indigo-600 font-medium py-2">LMS Login</a>
+                <a href="../log/registration.php" class="bg-indigo-600 text-white px-5 py-3 rounded-full font-medium shadow-md hover:bg-indigo-700 mx-auto w-full max-w-xs">Join 2026 Batch</a>
             </div>
         </div>
     </nav>
