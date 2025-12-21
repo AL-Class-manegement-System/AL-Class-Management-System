@@ -58,6 +58,7 @@ $status = 1;
     // ==========================================
 
     // Student Registration Number Auto Generate කිරීම
+    
     $current_year = date("Y");
     $prefix = "ST{$current_year}";
 
