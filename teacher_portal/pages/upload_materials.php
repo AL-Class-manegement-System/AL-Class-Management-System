@@ -41,7 +41,7 @@ $msg_type = "";
 // ---------------------------------------------------------
 if (isset($_GET['msg'])) {
     if ($_GET['msg'] == 'success') {
-        $message = "Material uploaded successfully! Sent for Admin Approval.";
+        $message = "Material uploaded successfully!";
         $msg_type = "green";
     } elseif ($_GET['msg'] == 'error_db') {
         $message = "Database Error occurred.";
@@ -86,8 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['upload_material'])) {
 
             if (move_uploaded_file($_FILES['material_file']['tmp_name'], $target_file)) {
                 
-                // Status = 0 (Pending Approval)
-                $sql = "INSERT INTO study_materials (title, class_id, file_path, uploaded_by, uploaded_on, status) VALUES (?, ?, ?, ?, NOW(), 0)";
+                // Status = 1 (Approved / Live immediately)
+                $sql = "INSERT INTO study_materials (title, class_id, file_path, uploaded_by, uploaded_on, status) VALUES (?, ?, ?, ?, NOW(), 1)";
                 
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("sisi", $title, $class_id, $db_path, $teacher_db_id);
@@ -119,13 +119,13 @@ include("../include/head.php");
 include("../include/sidebar.php");
 ?>
 
-<div class="p-4 sm:ml-64 pb-20">
+<div class="p-4 sm:ml-64 pt-20 pb-20">
     <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6">
         <h2 class="text-xl font-bold text-gray-800 mb-4">Upload Study Materials</h2>
 
         <?php if ($message): ?>
-            <div class="p-4 mb-4 text-sm rounded-lg flex items-center gap-2 <?php echo $msg_type == 'green' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' : 'bg-red-100 text-red-700 border border-red-200'; ?>">
-                <i class="fas <?php echo $msg_type == 'green' ? 'fa-clock' : 'fa-exclamation-circle'; ?>"></i>
+            <div class="p-4 mb-4 text-sm rounded-lg flex items-center gap-2 <?php echo $msg_type == 'green' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'; ?>">
+                <i class="fas <?php echo $msg_type == 'green' ? 'fa-check-circle' : 'fa-exclamation-circle'; ?>"></i>
                 <?php echo $message; ?>
             </div>
         <?php endif; ?>
@@ -159,7 +159,7 @@ include("../include/sidebar.php");
             </div>
             <button type="submit" name="upload_material"
                 class="mt-6 text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 transition flex items-center gap-2">
-                <i class="fas fa-cloud-upload-alt"></i> Upload & Request Approval
+                <i class="fas fa-cloud-upload-alt"></i> Upload Material
             </button>
         </form>
     </div>

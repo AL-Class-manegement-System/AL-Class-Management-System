@@ -18,8 +18,8 @@ $student_id = $_SESSION['student_id'];
 // ==========================================
 $enrolled_class_ids = [];
 
-// enrollment status = 1 (Active) Only
-$enroll_sql = "SELECT class_id FROM enrollments WHERE student_id = ? AND status = 1";
+// enrollment status check removed as column does not exist
+$enroll_sql = "SELECT class_id FROM enrollments WHERE student_id = ?";
 $enroll_stmt = $conn->prepare($enroll_sql);
 $enroll_stmt->bind_param("i", $student_id);
 $enroll_stmt->execute();
