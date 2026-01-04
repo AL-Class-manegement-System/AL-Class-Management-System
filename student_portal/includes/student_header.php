@@ -280,10 +280,10 @@ function getActiveClass($page_name, $current_page)
                                         class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
                                         <i class="far fa-user mr-3 w-4 text-gray-400"></i> Your Profile
                                     </a>
-                                    <a href="#"
+                                    <!-- <a href="#"
                                         class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">
                                         <i class="fas fa-cog mr-3 w-4 text-gray-400"></i> Settings
-                                    </a>
+                                    </a> -->
                                 </div>
 
                                 <div class="border-t border-gray-100 my-1"></div>

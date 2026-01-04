@@ -55,6 +55,12 @@
                <span class="ms-3">Upload Materials</span>
             </a>
          </li>
+         <li>
+            <a href="../pages/add_past_lesson.php" class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white group transition-colors">
+               <i class="ph ph-video text-xl text-gray-400 group-hover:text-white"></i>
+               <span class="ms-3">Add Past Lessons</span>
+            </a>
+         </li>
       </ul>
       <ul class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-700">
          <li>
