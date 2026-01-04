@@ -1,10 +1,10 @@
 <?php
 
-$merchant_id = "1225260";
+$merchant_id = "1231876";
 $order_id = uniqid();
 $amount = 4000;
 $currency = "LKR";
-$merchant_secret = "NzY0Nzg1Mjc0MTgzMTY4Mjg5MjE4ODcyNjMyMzYzMjA1MTcwOTY4";
+$merchant_secret = "MTUyNTg1MzQyNDIyMTc3MTE0ODIzMTIyNzU0NTg4Njk2NDEwMTYw";
 $item=array('jjjjj','kkjkkk');
 $hash = strtoupper(
     md5(
