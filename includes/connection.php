@@ -17,11 +17,11 @@ $username = "futuremi";
 $password = "IQ4-ij.Sim33J2"; 
 $dbname = "futuremi_al_class_db"; 
 
-$con = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-$con->set_charset("utf8mb4");
+$conn->set_charset("utf8mb4");
 
-if ($con->connect_error) {
-    die("Connection failed: " . $con->connect_error);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 ?>
