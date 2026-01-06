@@ -46,7 +46,8 @@ if (isset($_GET['msg'])) {
 }
 
 // Handle Form Submission
-if $_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_lesson']) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_lesson'])) {
+    
     $title = trim($_POST['title']);
     $class_id = intval($_POST['class_id']);
     $video_url = trim($_POST['video_url']);
